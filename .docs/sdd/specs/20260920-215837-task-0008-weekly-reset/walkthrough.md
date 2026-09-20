@@ -27,7 +27,7 @@ created: 2026-09-21
   usada por las dos ventanas. Antes ambas comprobaban el campo por truthy y un valor
   no numérico pintaba `NaN`. Fuera del scope original: entró tras la code-review, con
   el visto bueno del usuario (ver §3).
-- Commits: `4eadd11` (segmento semanal) y el del fix de `resets_at`.
+- Commits: `4eadd11` (segmento semanal), `9ee4d4a` (cierre) y `f16730a` (fix de `resets_at`).
 
 ## 2. Tiempo: estimado vs real
 
