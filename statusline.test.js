@@ -46,4 +46,31 @@ assert.ok(bar(0, 10).includes('38;2;60;60;60'), 'bloque vacío gris');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
+// Instalador: solo Windows (install.ps1 necesita pwsh). Instalación limpia y update sobre una ya hecha.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
+    const install = () => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir], { encoding: 'utf8' });
+    const cmd = path.join(dir, 'hooks', 'statusline.cmd');
+    try {
+        const fresh = install();
+        assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
+        assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');
+        assert.ok(fresh.stdout.includes(`"\\"${cmd.replace(/\\/g, '\\\\')}\\""`), 'bloque statusLine con la ruta escapada');
+        assert.ok(!fs.existsSync(path.join(dir, 'settings.json')), 'no crea settings.json');
+
+        const settings = JSON.stringify({ model: 'x', statusLine: { type: 'command', command: `"${cmd}"` } });
+        fs.writeFileSync(path.join(dir, 'settings.json'), settings);
+        fs.writeFileSync(path.join(dir, 'hooks', 'statusline.js'), '// versión vieja');
+        const update = install();
+        assert.strictEqual(update.stderr, '', 'update sin errores');
+        assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
+        assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
+        assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+}
+
 console.log('statusline.test.js OK');

@@ -9,8 +9,18 @@ foreach ($f in 'statusline.js', 'statusline.cmd', 'statusline.test.js') {
 }
 $cmd = Join-Path $hooks 'statusline.cmd'
 $settings = Join-Path $ConfigDir 'settings.json'
-$json = ($cmd -replace '\', '\\')
 Write-Host "Ficheros copiados en $hooks"
+
+# Update: si settings.json ya lanza este statusline no hay nada que pegar. Solo se lee, nunca se escribe.
+$current = $null
+try { $current = (Get-Content $settings -Raw -ErrorAction Stop | ConvertFrom-Json).statusLine.command } catch { }
+if ($current -and $current.IndexOf($cmd, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+    Write-Host "Actualizado: $settings ya apunta a $cmd"
+    return
+}
+
+# .Replace es literal; -replace interpreta el patrón como regex y una '\' suelta no es válida.
+$json = $cmd.Replace('\', '\\')
 Write-Host "Pon esto en $settings :"
 Write-Host @"
   "statusLine": {
