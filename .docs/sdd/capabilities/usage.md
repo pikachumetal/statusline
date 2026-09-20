@@ -26,13 +26,13 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 ### Ventana de 5h
 
-> Cobertura: con test, salvo la ausencia de `resets_at`.
+> Cobertura: con test.
 
 - GIVEN un JSON con `rate_limits.five_hour`
 - WHEN se pinta la L2
 - THEN se muestra `5h`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con la hora local de reset (`HH:MM`)
 - AND el tiempo transcurrido es 5 h menos lo que falta para `resets_at`, acotado entre 0 y 5 h
-- AND sin `resets_at` se muestran solo `5h`, la barra y el porcentaje
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo `5h`, la barra y el porcentaje
 - AND sin `rate_limits.five_hour` el segmento no aparece
 
 ### Ventana semanal
@@ -41,9 +41,20 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 - GIVEN un JSON con `rate_limits.seven_day`
 - WHEN se pinta la L2
-- THEN se muestra `7d`, una barra de 8 bloques y el porcentaje
-- AND no se muestra la hora de reset
+- THEN se muestra `7d`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con el tiempo que queda hasta `resets_at`
+- AND el tiempo transcurrido es 7 días menos lo que falta para `resets_at`, acotado entre 0 y 7 días
+- AND el tiempo que queda es lo que falta para `resets_at`, acotado a 0 por abajo
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo `7d`, la barra y el porcentaje
 - AND sin `rate_limits.seven_day` el segmento no aparece
+
+### Formato de duración larga
+
+> Cobertura: con test.
+
+- GIVEN una duración en milisegundos
+- WHEN se pinta el `⏳` o el `↻` de la ventana semanal
+- THEN a partir de 24 h se muestra en días y horas (`4d12h`), con las horas redondeadas hacia abajo
+- AND por debajo de 24 h se muestra en el formato corto ya existente (`4h16m` o `16m`)
 
 ### Coste
 
@@ -79,9 +90,10 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - **Dónde viven los datos**: no aplica. Todo llega en el JSON del stdin.
 - **Idioma de los nombres**: las etiquetas que se pintan (`5h`, `7d`) van en inglés.
 - **Límites**: barra del contexto de 10 bloques; barras de cuota de 8 bloques; porcentajes acotados entre 0 y 100.
-- **Avisos**: solo visuales: el icono del contexto y el color del porcentaje. Las ventanas de 5h y semanal no tienen icono de alerta (pendiente en `roadmap.md`).
+- **Avisos**: solo visuales: el icono del contexto y el color del porcentaje. Las ventanas de 5h y semanal no tienen icono de alerta (pendiente en `roadmap.md`). El `↻` de la ventana semanal es una cuenta atrás, no una hora local; el de la ventana de 5h sigue siendo la hora local.
 - **Regla ante conflicto**: no aplica. Cada dato tiene una sola fuente.
 
 ## Historial
 
+- 2026-09-21 — [0008](../specs/20260920-215837-task-0008-weekly-reset/walkthrough.md) — MODIFIED «Ventana semanal» (transcurrido y cuenta atrás hasta el reset), ADDED «Formato de duración larga», MODIFIED «Ventana de 5h» (un `resets_at` no numérico degrada como si no estuviera).
 - 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).
