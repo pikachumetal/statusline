@@ -39,6 +39,19 @@ const bareL2 = render(weekBare, env, NOW).split('\n')[1];
 assert.ok(bareL2.includes('38%'), 'semanal sin resets_at mantiene el porcentaje');
 assert.ok(!bareL2.includes('⏳'), 'semanal sin resets_at no pinta ⏳');
 assert.ok(!bareL2.includes('↻'), 'semanal sin resets_at no pinta ↻');
+
+// resets_at inválido degrada como si no estuviera: nunca se pinta NaN (constitution, regla 3).
+for (const bad of ['not-a-number', {}, NaN, null]) {
+    const l = render({ rate_limits: { five_hour: { used_percentage: 20, resets_at: bad }, seven_day: { used_percentage: 38, resets_at: bad } } }, env, NOW);
+    assert.ok(!l.includes('NaN'), `resets_at ${JSON.stringify(bad)} pinta NaN`);
+    assert.ok(!l.includes('⏳'), `resets_at ${JSON.stringify(bad)} pinta ⏳`);
+    assert.ok(!l.includes('↻'), `resets_at ${JSON.stringify(bad)} pinta ↻`);
+}
+
+// Reset ya vencido: las ventanas saturan, no se van a negativo.
+const expired = { ...fixture, rate_limits: { five_hour: { used_percentage: 34, resets_at: NOW / 1000 - 600 }, seven_day: { used_percentage: 38, resets_at: NOW / 1000 - 600 } } };
+const expiredL2 = render(expired, env, NOW).split('\n')[1];
+for (const s of ['5h ⏳ 5h00m', '↻', '7d ⏳ 7d00h', '↻0m']) assert.ok(expiredL2.replace(/\x1b\[[0-9;]*m/g, '').includes(s), `reset vencido falta ${s}`);
 assert.ok(!l1.includes('\uE0A0'), 'sin git no hay icono de branch');
 
 const gitEnv = { ...env, git: { repo: 'EasyClaw', branch: 'main', worktree: 'feat-x' } };

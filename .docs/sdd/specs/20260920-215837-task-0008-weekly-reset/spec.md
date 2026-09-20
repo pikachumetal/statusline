@@ -50,8 +50,12 @@ al reset. La semanal ya recibe `resets_at` en el JSON; solo no lo usa.
   que queda hasta el reset, ambos en formato días+horas.
 - Entra: helper de formato de duración con días.
 - No entra: el % de uso de Fable (sin fuente de datos, ver decisión 4).
-- No entra: cualquier cambio en la ventana de 5h, en el reloj de sesión o en el
-  icono de alerta de las cuotas (task 0005, aparte).
+- Entra *(ampliado el 2026-09-21, tras la code-review y con el visto bueno del
+  usuario)*: un `resets_at` no numérico degrada el segmento en vez de pintar `NaN`.
+  Afecta también a la ventana de 5h, donde el fallo era preexistente: la causa raíz
+  es la misma comprobación por truthy en los dos segmentos.
+- No entra: el `⏳` y el `↻` de la ventana de 5h en su forma actual, el reloj de
+  sesión y el icono de alerta de las cuotas (task 0005, aparte).
 
 ## Approach
 

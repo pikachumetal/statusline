@@ -24,6 +24,9 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
   `null` si no hay nada que pintar.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente
   degrada su segmento, no rompe el render.
+- **Un campo numérico del JSON se valida con `Number.isFinite` antes de operar
+  con él.** Comprobarlo por truthy deja pasar un string o un objeto y el segmento
+  acaba pintando `NaN`. Es el caso de `resets_at` en las dos ventanas de cuota.
 - **Exports:** solo `render` y `bar`, que son lo que usan los tests.
 
 ## Decisiones técnicas
