@@ -38,6 +38,8 @@ regla de forma explícita.
 - **En inglés:** código, variables de entorno propias, claves de configuración
   y el texto que pinta el statusline.
 - **En castellano:** `.docs/sdd/`, comentarios del código y commits.
+- **Nombres de fichero de `.docs/sdd/`:** en inglés kebab-case, incluidas las
+  capacidades (`capabilities/<capability>.md`). Solo el contenido va en castellano.
 - **README:** bilingüe (castellano e inglés). La forma concreta —un fichero con
   dos secciones o `README.md` más `README.en.md`— la decide la task que lo traduzca.
 
@@ -79,6 +81,10 @@ comportamiento vigente es el de arriba:
 
 El stdin de Claude Code manda. Si un dato viene en el JSON, se usa ese. `git`,
 las variables de entorno y los ficheros solo rellenan lo que el JSON no trae.
+
+Excepción: para el nombre del worktree manda `git`. El JSON trae el id interno
+de git (`.git/worktrees/<id>`), que es ilegible cuando el worktree se movió tras
+crearse. Se pinta el nombre de la carpeta del worktree.
 
 ## Git
 

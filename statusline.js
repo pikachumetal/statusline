@@ -83,13 +83,23 @@ function git(args, cwd) {
 // project_dir es donde arrancó Claude Code; current_dir sigue al cwd de la shell y baila.
 const projectDir = (data) => data.workspace?.project_dir || data.workspace?.current_dir || data.cwd || '';
 
+// Nombres legibles a partir de las rutas absolutas de git. En un worktree enlazado git-dir cuelga
+// de common-dir (.git/worktrees/<id>); ese <id> interno no es el nombre de la carpeta si el worktree
+// se movió tras crearse, y el JSON de Claude Code manda ese <id>. Por eso aquí manda git.
+function gitNames(top, commonDir, gitDir) {
+    const common = path.resolve(commonDir);
+    const repoRoot = path.basename(common) === '.git' ? path.dirname(common) : common;
+    const linked = path.resolve(gitDir) !== common;
+    return { repo: path.basename(repoRoot).replace(/\.git$/, ''), worktree: linked ? path.basename(top) : null };
+}
+
 function readGit(data) {
     const cwd = projectDir(data);
     if (!cwd) return null;
-    const top = git(['rev-parse', '--show-toplevel'], cwd);
-    if (!top) return null;
+    const paths = git(['rev-parse', '--path-format=absolute', '--show-toplevel', '--git-common-dir', '--git-dir'], cwd);
+    if (!paths) return null;
     const branch = git(['symbolic-ref', '--short', 'HEAD'], cwd) || git(['rev-parse', '--short', 'HEAD'], cwd) || '?';
-    return { repo: path.basename(top), branch, worktree: data.worktree?.name || data.workspace?.git_worktree || null };
+    return { ...gitNames(...paths.split(/\r?\n/)), branch };
 }
 
 // Mismo hardening que caveman-badge.js: sin symlinks, máx 64 bytes, whitelist.
@@ -208,5 +218,5 @@ function main() {
     process.stdout.write(render(data, readEnv(data)));
 }
 
-module.exports = { render, bar };
+module.exports = { render, bar, gitNames };
 if (require.main === module) main();

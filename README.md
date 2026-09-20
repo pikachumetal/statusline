@@ -20,6 +20,8 @@ EasyClaw  main 🌳 feat-x │ 🤖 Fable 5.1 (medium) │ 🗿 lite │ 🦥 fu
 
 Copia `hooks/statusline.{js,cmd,test.js}` y muestra el bloque `statusLine` para `settings.json`.
 
+Para actualizar, ejecuta el mismo comando sobre el mismo perfil: sobrescribe los ficheros y, si `settings.json` ya apunta al statusline, no pide pegar nada. Nunca modifica `settings.json`.
+
 ## Test
 
 ```

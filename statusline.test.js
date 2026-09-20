@@ -1,7 +1,7 @@
 'use strict';
 // Self-check del statusline: node hooks/statusline.test.js
 const assert = require('assert');
-const { render, bar } = require('./statusline.js');
+const { render, bar, gitNames } = require('./statusline.js');
 
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
@@ -30,12 +30,47 @@ const gitEnv = { ...env, git: { repo: 'EasyClaw', branch: 'main', worktree: 'fea
 const g1 = render(fixture, gitEnv, NOW).split('\n')[0];
 for (const s of ['EasyClaw', '\uE0A0 main', '🌳 feat-x', '+156', '-23']) assert.ok(g1.includes(s), `git falta ${s}`);
 
-const offEnv = { ...env, flags: { caveman: null, ponytail: null } };
+// Worktree movido tras crearse: el id interno de git (.git/worktrees/<id>) no es el nombre de la carpeta.
+const linked = gitNames('/code/.worktrees/proj/0006a', '/code/git/proj/.git', '/code/git/proj/.git/worktrees/52744-ad47b0e3');
+assert.deepStrictEqual(linked, { repo: 'proj', worktree: '0006a' }, 'worktree: repo principal + nombre de carpeta');
+const mainTree = gitNames('/code/git/proj', '/code/git/proj/.git', '/code/git/proj/.git');
+assert.deepStrictEqual(mainTree, { repo: 'proj', worktree: null }, 'árbol principal: sin worktree');
+const submodule = gitNames('/code/git/proj/sub', '/code/git/proj/.git/modules/sub', '/code/git/proj/.git/modules/sub');
+assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: no es un worktree');
+
+const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
 assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
 
 assert.strictEqual((bar(50, 10).match(/█/g) || []).length, 10, 'barra de 10 bloques');
 assert.ok(bar(0, 10).includes('38;2;60;60;60'), 'bloque vacío gris');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
+
+// Instalador: solo Windows (install.ps1 necesita pwsh). Instalación limpia y update sobre una ya hecha.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
+    const install = () => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir], { encoding: 'utf8' });
+    const cmd = path.join(dir, 'hooks', 'statusline.cmd');
+    try {
+        const fresh = install();
+        assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
+        assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');
+        assert.ok(fresh.stdout.includes(`"\\"${cmd.replace(/\\/g, '\\\\')}\\""`), 'bloque statusLine con la ruta escapada');
+        assert.ok(!fs.existsSync(path.join(dir, 'settings.json')), 'no crea settings.json');
+
+        const settings = JSON.stringify({ model: 'x', statusLine: { type: 'command', command: `"${cmd}"` } });
+        fs.writeFileSync(path.join(dir, 'settings.json'), settings);
+        fs.writeFileSync(path.join(dir, 'hooks', 'statusline.js'), '// versión vieja');
+        const update = install();
+        assert.strictEqual(update.stderr, '', 'update sin errores');
+        assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
+        assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
+        assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+}
 
 console.log('statusline.test.js OK');
