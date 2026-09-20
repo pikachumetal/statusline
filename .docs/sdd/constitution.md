@@ -108,6 +108,11 @@ crearse. Se pinta el nombre de la carpeta del worktree.
 
 - **Changelog:** solo técnico, en `.docs/sdd/changelog.md`. No hay changelog
   para cliente.
+- **Numeración:** propia, porque no hay gestor de tickets. Una sola secuencia de
+  cuatro dígitos (`0001`, `0002`…) compartida por tasks y patches. El id se asigna
+  en `roadmap.md` cuando el item entra en una release, y es el `<id>` de su carpeta
+  en `specs/` y de su rama (`feature/0001-<slug>`). Un id no se reutiliza. Los tres
+  registros anteriores a esta regla conservan `0000`.
 - **Tickets:** no hay gestor. La fuente de tasks es `roadmap.md`. Un issue de
   GitHub se triagea y acaba como entrada del roadmap con su referencia (`#N`).
 - **Datos y migraciones:** no aplican. El statusline no guarda estado propio.
