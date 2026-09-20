@@ -1,7 +1,7 @@
 'use strict';
 // Self-check del statusline: node hooks/statusline.test.js
 const assert = require('assert');
-const { render, bar } = require('./statusline.js');
+const { render, bar, gitNames } = require('./statusline.js');
 
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
@@ -30,7 +30,15 @@ const gitEnv = { ...env, git: { repo: 'EasyClaw', branch: 'main', worktree: 'fea
 const g1 = render(fixture, gitEnv, NOW).split('\n')[0];
 for (const s of ['EasyClaw', '\uE0A0 main', '🌳 feat-x', '+156', '-23']) assert.ok(g1.includes(s), `git falta ${s}`);
 
-const offEnv = { ...env, flags: { caveman: null, ponytail: null } };
+// Worktree movido tras crearse: el id interno de git (.git/worktrees/<id>) no es el nombre de la carpeta.
+const linked = gitNames('/code/.worktrees/proj/0006a', '/code/git/proj/.git', '/code/git/proj/.git/worktrees/52744-ad47b0e3');
+assert.deepStrictEqual(linked, { repo: 'proj', worktree: '0006a' }, 'worktree: repo principal + nombre de carpeta');
+const mainTree = gitNames('/code/git/proj', '/code/git/proj/.git', '/code/git/proj/.git');
+assert.deepStrictEqual(mainTree, { repo: 'proj', worktree: null }, 'árbol principal: sin worktree');
+const submodule = gitNames('/code/git/proj/sub', '/code/git/proj/.git/modules/sub', '/code/git/proj/.git/modules/sub');
+assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: no es un worktree');
+
+const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
 assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
 
 assert.strictEqual((bar(50, 10).match(/█/g) || []).length, 10, 'barra de 10 bloques');

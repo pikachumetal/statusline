@@ -82,6 +82,10 @@ comportamiento vigente es el de arriba:
 El stdin de Claude Code manda. Si un dato viene en el JSON, se usa ese. `git`,
 las variables de entorno y los ficheros solo rellenan lo que el JSON no trae.
 
+Excepción: para el nombre del worktree manda `git`. El JSON trae el id interno
+de git (`.git/worktrees/<id>`), que es ilegible cuando el worktree se movió tras
+crearse. Se pinta el nombre de la carpeta del worktree.
+
 ## Git
 
 - **`main`:** solo lo publicado. Cada publicación lleva su tag.
