@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **0008** — La ventana semanal pinta el tiempo transcurrido (`⏳ 4d13h`) y la cuenta atrás hasta el reset (`↻2d10h`), en días y horas. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
+
 ## [1.0.0] - 2026-09-20
 
 Primera release. Documenta lo hecho hasta la fecha.

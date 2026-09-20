@@ -3,7 +3,7 @@ id: 20260920-215837-task-0008-weekly-reset
 task: 0008
 title: Tiempo transcurrido y cuenta atrás de reset en la ventana semanal
 mode: lite
-status: implementing
+status: done
 created: 2026-09-20
 author: Àngel Delgado
 approvers:

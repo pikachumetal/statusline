@@ -24,7 +24,7 @@ cada fila es el `<id>` de su carpeta en `specs/`.
 | 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | Task | Pendiente |
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | Task | Pendiente |
 | 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | Task | Pendiente |
-| 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | Task | En curso |
+| 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | Task | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |
 
 Action items de proceso de la retro anterior, a comprobar al cerrar: A1 (commits
 con rutas explícitas, nunca `git add -A`) y A3 (una pregunta sin respuesta se
