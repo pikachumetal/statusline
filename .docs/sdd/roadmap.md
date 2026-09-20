@@ -6,6 +6,18 @@ El producto se queda como está (ver `mission.md`). Lo que sigue son módulos
 identificados sin compromiso de fecha ni de orden. La partición fina en tasks
 se hace cuando `capabilities/` madure.
 
+## Releases
+
+### v1.0.0 — 2026-09-20 (publicada)
+
+Primera release: la versión inicial del statusline (con walkthrough
+retroactivo), la init SDD con cinco capacidades y los patches `worktree-name` e `installer-update`. Sin pendientes
+vivos: todo su scope estaba hecho al abrirla.
+
+[release notes](releases/v1.0.0/release-notes.md) · [changelog](changelog.md) · [acta](releases/v1.0.0/feedback.md)
+
+smoke: 2026-09-20 · 1 hallazgo (el bug de `install.ps1`, corregido dentro de la release)
+
 ## Módulos identificados
 
 | Módulo | Qué es | Estado |

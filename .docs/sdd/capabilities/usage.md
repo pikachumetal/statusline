@@ -61,6 +61,7 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - GIVEN un porcentaje y un ancho en bloques
 - WHEN se pinta una barra
 - THEN la barra tiene siempre ese número de bloques `█`
+- AND el número de bloques rellenos es el porcentaje llevado al ancho y redondeado al bloque más cercano (un 47 % en 10 bloques rellena 5)
 - AND los bloques rellenos toman su color de su posición en la barra (verde, amarillo, rojo), no del valor
 - AND los bloques vacíos son grises
 - AND un porcentaje fuera de rango o no numérico se acota entre 0 y 100
