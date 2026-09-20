@@ -12,17 +12,18 @@ el usuario el 2026-09-20. Los módulos grandes quedan como candidatos a una
 
 Scope decidido por el usuario el 2026-09-20. Sin fecha y sin bloqueos. El orden
 es por riesgo primero y por coste-beneficio después. Las tasks se arrancan de
-una en una con `sdd-start-task`; los patches, con `sdd-start-patch`.
+una en una con `sdd-start-task`; los patches, con `sdd-start-patch`. El id de
+cada fila es el `<id>` de su carpeta en `specs/`.
 
-| # | Item | Origen | Carril | Estado |
+| Id | Item | Origen | Carril | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | `readGit` sin bloqueo de hasta 6 s, y presupuesto de tiempo total del render comprobado con un test | Deuda técnica + módulo «Presupuesto de tiempo» (regla 3) | Task | Pendiente |
-| 2 | Dar test a los 10 requisitos marcados «sin test» en `capabilities/` | Action item A2 del [acta de la v1.0.0](releases/v1.0.0/feedback.md) + deuda técnica | Task | Pendiente |
-| 3 | Con stdin inválido la L1 no empieza con un segmento vacío | Deuda técnica | Patch | Pendiente |
-| 4 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica | Patch | Pendiente |
-| 5 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | Task | Pendiente |
-| 6 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | Task | Pendiente |
-| 7 | README bilingüe | Módulo «README bilingüe» (regla 2) | Task | Pendiente |
+| 0001 | `readGit` sin bloqueo de hasta 6 s, y presupuesto de tiempo total del render comprobado con un test | Deuda técnica + módulo «Presupuesto de tiempo» (regla 3) | Task | Pendiente |
+| 0002 | Dar test a los 10 requisitos marcados «sin test» en `capabilities/` | Action item A2 del [acta de la v1.0.0](releases/v1.0.0/feedback.md) + deuda técnica | Task | Pendiente |
+| 0003 | Con stdin inválido la L1 no empieza con un segmento vacío | Deuda técnica | Patch | Pendiente |
+| 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica | Patch | Pendiente |
+| 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | Task | Pendiente |
+| 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | Task | Pendiente |
+| 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | Task | Pendiente |
 
 Action items de proceso de la retro anterior, a comprobar al cerrar: A1 (commits
 con rutas explícitas, nunca `git add -A`) y A3 (una pregunta sin respuesta se
@@ -47,10 +48,10 @@ smoke: 2026-09-20 · 1 hallazgo (el bug de `install.ps1`, corregido dentro de la
 
 | Módulo | Qué es | Estado |
 | --- | --- | --- |
-| Avisos de cuota | Icono de alerta en las ventanas de 5h y semanal, como el del contexto. El color del porcentaje ya existe. | En `v1.1.0` (item 5) |
-| Errores visibles | Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo sin avisar. | En `v1.1.0` (item 6) |
-| Presupuesto de tiempo | Tope de tiempo total del render, comprobado con un test. Sin cifra todavía. | En `v1.1.0` (item 1) |
-| README bilingüe | Castellano e inglés. La forma (un fichero o dos) la decide su task. | En `v1.1.0` (item 7) |
+| Avisos de cuota | Icono de alerta en las ventanas de 5h y semanal, como el del contexto. El color del porcentaje ya existe. | En `v1.1.0` (0005) |
+| Errores visibles | Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo sin avisar. | En `v1.1.0` (0006) |
+| Presupuesto de tiempo | Tope de tiempo total del render, comprobado con un test. Sin cifra todavía. | En `v1.1.0` (0001) |
+| README bilingüe | Castellano e inglés. La forma (un fichero o dos) la decide su task. | En `v1.1.0` (0007) |
 | Configurabilidad | Elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Candidato a `v2.0.0` |
 | Segmentos nuevos | Sin lista concreta todavía. | Candidato a `v2.0.0` |
 | Lanzador para macOS y Linux | Hoy se configura a mano. | Candidato a `v2.0.0` |
@@ -59,10 +60,10 @@ smoke: 2026-09-20 · 1 hallazgo (el bug de `install.ps1`, corregido dentro de la
 
 | Deuda | Impacto | Vía de mejora | Release |
 | --- | --- | --- | --- |
-| `readGit` hace hasta 3 llamadas a `git`, cada una con 2 s de timeout | 6 s de bloqueo en el peor caso, en cada refresco | Una sola llamada a `git` que devuelva todo, o un timeout global. Es lo que acota el módulo «Presupuesto de tiempo». | `v1.1.0` (item 1) |
-| Requisitos sin test: stdin inválido, perfil, detached HEAD, valor y hardening de flags, precedencia de `project_dir`, color del porcentaje, y `statusline.cmd` (`install.ps1` tiene test desde el patch `installer-update`) | Un cambio puede romperlos sin que `node statusline.test.js` lo detecte. Cada capacidad marca su cobertura. | Tests de `readEnv` con un directorio temporal como perfil; para el instalador, un test de PowerShell o una comprobación manual documentada. | `v1.1.0` (item 2) |
-| Con stdin inválido la L1 empieza con un segmento de ubicación vacío (` │ 🤖 ?`) | Cosmético | Omitir el segmento de ubicación si no hay directorio de proyecto. | `v1.1.0` (item 3) |
-| `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Ordenar por versión, o respetar la versión fijada por proto. | `v1.1.0` (item 4) |
+| `readGit` hace hasta 3 llamadas a `git`, cada una con 2 s de timeout | 6 s de bloqueo en el peor caso, en cada refresco | Una sola llamada a `git` que devuelva todo, o un timeout global. Es lo que acota el módulo «Presupuesto de tiempo». | `v1.1.0` (0001) |
+| Requisitos sin test: stdin inválido, perfil, detached HEAD, valor y hardening de flags, precedencia de `project_dir`, color del porcentaje, y `statusline.cmd` (`install.ps1` tiene test desde el patch `installer-update`) | Un cambio puede romperlos sin que `node statusline.test.js` lo detecte. Cada capacidad marca su cobertura. | Tests de `readEnv` con un directorio temporal como perfil; para el instalador, un test de PowerShell o una comprobación manual documentada. | `v1.1.0` (0002) |
+| Con stdin inválido la L1 empieza con un segmento de ubicación vacío (` │ 🤖 ?`) | Cosmético | Omitir el segmento de ubicación si no hay directorio de proyecto. | `v1.1.0` (0003) |
+| `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Ordenar por versión, o respetar la versión fijada por proto. | `v1.1.0` (0004) |
 
 ## Issues de GitHub
 
