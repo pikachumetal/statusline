@@ -24,6 +24,7 @@ cada fila es el `<id>` de su carpeta en `specs/`.
 | 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | Task | Pendiente |
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | Task | Pendiente |
 | 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | Task | Pendiente |
+| 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | Task | En curso |
 
 Action items de proceso de la retro anterior, a comprobar al cerrar: A1 (commits
 con rutas explícitas, nunca `git add -A`) y A3 (una pregunta sin respuesta se
@@ -55,6 +56,7 @@ smoke: 2026-09-20 · 1 hallazgo (el bug de `install.ps1`, corregido dentro de la
 | Configurabilidad | Elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Candidato a `v2.0.0` |
 | Segmentos nuevos | Sin lista concreta todavía. | Candidato a `v2.0.0` |
 | Lanzador para macOS y Linux | Hoy se configura a mano. | Candidato a `v2.0.0` |
+| % de uso de Fable en la ventana semanal | Porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. | Bloqueado (revisar si una versión futura proyecta `model_scoped`) |
 
 ## Deuda técnica
 

@@ -24,6 +24,21 @@ for (const s of ['.claude', '+156', '-23', 'Fable 5.1', '(medium)', '🗿 lite',
 const noChanges = { ...fixture, cost: { ...fixture.cost, total_lines_added: 0, total_lines_removed: 0 } };
 assert.ok(!render(noChanges, env, NOW).includes('+0'), 'velocity oculta sin cambios');
 for (const s of ['⏱️ 12m', '🟡', '47%', '5h', '⏳ 1h23m', '34%', '↻', '7d', '38%', '$0.47']) assert.ok(l2.includes(s), `L2 falta ${s}`);
+
+// Ventana semanal: transcurrido de la ventana y cuenta atrás hasta el reset, en días.
+for (const s of ['⏳ 6d00h', '↻1d00h']) assert.ok(l2.includes(s), `semanal falta ${s}`);
+
+// Por debajo de 24 h la duración cae al formato corto; el transcurrido sigue en días.
+const weekSoon = { ...fixture, rate_limits: { seven_day: { used_percentage: 38, resets_at: NOW / 1000 + 2 * 3600 } } };
+const soonL2 = render(weekSoon, env, NOW).split('\n')[1];
+for (const s of ['⏳ 6d22h', '↻2h00m']) assert.ok(soonL2.includes(s), `semanal corto falta ${s}`);
+
+// Sin resets_at el semanal degrada: solo 7d, barra y porcentaje.
+const weekBare = { ...fixture, rate_limits: { seven_day: { used_percentage: 38 } } };
+const bareL2 = render(weekBare, env, NOW).split('\n')[1];
+assert.ok(bareL2.includes('38%'), 'semanal sin resets_at mantiene el porcentaje');
+assert.ok(!bareL2.includes('⏳'), 'semanal sin resets_at no pinta ⏳');
+assert.ok(!bareL2.includes('↻'), 'semanal sin resets_at no pinta ↻');
 assert.ok(!l1.includes('\uE0A0'), 'sin git no hay icono de branch');
 
 const gitEnv = { ...env, git: { repo: 'EasyClaw', branch: 'main', worktree: 'feat-x' } };

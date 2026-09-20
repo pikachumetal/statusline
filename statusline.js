@@ -25,6 +25,7 @@ const BRANCH_ICON = '';
 const CONTEXT_WIDTH = 10;
 const USAGE_WIDTH = 8;
 const FIVE_HOURS_MS = 5 * 3600 * 1000;
+const SEVEN_DAYS_MS = 7 * 24 * 3600 * 1000;
 
 // ---------- barras ----------
 const clamp = (n) => Math.max(0, Math.min(100, Number(n) || 0));
@@ -64,6 +65,13 @@ function fmtDuration(ms) {
     const mins = Math.max(0, Math.round(ms / 60000));
     const h = Math.floor(mins / 60), m = mins % 60;
     return h > 0 ? `${h}h${String(m).padStart(2, '0')}m` : `${m}m`;
+}
+
+// Duraciones de varios días (ventana semanal): en horas solas serían ilegibles.
+function fmtSpan(ms) {
+    const hours = Math.floor(Math.max(0, ms) / 3600000);
+    if (hours < 24) return fmtDuration(ms);
+    return `${Math.floor(hours / 24)}d${String(hours % 24).padStart(2, '0')}h`;
 }
 
 function fmtClock(epochSeconds) {
@@ -190,6 +198,17 @@ function renderFiveHour(five, now) {
     return s;
 }
 
+// El ↻ del semanal es una cuenta atrás: la hora sola no dice de qué día es.
+function renderSevenDay(week, now) {
+    const pct = clamp(week.used_percentage);
+    const left = week.resets_at ? Math.max(0, week.resets_at * 1000 - now) : null;
+    let s = `${C.dim}7d${RESET}`;
+    if (left !== null) s += ` ⏳ ${fmtSpan(Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left))}`;
+    s += ` ${bar(pct, USAGE_WIDTH)} ${pctText(pct)}`;
+    if (left !== null) s += ` ${C.dim}↻${fmtSpan(left)}${RESET}`;
+    return s;
+}
+
 function renderLine2(data, now) {
     const parts = [`⏱️ ${fmtDuration(data.cost?.total_duration_ms || 0)}`];
 
@@ -198,11 +217,7 @@ function renderLine2(data, now) {
 
     if (data.rate_limits?.five_hour) parts.push(renderFiveHour(data.rate_limits.five_hour, now));
 
-    const week = data.rate_limits?.seven_day;
-    if (week) {
-        const pct = clamp(week.used_percentage);
-        parts.push(`${C.dim}7d${RESET} ${bar(pct, USAGE_WIDTH)} ${pctText(pct)}`);
-    }
+    if (data.rate_limits?.seven_day) parts.push(renderSevenDay(data.rate_limits.seven_day, now));
 
     parts.push(`${C.dim}💰 $${(data.cost?.total_cost_usd || 0).toFixed(2)}${RESET}`);
     return parts.join(SEP);
