@@ -67,7 +67,7 @@ shell y cambia durante la sesión.
 - **Idioma de los nombres**: no aplica.
 - **Límites**: 64 bytes por fichero flag; 2000 ms por llamada a `git`.
 - **Avisos**: ninguno. Una fuente que falla se trata como dato ausente.
-- **Regla ante conflicto**: el stdin manda; `git`, el entorno y los ficheros solo rellenan lo que el JSON no trae.
+- **Regla ante conflicto**: el stdin manda; `git`, el entorno y los ficheros solo rellenan lo que el JSON no trae. Excepción: el nombre del worktree sale de `git` (ver `session-state.md`).
 
 ## Historial
 

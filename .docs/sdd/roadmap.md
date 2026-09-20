@@ -36,3 +36,4 @@ técnica», con su referencia (`#N`). Los issues no sustituyen a este roadmap.
 
 | Fecha | Patch | Rama | Carpeta |
 | --- | --- | --- | --- |
+| 2026-09-20 | 0000 — el worktree se pinta con el id interno de git | `chore/worktree-name` | `20260920-160436-patch-0000-worktree-name` |

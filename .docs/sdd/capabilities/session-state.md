@@ -21,8 +21,10 @@ perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 - GIVEN un directorio de proyecto dentro de un repo git
 - WHEN se pinta la L1
-- THEN se muestra el nombre del repo (el directorio raíz del repo), el icono de branch y el nombre del branch
-- AND si el JSON trae worktree (`worktree.name`, o si falta, `workspace.git_worktree`), se añade `🌳 <worktree>`
+- THEN se muestra el nombre del repo principal (la carpeta que contiene el `.git` común), el icono de branch y el nombre del branch
+- AND si el directorio está en un worktree enlazado, se añade `🌳` y el nombre de la carpeta del worktree
+- AND dentro de un worktree enlazado el repo sigue siendo el principal, no la carpeta del worktree
+- AND el nombre del worktree sale de `git`, no del JSON: el JSON trae el id interno de git (`.git/worktrees/<id>`), que es ilegible si el worktree se movió tras crearse
 
 ### Ubicación en detached HEAD
 
@@ -96,4 +98,5 @@ Velocity sale del JSON de la sesión, no de `git`.
 
 ## Historial
 
+- 2026-09-20 — patch 0000 (`worktree-name`) — MODIFIED Ubicación con git (antes: el worktree se tomaba del JSON y el repo era la carpeta raíz del árbol de trabajo).
 - 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).

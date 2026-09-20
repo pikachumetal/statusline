@@ -6,7 +6,7 @@ type: patch
 status: done
 created: 2026-09-20
 branch: chore/worktree-name
-commit: <pendiente>
+commit: b2127ff
 ---
 
 # Patch 0000 — el worktree se pinta con el id interno de git
