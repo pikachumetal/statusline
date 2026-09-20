@@ -6,7 +6,7 @@ type: patch
 status: done
 created: 2026-09-20
 branch: chore/installer-update
-commit: <pendiente>
+commit: 345c8fd
 ---
 
 # Patch 0000 — install.ps1 falla al escapar la ruta y no distingue un update

@@ -7,7 +7,7 @@ Windows tiene instalador y lanzador.
 
 ### Copia de ficheros al perfil
 
-> Cobertura: sin test.
+> Cobertura: con test (solo en Windows).
 
 - GIVEN el repo clonado en una máquina Windows con PowerShell 7+
 - WHEN se ejecuta `.\install.ps1`, con o sin `-ConfigDir <perfil>`
@@ -17,12 +17,23 @@ Windows tiene instalador y lanzador.
 
 ### El instalador no toca settings.json
 
-> Cobertura: sin test.
+> Cobertura: con test (solo en Windows).
 
 - GIVEN una instalación en un perfil
 - WHEN `install.ps1` termina
 - THEN muestra por pantalla el bloque `statusLine` que hay que pegar en `<perfil>\settings.json`, con la ruta del `.cmd` ya escapada, `padding: 0` y `refreshInterval: 10`
 - AND no crea ni modifica `settings.json`
+
+### Update sobre una instalación existente
+
+> Cobertura: con test (solo en Windows).
+
+- GIVEN un perfil donde el statusline ya está instalado y `settings.json` tiene un `statusLine.command` que apunta al `statusline.cmd` de ese perfil
+- WHEN se ejecuta otra vez `.\install.ps1` sobre ese perfil
+- THEN los ficheros de `hooks` se sobrescriben con los del repo
+- AND el instalador informa de que el perfil está actualizado y no muestra el bloque para pegar
+- AND `settings.json` se lee pero no se modifica
+- AND si `settings.json` no existe, no se puede leer o apunta a otro comando, se muestra el bloque como en una instalación limpia
 
 ### Lanzador
 
@@ -47,4 +58,5 @@ una línea NDJSON en stdout que ensuciaría el statusline.
 
 ## Historial
 
+- 2026-09-20 — patch 0000 (`installer-update`) — ADDED Update sobre una instalación existente. Los dos requisitos de `install.ps1` pasan a tener test.
 - 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).
