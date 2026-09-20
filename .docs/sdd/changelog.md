@@ -8,9 +8,9 @@ Primera release. Documenta lo hecho hasta la fecha.
 
 ### Added
 
-- Statusline de dos líneas para Claude Code. L1: perfil, repo, branch, worktree, modelo y effort, modos caveman y ponytail, velocity. L2: reloj de sesión, contexto, ventana de 5h, ventana semanal y coste, con barras de gradiente truecolor.
+- Statusline de dos líneas para Claude Code. L1: perfil, repo, branch, worktree, modelo y effort, modos caveman y ponytail, velocity. L2: reloj de sesión, contexto, ventana de 5h, ventana semanal y coste, con barras de gradiente truecolor. ([walkthrough retroactivo](specs/20260917-180410-task-0000-initial-version/walkthrough.md))
 - Instalador para Windows (`install.ps1`) con soporte de varios perfiles (`-ConfigDir`) y lanzador `statusline.cmd`.
-- Documentación de anclaje SDD en `.docs/sdd/` y cuatro capacidades: `input`, `session-state`, `usage` e `installation`.
+- Documentación de anclaje SDD en `.docs/sdd/` y cinco capacidades: `input`, `session-state`, `usage`, `installation` y `output`.
 
 ### Fixed
 

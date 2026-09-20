@@ -10,8 +10,8 @@ se hace cuando `capabilities/` madure.
 
 ### v1.0.0 — 2026-09-20 (publicada)
 
-Primera release: la versión inicial del statusline, la init SDD con cuatro
-capacidades y los patches `worktree-name` e `installer-update`. Sin pendientes
+Primera release: la versión inicial del statusline (con walkthrough
+retroactivo), la init SDD con cinco capacidades y los patches `worktree-name` e `installer-update`. Sin pendientes
 vivos: todo su scope estaba hecho al abrirla.
 
 [release notes](releases/v1.0.0/release-notes.md) · [changelog](changelog.md) · [acta](releases/v1.0.0/feedback.md)
