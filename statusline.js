@@ -224,12 +224,23 @@ function renderSevenDay(week, now) {
     const pct = clamp(week.used_percentage);
     const reset = resetMs(week.resets_at);
     const left = reset === null ? null : Math.max(0, reset - now);
-    const elapsed = left === null ? null : Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left);
+    const elapsed = left === null ? null : Math.max(0, Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left));
     let s = `${C.dim}7d${RESET}`;
     if (elapsed !== null) s += ` ⏳ ${fmtSpan(elapsed)}`;
     s += ` ${bar(pct, USAGE_WIDTH, elapsed === null ? null : elapsed / SEVEN_DAYS_MS * 100)} ${pctText(pct)}`;
     if (left !== null) s += ` ${C.dim}↻${fmtSpan(left)}${RESET}`;
     return s;
+}
+
+// Por debajo de 5 minutos el ritmo se dispara con la primera respuesta y no informa.
+const MIN_RATE_MS = 5 * 60000;
+
+function renderCost(cost) {
+    const usd = Number.isFinite(cost?.total_cost_usd) ? cost.total_cost_usd : 0;
+    const ms = cost?.total_duration_ms;
+    let s = `💰 $${usd.toFixed(2)}`;
+    if (Number.isFinite(ms) && ms >= MIN_RATE_MS && usd > 0) s += ` · $${(usd / (ms / 3600000)).toFixed(2)}/h`;
+    return `${C.dim}${s}${RESET}`;
 }
 
 function renderLine2(data, now) {
@@ -242,7 +253,7 @@ function renderLine2(data, now) {
 
     if (data.rate_limits?.seven_day) parts.push(renderSevenDay(data.rate_limits.seven_day, now));
 
-    parts.push(`${C.dim}💰 $${(data.cost?.total_cost_usd || 0).toFixed(2)}${RESET}`);
+    parts.push(renderCost(data.cost));
     return parts.join(SEP);
 }
 
