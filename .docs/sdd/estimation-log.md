@@ -7,19 +7,21 @@
 | 2026-09-20 | 0000 | patch | — | 0.3 | — | — | — | — | — | 20260920-161940-patch-0000-installer-update |
 | 2026-09-21 | 0008 | infra/tooling | 1 | 0.8 | 0.8 | — | — | — | — | 20260920-215837-task-0008-weekly-reset |
 | 2026-10-04 | 0009 | patch | — | 0.5 | — | — | — | — | — | 20261004-113838-patch-0009-orca-wrapper |
+| 2026-10-04 | 0010 | frontend | 0.3 | 0.15 | 0.5 | 4076k | 99k | no aplica | sin precio | 20261004-141040-feature-0010-sub-block-bars |
 
-**Factor de calibración** (ratio mediano real/estimado, 1 artefacto): **0.8** · media 0.8
+**Factor de calibración** (ratio mediano real/estimado, 2 artefactos): **0.65** · media 0.65
 
 - n insuficiente (hacen falta 5)
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
+| frontend | 1 | 0.5 | — |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 2 | 1.3 | 0.8 | — | — |
+| sin publicar | 3 | 1.45 | 0.65 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.

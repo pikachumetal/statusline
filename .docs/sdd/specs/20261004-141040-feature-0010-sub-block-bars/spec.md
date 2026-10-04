@@ -4,7 +4,7 @@ feature: 0010
 title: Barras con sub-bloques
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:
