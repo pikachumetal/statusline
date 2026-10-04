@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-05
+
 ### Added
 
 - **0009** — Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), `install.ps1` copia y propone el wrapper `statusline-orca.cmd`, que pinta el statusline y reenvía el mismo JSON a Orca para que lea `rate_limits`. La integración entró sin registro SDD en `252c34c`; el patch la documenta. → [ref](specs/20261004-113838-patch-0009-orca-wrapper/)

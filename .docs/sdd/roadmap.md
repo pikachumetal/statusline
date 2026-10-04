@@ -5,32 +5,13 @@
 | # | Ítem | Estado |
 | --- | --- | --- |
 
-## Release 1.1.0
-
-en preparación
-
-| id | Feature | Origen | Ficheros que toca | Estado |
-| --- | --- | --- | --- | --- |
-| 0001 | `readGit` sin bloqueo de hasta 6 s, y presupuesto de tiempo total del render comprobado con un test | Deuda técnica + módulo «Presupuesto de tiempo» (regla 3) | `statusline.js` (`readGit`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-152728-feature-0001-git-time-budget/walkthrough.md)) |
-| 0002 | Dar test a los 10 requisitos marcados «sin test» en `capabilities/` | Action item A2 del [acta de la v1.0.0](releases/v1.0.0/feedback.md) + deuda técnica | `statusline.test.js` | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-214415-feature-0002-untested-requirements/walkthrough.md)) |
-| 0003 | Con stdin inválido la L1 no empieza con un segmento vacío | Deuda técnica · patch | `statusline.js` (render de la L1) | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-175801-patch-0003-empty-location/patch.md)) |
-| 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica · patch | `statusline.cmd` | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-182241-patch-0004-node-semver/patch.md)) |
-| 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | `statusline.js` (render de las ventanas) | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-185434-feature-0005-quota-alert-icon/walkthrough.md)) |
-| 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | `statusline.js` (`render`) | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-203701-feature-0006-failed-segment-mark/walkthrough.md)) |
-| 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | `README.md` | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-220000-feature-0007-bilingual-readme/walkthrough.md)) |
-| 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | `statusline.js`, `statusline.test.js` | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |
-| 0009 | Wrapper de Orca (`statusline-orca.cmd`): registro SDD de la integración de `252c34c`, test del instalador independiente de la máquina y excepción a la regla 1 | Petición del usuario el 2026-10-04 · patch | `install.ps1`, `statusline-orca.cmd`, `statusline.test.js` | ✅ 2026-10-04 ([patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md)) |
-
 ## Release 2.0.0
 
 en preparación
 
 | id | Feature | Origen | Ficheros que toca | Estado |
 | --- | --- | --- | --- | --- |
-| 0010 | Barras con sub-bloques (`▏▎▍▌▋▊▉█`): 8 veces más resolución con el mismo ancho | Petición del usuario el 2026-10-04 | `statusline.js` (`bar`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 ([walkthrough](specs/20261004-141040-feature-0010-sub-block-bars/walkthrough.md)) |
-| 0011 | Marcador de ritmo en las barras de 5h y 7d: dónde estarías si gastaras uniforme hasta el reset, desde `used_percentage` y `resets_at` · tras 0010 | Petición del usuario el 2026-10-04 | `statusline.js` (`bar`, render de las ventanas), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 ([walkthrough](specs/20261004-143157-feature-0011-pace-marker/walkthrough.md)) |
 | 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | ⏳ |
-| 0013 | Coste por hora (`$/h`) junto al coste, desde `total_cost_usd` y `total_duration_ms` | Petición del usuario el 2026-10-04 | `statusline.js` (render del coste), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 ([walkthrough](specs/20261004-151215-feature-0013-cost-per-hour/walkthrough.md)) |
 
 ## Backlog
 
@@ -45,32 +26,23 @@ en preparación
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
-| **[Feature 0001, 2026-10-04: saldada — [walkthrough](specs/20261004-152728-feature-0001-git-time-budget/walkthrough.md)]** `readGit` hace hasta 3 llamadas a `git`, cada una con 2 s de timeout | 6 s de bloqueo en el peor caso, en cada refresco | Actuar: una sola llamada a `git` que devuelva todo, o un timeout global. Es lo que acota el módulo «Presupuesto de tiempo». Feature 0001 |
-| **[Feature 0002, 2026-10-04: saldada — [walkthrough](specs/20261004-214415-feature-0002-untested-requirements/walkthrough.md)]** Requisitos sin test: stdin inválido, perfil, detached HEAD, valor y hardening de flags, precedencia de `project_dir`, color del porcentaje, y `statusline.cmd` (`install.ps1` tiene test desde el patch `installer-update`) | Un cambio puede romperlos sin que `node statusline.test.js` lo detecte. Cada capacidad marca su cobertura. | Actuar: tests de `readEnv` con un directorio temporal como perfil; para el instalador, un test de PowerShell o una comprobación manual documentada. Feature 0002 |
-| **[Patch 0003, 2026-10-04: saldada — [patch](specs/20261004-175801-patch-0003-empty-location/patch.md)]** Con stdin inválido la L1 empieza con un segmento de ubicación vacío (` │ 🤖 ?`) | Cosmético | Actuar: omitir el segmento de ubicación si no hay directorio de proyecto. Patch 0003 |
-| **[Feature 0011, 2026-10-04: saldada — [walkthrough](specs/20261004-143157-feature-0011-pace-marker/walkthrough.md)]** Tests de `bar` sin assert del color por posición del sub-bloque ni del `RESET` tras el fondo gris; solo se prueban los restos 1 y 6 (Minor de la revisión final de la 0010) | Un error de índice en los restos 2-5 o 7 pasaría los tests | Actuar: un bucle con los 7 restos y un assert del color en `bar(34, 8)`; con la 0011, que toca `bar` |
-| **[Feature 0013, 2026-10-04: saldada — [walkthrough](specs/20261004-151215-feature-0013-cost-per-hour/walkthrough.md)]** Tests del marcador de ritmo solo a nivel de `bar`: sin assert de render del reset vencido semanal, de `resets_at` no numérico en las dos ventanas ni del contexto sin `┃`; `elapsed` semanal sin cota inferior en la variable; `ESC_BG_GRAY` repite `GRAY_BG` en el test (Minor de la revisión final de la 0011) | Bajo: sin efecto visible hoy; un cambio en las ventanas podría romper el marcador sin que fallen los tests | Actuar: asserts de render y `Math.max(0, …)` en `renderSevenDay`; con la 0013, que toca la L2 |
-| **[Patch 0017, 2026-10-04: saldada — [patch](specs/20261004-215710-patch-0017-suffix-c1/patch.md)]** El saneado de `.caveman-statusline-suffix` deja pasar `DEL` (`0x7F`) y los C1 (`0x80`–`0x9F`, entre ellos `0x9B`, CSI de un byte): incumple «un fichero externo no puede inyectar secuencias ANSI» (`input`, «Saneado del sufijo de ahorro»). Visto en la 0002 | Medio: un sufijo manipulado podría colar una secuencia en terminales que interpretan C1 | Actuar: ampliar el filtro a `[\x00-\x1f\x7f-\x9f]` con su test; patch |
 | Tests pendientes tras la 0002: colores atenuados del resto de fragmentos (perfil, effort, sufijo, `5h`/`7d`, reset, coste) y velocity verde/rojo; el `cwd` que recibe `git` según la precedencia; el wrapper de Orca descartando la salida del hook y sin hook (Minor #5, #9, #10 de la revisión final de la 0002) | Bajo: esos detalles pueden romperse sin que falle la suite | Actuar: asserts en los bloques de la 0002; patch |
 | El `↻` semanal pinta `24h00m` cuando faltan algo menos de 24 h: `fmtDuration` redondea los minutos a 1440 y no pasa al formato en días | Cosmético: `24h00m` en vez de `1d00h` durante unos segundos | Actuar: redondear antes de elegir el formato largo o corto; patch |
-| **[Patch 0016, 2026-10-04: saldada — [patch](specs/20261004-204410-patch-0016-json-garbage/patch.md)]** El reloj de sesión pinta `⏱️ NaNm` con un `total_duration_ms` no numérico (`InfinityhNaNm` con `Infinity`): `renderLine2` usa `\|\| 0` en vez de `Number.isFinite`. Además, un coste negativo pinta `$-1.00` (Important y Minor de la revisión final de la 0013), y con tipos inesperados velocity pinta `+[object Object]` y la 5h `↻NaN:NaN` (revisión final de la 0006) | Bajo: Claude Code manda un número; ensucia la L2 si no | Actuar: `Number.isFinite` en el reloj y `Math.max(0, …)` en el coste, con sus asserts; patch |
-| **[Patch 0016, 2026-10-04: saldada — [patch](specs/20261004-204410-patch-0016-json-garbage/patch.md)]** Tras la 0006: faltan las líneas en blanco antes de `renderFiveHour` y `render`, y el bucle del stdin no comprueba `⏱️ 0m`, `0%`, `$0.00`, la ausencia de `⚠` ni stderr vacío (Minor de la revisión final de la 0006) | Bajo: formato y asserts menos estrictos | Actuar: con el patch del `NaNm`, que toca los mismos segmentos |
-| **[Patch 0015, 2026-10-04: saldada — [patch](specs/20261004-170112-patch-0015-timing-tests/patch.md)]** Tests de tiempo de la 0001 frágiles: el del presupuesto deja 150 ms de margen (`took <= 2150`) y el del render completo usa `spawnSync` sin `timeout` ni comprobación de salida; `git()` sin timeout por defecto (Minor de la revisión final de la 0001) | Medio: un falso rojo en una máquina cargada bloquea un commit (regla 1) | Actuar: margen de ~2500 ms, `timeout: 5000` y stdout no vacío; patch |
-| **[Patch 0004, 2026-10-04: saldada — [patch](specs/20261004-182241-patch-0004-node-semver/patch.md)]** `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Actuar: ordenar por versión, o respetar la versión fijada por proto. Patch 0004 |
 
 ## Patches
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
-| 2026-10-04 | 0017 | 🧪 validación diferida a smoke de la release 1.1.0 — el saneado del sufijo deja pasar DEL y los C1 · rama `chore/0017-suffix-c1` · [patch](specs/20261004-215710-patch-0017-suffix-c1/patch.md) |
-| 2026-10-04 | 0016 | 🧪 validación diferida a smoke de la release 1.1.0 — valores del JSON de tipo inesperado pintan basura · rama `chore/0016-json-garbage` · [patch](specs/20261004-204410-patch-0016-json-garbage/patch.md) |
-| 2026-10-04 | 0004 | 🧪 validación diferida a smoke de la release 1.1.0 — el lanzador elige el Node de proto por nombre, no por versión · rama `chore/0004-node-semver` · [patch](specs/20261004-182241-patch-0004-node-semver/patch.md) |
-| 2026-10-04 | 0003 | 🧪 validación diferida a smoke de la release 1.1.0 — la L1 empieza con un segmento vacío sin directorio de proyecto · rama `chore/0003-empty-location` · [patch](specs/20261004-175801-patch-0003-empty-location/patch.md) |
-| 2026-10-04 | 0015 | 🧪 validación diferida a smoke de la release 1.1.0 — tests de tiempo sin falsos rojos · rama `chore/0015-timing-tests` · [patch](specs/20261004-170112-patch-0015-timing-tests/patch.md) |
-| 2026-10-04 | 0014 | 🧪 validación diferida a el próximo refresco del statusline en `~\.claude` tras instalar — el icono de caveman desaparece con caveman 3.x · rama `chore/0014-caveman-modes` · [patch](specs/20261004-152212-patch-0014-caveman-modes/patch.md) |
-| 2026-10-04 | 0009 | Wrapper de Orca: registro SDD, test independiente de la máquina y excepción a la regla 1 · rama `chore/0009-orca-wrapper` · [patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md) |
 
 ## Releases cerradas
+
+### v1.1.0 — 2026-10-05
+
+Presupuesto de tiempo de `git` (0001), tests de los requisitos sin cobertura (0002), icono de nivel en las ventanas de cuota (0005), marcador `⚠` cuando un segmento falla (0006) y README en castellano e inglés (0007). Entran también, planificadas para la 2.0.0 y ya integradas: barras con sub-bloques (0010), marcador de ritmo (0011) y coste por hora (0013). Ya estaban cerradas al abrirla la cuenta atrás semanal (0008) y el registro del wrapper de Orca (0009). Patches: 0003, 0004, 0014, 0015, 0016 y 0017. Antes, la migración del kit SDD de la 1.1.0 a la 2.3.1. El estado de git en la L1 sigue en la 2.0.0.
+
+[changelog](changelog.md) · [retro](releases/v1.1.0/retro.md)
+
+smoke: 2026-10-05 · 0 hallazgos (suite completa en 7 s; lanzador instalado con un caso real, stdin `null` y `project_dir` numérico; guion del dev-lead en su sesión; 0 corregidos)
 
 ### v1.0.0 — 2026-09-20
 

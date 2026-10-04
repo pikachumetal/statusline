@@ -22,5 +22,8 @@
   "execution": "auto",
   "validation": {
     "mode": "manual"
+  },
+  "release": {
+    "hasRecipient": false
   }
 }

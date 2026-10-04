@@ -101,3 +101,7 @@ Validación diferida: 2026-10-04 · «ok! dale unattended» · disparador: smoke
 - AND si los dos son cero o faltan, el segmento no aparece
 - AND un valor que no sea un número finito y positivo cuenta como 0: `{}` añadidas y 2 eliminadas pintan `+0 -2`
 - AND velocity sale del JSON de la sesión, no de `git`
+
+## Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead

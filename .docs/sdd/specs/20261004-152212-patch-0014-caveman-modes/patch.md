@@ -60,3 +60,7 @@ Validación diferida: 2026-10-04 · «he perdido el icono de caveman» · dispar
 - AND los modos válidos son los de caveman 3.x (`caveman`, `ultracave`, `megacave`) y los de 2.x (`lite`, `full`, `ultra`, `wenyan-lite`, `wenyan`, `wenyan-full`, `wenyan-ultra`, `commit`, `review`, `compress`)
 - AND si existe `.caveman-statusline-suffix`, su contenido se añade detrás del modo
 - AND con `CAVEMAN_STATUSLINE_SAVINGS=0` el sufijo no se muestra
+
+## Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead

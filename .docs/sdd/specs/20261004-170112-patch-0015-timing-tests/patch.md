@@ -43,3 +43,7 @@ Validación diferida: 2026-10-04 · «si,por favor» · disparador: smoke de la 
 ## 5. Tiempo (ligero)
 
 - Real: 0,1h
+
+## Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead

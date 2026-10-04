@@ -72,3 +72,5 @@ Revisión final: sdd-kit:effort-medium + sonnet, limpia (1 Minor opcional, no ap
 - Revisión de skills: no aplica — el repo no tiene `.claude/skills/` (mirado).
 
 ## 6. Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead

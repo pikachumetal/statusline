@@ -64,3 +64,7 @@ Validación diferida: 2026-10-04 · «ok, sigue» · disparador: smoke de la rel
 - WHEN se pinta
 - THEN los segmentos van separados por `│` en gris, con un espacio a cada lado
 - AND un segmento que no tiene nada que mostrar no deja separador ni hueco
+
+## Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead

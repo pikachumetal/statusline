@@ -61,3 +61,7 @@ Validación diferida: 2026-10-04 · «ok! dale unattended» · disparador: smoke
 - AND usa el `node.exe` real de proto y no su shim, que a veces inyecta una línea NDJSON en stdout que ensuciaría el statusline
 - AND si no hay proto, usa el `node` del PATH
 - AND el código de salida es siempre 0
+
+## Adendas
+
+- 2026-10-05 — Validado en el smoke de la release 1.1.0: «Validado: lo he probado y funciona» · no detalló qué probó — el dev-lead
