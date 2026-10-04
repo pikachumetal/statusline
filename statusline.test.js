@@ -87,15 +87,28 @@ for (let r = 1; r <= 7; r++) assert.strictEqual(cells(bar(r * 100 / 64, 8))[0], 
 assert.ok(bar(34, 8).includes(`${GRAY_BG}${gradientAt(2 / 7)}▊${RESET}`), 'sub-bloque con el color de su celda y RESET');
 
 // Marcador de ritmo: dónde estarías gastando uniforme hasta el reset.
-const ESC_BG_GRAY = '\x1b[48;2;60;60;60m';
 assert.ok(cells(l2).includes('██┃█████'), '5h con marcador');
 assert.ok(cells(l2).includes('██████┃█'), 'semanal con marcador');
 assert.strictEqual(cells(bar(80, 8, 27.7)), '██┃███▍█', '80 % con ritmo 27,7 %');
 assert.ok(bar(80, 8, 27.7).includes(gradientAt(2 / 7).replace('38;2', '48;2')), 'marcador sobre gradiente');
-assert.ok(bar(0, 8, 0).startsWith(ESC_BG_GRAY) && cells(bar(0, 8, 0)) === '┃███████', 'marcador sobre gris en la primera celda');
+assert.ok(bar(0, 8, 0).startsWith(GRAY_BG) && cells(bar(0, 8, 0)) === '┃███████', 'marcador sobre gris en la primera celda');
 assert.strictEqual(cells(bar(38, 8, 100)), '███████┃', 'marcador en la última celda');
 assert.ok(!cells(bar(38, 8)).includes('┃'), 'sin ritmo no hay marcador');
 assert.ok(!cells(render(weekBare, env, NOW)).includes('┃'), 'sin marcador sin reset');
+const weekAt = (resets_at) => cells(render({ rate_limits: { seven_day: { used_percentage: 38, resets_at } } }, env, NOW).split('\n')[1]);
+assert.ok(weekAt(NOW / 1000 - 600).includes('███████┃'), 'semanal vencido: marcador en la última celda');
+assert.ok(weekAt(NOW / 1000 + 8 * 86400).includes('⏳ 0m ┃███████'), 'semanal con reset lejano');
+for (const bad of ['x', {}]) assert.ok(!weekAt(bad).includes('┃'), `semanal sin marcador con resets_at ${JSON.stringify(bad)}`);
+assert.ok(!cells(l2).split('│')[1].includes('┃'), 'contexto sin marcador');
+
+// Coste por hora: desde 5 minutos de sesión y con coste mayor que 0.
+const costL2 = (cost) => cells(render({ ...fixture, cost }, env, NOW).split('\n')[1]);
+assert.ok(costL2({ total_cost_usd: 0.47, total_duration_ms: 12 * 60000 }).includes('💰 $0.47 · $2.35/h'), 'coste por hora');
+assert.ok(costL2({ total_cost_usd: 0.25, total_duration_ms: 5 * 60000 }).includes('$3.00/h'), 'coste por hora desde 5 min');
+assert.ok(!costL2({ total_cost_usd: 0.2, total_duration_ms: 4 * 60000 }).includes('/h'), 'sin coste por hora antes de 5 min');
+assert.ok(!costL2({ total_cost_usd: 0, total_duration_ms: 60 * 60000 }).includes('/h'), 'sin coste por hora con coste 0');
+assert.ok(!costL2({ total_cost_usd: 0.47, total_duration_ms: 'x' }).includes('/h'), 'sin duración numérica');
+assert.ok(costL2({ total_cost_usd: 'abc', total_duration_ms: 12 * 60000 }).includes('💰 $0.00'), 'coste no numérico');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 

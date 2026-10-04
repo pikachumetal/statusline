@@ -9,20 +9,21 @@
 | 2026-10-04 | 0009 | patch | — | 0.5 | — | — | — | — | — | 20261004-113838-patch-0009-orca-wrapper |
 | 2026-10-04 | 0010 | frontend | 0.3 | 0.15 | 0.5 | 4076k | 99k | no aplica | sin precio | 20261004-141040-feature-0010-sub-block-bars |
 | 2026-10-04 | 0011 | frontend | 0.3 | 0.3 | 1 | 4402k | 222k | no aplica | sin precio | 20261004-143157-feature-0011-pace-marker |
+| 2026-10-04 | 0013 | frontend | 0.3 | 0.25 | 0.83 | 4132k | 156k | no aplica | sin precio | 20261004-151215-feature-0013-cost-per-hour |
 
-**Factor de calibración** (ratio mediano real/estimado, 3 artefactos): **0.8** · media 0.77
+**Factor de calibración** (ratio mediano real/estimado, 4 artefactos): **0.82** · media 0.78
 
 - n insuficiente (hacen falta 5)
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
-| frontend | 2 | 0.75 | — |
+| frontend | 3 | 0.83 | — |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 4 | 1.75 | 0.8 | — | — |
+| sin publicar | 5 | 2 | 0.82 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.
