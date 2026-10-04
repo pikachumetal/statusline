@@ -14,7 +14,7 @@ De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variab
 
 ### Campo ausente en el JSON
 
-> Cobertura: parcial. Los tests cubren la ausencia de velocity y de `git`.
+> Cobertura: con test.
 
 - GIVEN un JSON válido al que le falta un campo que usa un segmento
 - WHEN se pinta el statusline
@@ -22,7 +22,7 @@ De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variab
 
 ### Directorio del proyecto
 
-> Cobertura: parcial. Los tests solo ejercitan `current_dir`.
+> Cobertura: con test.
 
 - GIVEN un JSON con varios directorios informados
 - WHEN el statusline decide sobre qué directorio consultar `git` y qué nombre mostrar
@@ -43,7 +43,7 @@ shell y cambia durante la sesión.
 
 ### Lectura de ficheros flag
 
-> Cobertura: sin test.
+> Cobertura: con test. El symlink, solo si el sistema deja crearlo.
 
 - GIVEN un fichero flag de otro plugin dentro del perfil (`CLAUDE_CONFIG_DIR`, o `~/.claude` si no está definida)
 - WHEN el statusline lo lee
@@ -53,7 +53,7 @@ shell y cambia durante la sesión.
 
 ### Saneado del sufijo de ahorro
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN el fichero `.caveman-statusline-suffix` con caracteres de control o secuencias de escape
 - WHEN el statusline lo lee

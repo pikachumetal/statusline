@@ -8,7 +8,7 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 
 ### Perfil
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN la variable `CLAUDE_CONFIG_DIR` definida y apuntando a un directorio que no se llama `.claude`
 - WHEN se pinta la L1
@@ -28,7 +28,7 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 
 ### Ubicación en detached HEAD
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN un repo en detached HEAD
 - WHEN se pinta la L1
@@ -72,7 +72,7 @@ Modos válidos: `lite`, `full`, `ultra`, `review`.
 
 ### Valor de un flag
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN un fichero flag que existe
 - WHEN su primera línea está vacía

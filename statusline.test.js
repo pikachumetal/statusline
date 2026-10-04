@@ -250,4 +250,139 @@ if (process.platform === 'win32') {
     }
 }
 
+// ---------- requisitos que dependen del entorno (perfil y ficheros flag) ----------
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const script = path.join(__dirname, 'statusline.js');
+    // CAVEMAN_STATUSLINE_SAVINGS fijo: el valor exportado por el usuario no puede cambiar el resultado.
+    const launch = (env) => {
+        const r = spawnSync(process.execPath, [script], { input: '{}', encoding: 'utf8', timeout: 10000, env });
+        assert.ok(r.status === 0 && typeof r.stdout === 'string', `statusline.js falló: status ${r.status}, ${r.error || r.stderr}`);
+        return r.stdout;
+    };
+    const run = (dir, extra = {}) => launch({ ...process.env, CAVEMAN_STATUSLINE_SAVINGS: '1', CLAUDE_CONFIG_DIR: dir, ...extra });
+    const l1 = (dir, extra) => cells(run(dir, extra).split('\n')[0]);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-env-'));
+    try {
+        // Perfil: el nombre del directorio, salvo que sea .claude.
+        const profile = fs.mkdtempSync(path.join(root, 'statusline-perfil-'));
+        assert.ok(l1(profile).startsWith(`🧪 ${path.basename(profile)} │`), 'perfil como primer segmento');
+        const dotClaude = path.join(root, 'home', '.claude');
+        fs.mkdirSync(dotClaude, { recursive: true });
+        assert.ok(!l1(dotClaude).includes('🧪'), 'perfil .claude oculto');
+        // Sin CLAUDE_CONFIG_DIR: el home apunta a un temporal para no leer el ~/.claude real.
+        const { CLAUDE_CONFIG_DIR: _omit, ...noProfile } = process.env;
+        const home = path.join(root, 'home');
+        assert.ok(!cells(launch({ ...noProfile, USERPROFILE: home, HOME: home })).includes('🧪'), 'sin CLAUDE_CONFIG_DIR no hay perfil');
+
+        // Valor de un flag.
+        const flag = path.join(profile, '.ponytail-active');
+        const ponytail = (content) => {
+            fs.rmSync(flag, { recursive: true, force: true });
+            if (content !== null) fs.writeFileSync(flag, content);
+            return l1(profile);
+        };
+        assert.ok(ponytail('').includes('🦥 full'), 'flag vacío es full');
+        for (const v of ['off', 'xyz', null]) assert.ok(!ponytail(v).includes('🦥'), `flag ${v} oculto`);
+
+        // Lectura de ficheros flag: primera línea, minúsculas, solo a-z0-9-.
+        assert.ok(ponytail('FULL\nlite').includes('🦥 full'), 'solo la primera línea, en minúsculas');
+        assert.ok(ponytail('fu ll!').includes('🦥 full'), 'caracteres fuera de a-z0-9- eliminados');
+        assert.ok(!ponytail('full' + ' '.repeat(61)).includes('🦥'), 'flag de más de 64 bytes ignorado');
+        fs.rmSync(flag, { force: true });
+        fs.mkdirSync(flag);
+        assert.ok(!l1(profile).includes('🦥'), 'flag que no es un fichero ignorado');
+        fs.rmSync(flag, { recursive: true, force: true });
+        const target = path.join(root, 'target-flag');
+        fs.writeFileSync(target, 'full');
+        let linked = true;
+        try { fs.symlinkSync(target, flag, 'file'); } catch { linked = false; }
+        if (linked) assert.ok(!l1(profile).includes('🦥'), 'flag symlink ignorado');
+        else console.log('  (symlink no permitido en este sistema: test del symlink omitido)');
+        fs.rmSync(flag, { force: true });
+
+        // Saneado del sufijo de ahorro: sin caracteres de control ni secuencias ANSI ajenas.
+        fs.writeFileSync(path.join(profile, '.caveman-active'), 'lite');
+        fs.writeFileSync(path.join(profile, '.ponytail-active'), 'full');
+        fs.writeFileSync(path.join(profile, '.caveman-statusline-suffix'), '\x1b[31mX\x07\tY\rZ\n');
+        const raw = run(profile).split('\n')[0];
+        assert.ok(cells(raw).includes('🗿 lite [31mXYZ') && !raw.includes('\x1b[31mX') && !/[\x07\t\r]/.test(raw), 'sufijo sin escape ni control');
+
+        // El statusline nunca escribe en el perfil: mismos ficheros y mismo contenido tras pintar.
+        const snapshot = () => fs.readdirSync(profile).sort().map((f) => `${f}=${fs.readFileSync(path.join(profile, f), 'utf8')}`).join('|');
+        const before = snapshot();
+        run(profile);
+        assert.strictEqual(snapshot(), before, 'el perfil no cambia al pintar');
+        assert.ok(!l1(profile, { CAVEMAN_STATUSLINE_SAVINGS: '0' }).includes('[31mX'), 'sufijo oculto con CAVEMAN_STATUSLINE_SAVINGS=0');
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+}
+
+// Directorio del proyecto: project_dir, si falta current_dir, si falta cwd.
+{
+    const where = (data) => cells(render(data, env, NOW).split('\n')[0]).split(' │')[0];
+    assert.strictEqual(where({ workspace: { project_dir: '/a/proj', current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'proj', 'manda project_dir');
+    assert.strictEqual(where({ workspace: { current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'cur', 'sin project_dir, current_dir');
+    assert.strictEqual(where({ cwd: '/a/cwd' }), 'cwd', 'sin workspace, cwd');
+}
+
+// Detached HEAD: sin rama, el hash corto; sin hash, ?.
+{
+    const PATHS = '/code/proj\n/code/proj/.git\n/code/proj/.git';
+    const detached = (sha) => (args) => (args.includes('--git-dir') ? PATHS : args.includes('--short') && args[0] === 'rev-parse' ? sha : null);
+    assert.strictEqual(readGit({ cwd: '/code/proj' }, detached('abc1234')).branch, 'abc1234', 'detached HEAD pinta el hash corto');
+    assert.strictEqual(readGit({ cwd: '/code/proj' }, detached(null)).branch, '?', 'sin hash, ?');
+    for (const [sha, shown] of [['abc1234', 'abc1234'], [null, '?']]) {
+        const line = cells(render({ cwd: '/code/proj' }, { ...env, git: readGit({ cwd: '/code/proj' }, detached(sha)) }, NOW).split('\n')[0]);
+        assert.ok(line.startsWith(`proj  ${shown} │`), `L1 en detached HEAD con ${shown}`);
+    }
+}
+
+// Color del porcentaje: mismos cortes que el icono, en el contexto y en las dos ventanas.
+for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200;0'], [70, '255;140;0'], [89, '255;140;0'], [90, '220;60;40']]) {
+    const out = render({ context_window: { used_percentage: pct }, rate_limits: { five_hour: { used_percentage: pct }, seven_day: { used_percentage: pct } } }, env, NOW);
+    assert.strictEqual(out.split(`\x1b[38;2;${color}m${pct}%`).length - 1, 3, `color del ${pct} % en contexto, 5h y 7d`);
+}
+
+// Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, modelo magenta.
+{
+    const out = render(fixture, gitEnv, NOW);
+    for (const seg of out.split('\n').flatMap((line) => line.split(/ \x1b\[38;2;60;60;60m│\x1b\[0m /))) {
+        const lastColor = Math.max(seg.lastIndexOf('\x1b[38;2'), seg.lastIndexOf('\x1b[48;2'), seg.lastIndexOf('\x1b[1m'));
+        assert.ok(lastColor === -1 || seg.lastIndexOf('\x1b[0m') > lastColor, `segmento sin reset final: «${cells(seg)}»`);
+    }
+    assert.ok(out.includes('\x1b[1m\x1b[38;2;217;119;87mEasyClaw'), 'repo en negrita y naranja');
+    assert.ok(out.includes('\x1b[38;2;80;200;120m main'), 'branch en verde');
+    assert.ok(out.includes('\x1b[38;2;200;120;220m🤖 Fable 5.1'), 'modelo en magenta');
+}
+
+// Wrapper de Orca: pinta el statusline, reenvía el mismo JSON a Orca y borra su temporal.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-orca-'));
+    const temp = path.join(home, 'tmp');
+    try {
+        fs.mkdirSync(temp);
+        const hooks = path.join(home, '.orca', 'agent-hooks');
+        fs.mkdirSync(hooks, { recursive: true });
+        fs.writeFileSync(path.join(hooks, 'claude-statusline.cmd'), '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\n');
+        const input = '{"model":{"display_name":"Orca test"}}';
+        // Sin proto en el USERPROFILE de prueba, statusline.cmd usa el node del PATH: el de este test.
+        const pathKey = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
+        const pathWithNode = `${path.dirname(process.execPath)};${process.env[pathKey]}`;
+        const run = spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
+            input, encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home, TEMP: temp, TMP: temp, [pathKey]: pathWithNode },
+        });
+        assert.strictEqual(run.status, 0, 'wrapper de Orca sale con 0');
+        assert.ok(cells(run.stdout).includes('🤖 Orca test'), 'wrapper de Orca pinta el statusline');
+        assert.ok(fs.readFileSync(path.join(hooks, 'got.json'), 'utf8').includes('"Orca test"'), 'Orca recibe el mismo JSON');
+        assert.deepStrictEqual(fs.readdirSync(temp).filter((f) => f.startsWith('cc-statusline-')), [], 'el temporal se borra');
+    } finally {
+        fs.rmSync(home, { recursive: true, force: true });
+    }
+}
+
 console.log('statusline.test.js OK');

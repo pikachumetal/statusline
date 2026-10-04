@@ -79,7 +79,7 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 ### Color del porcentaje
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN el porcentaje del contexto, de la ventana de 5h o de la semanal
 - WHEN se pinta
