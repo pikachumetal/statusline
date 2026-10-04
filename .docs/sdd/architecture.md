@@ -43,6 +43,8 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **La celda de corte de una barra lleva fondo gris.** El sub-bloque de octavos
   solo ocupa parte de la celda; sin fondo propio, el resto mostraría el color de
   la terminal y partiría la barra.
+- **El marcador de ritmo lleva el color de su celda en el fondo.** Sustituye el
+  carácter de la celda por `┃`; el fondo conserva si esa celda estaba llena.
 
 ## Referencia externa
 

@@ -41,12 +41,17 @@ function gradientAt(t) {
 const EIGHTHS = '▏▎▍▌▋▊▉';
 const GRAY_BG = `${ESC}48;2;60;60;60m`;
 
-function bar(pct, width) {
+const MARK = `${rgb(240, 240, 240)}┃${RESET}`;
+
+// El marcador lleva de fondo el color que tendría su celda, para que el relleno se siga leyendo.
+function bar(pct, width, pace = null) {
     const eighths = Math.round(clamp(pct) / 100 * width * 8);
     const full = Math.floor(eighths / 8), rest = eighths % 8;
+    const mark = pace == null ? -1 : Math.min(width - 1, Math.floor(clamp(pace) / 100 * width));
     let out = '';
     for (let i = 0; i < width; i++) {
-        if (i < full) out += gradientAt(i / (width - 1)) + '█';
+        if (i === mark) out += (i < full ? gradientAt(i / (width - 1)).replace('38;2', '48;2') : GRAY_BG) + MARK;
+        else if (i < full) out += gradientAt(i / (width - 1)) + '█';
         else if (i === full && rest > 0) out += GRAY_BG + gradientAt(i / (width - 1)) + EIGHTHS[rest - 1] + RESET;
         else out += C.gray + '█';
     }
@@ -203,11 +208,13 @@ function renderFiveHour(five, now) {
     const pct = clamp(five.used_percentage);
     const reset = resetMs(five.resets_at);
     let s = `${C.dim}5h${RESET}`;
+    let pace = null;
     if (reset !== null) {
-        const elapsed = FIVE_HOURS_MS - (reset - now);
-        s += ` ⏳ ${fmtDuration(Math.max(0, Math.min(FIVE_HOURS_MS, elapsed)))}`;
+        const elapsed = Math.max(0, Math.min(FIVE_HOURS_MS, FIVE_HOURS_MS - (reset - now)));
+        s += ` ⏳ ${fmtDuration(elapsed)}`;
+        pace = elapsed / FIVE_HOURS_MS * 100;
     }
-    s += ` ${bar(pct, USAGE_WIDTH)} ${pctText(pct)}`;
+    s += ` ${bar(pct, USAGE_WIDTH, pace)} ${pctText(pct)}`;
     if (reset !== null) s += ` ${C.dim}↻${fmtClock(five.resets_at)}${RESET}`;
     return s;
 }
@@ -217,9 +224,10 @@ function renderSevenDay(week, now) {
     const pct = clamp(week.used_percentage);
     const reset = resetMs(week.resets_at);
     const left = reset === null ? null : Math.max(0, reset - now);
+    const elapsed = left === null ? null : Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left);
     let s = `${C.dim}7d${RESET}`;
-    if (left !== null) s += ` ⏳ ${fmtSpan(Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left))}`;
-    s += ` ${bar(pct, USAGE_WIDTH)} ${pctText(pct)}`;
+    if (elapsed !== null) s += ` ⏳ ${fmtSpan(elapsed)}`;
+    s += ` ${bar(pct, USAGE_WIDTH, elapsed === null ? null : elapsed / SEVEN_DAYS_MS * 100)} ${pctText(pct)}`;
     if (left !== null) s += ` ${C.dim}↻${fmtSpan(left)}${RESET}`;
     return s;
 }
@@ -248,5 +256,5 @@ function main() {
     process.stdout.write(render(data, readEnv(data)));
 }
 
-module.exports = { render, bar, gitNames };
+module.exports = { render, bar, gitNames, gradientAt, GRAY_BG, RESET };
 if (require.main === module) main();
