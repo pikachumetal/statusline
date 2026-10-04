@@ -1,7 +1,8 @@
 # Capacidad — installation
 
-Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo
-Windows tiene instalador y lanzador.
+## Propósito
+
+Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Windows tiene instalador y lanzador.
 
 ## Requisitos
 
@@ -60,8 +61,3 @@ una línea NDJSON en stdout que ensuciaría el statusline.
 - **Límites**: no aplica.
 - **Avisos**: el instalador avisa de dónde ha copiado y de qué hay que pegar en `settings.json`.
 - **Regla ante conflicto**: la copia del repo manda: sobrescribe lo que haya en `hooks`.
-
-## Historial
-
-- 2026-09-20 — patch 0000 (`installer-update`) — ADDED Update sobre una instalación existente. Los dos requisitos de `install.ps1` pasan a tener test.
-- 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).

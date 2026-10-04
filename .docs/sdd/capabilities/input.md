@@ -1,8 +1,8 @@
 # Capacidad — input
 
-De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las
-variables de entorno y los ficheros flag. Las reglas generales están en
-`constitution.md`; aquí está el comportamiento observable.
+## Propósito
+
+De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variables de entorno y los ficheros flag.
 
 ## Requisitos
 
@@ -68,7 +68,3 @@ shell y cambia durante la sesión.
 - **Límites**: 64 bytes por fichero flag; 2000 ms por llamada a `git`.
 - **Avisos**: ninguno. Una fuente que falla se trata como dato ausente.
 - **Regla ante conflicto**: el stdin manda; `git`, el entorno y los ficheros solo rellenan lo que el JSON no trae. Excepción: el nombre del worktree sale de `git` (ver `session-state.md`).
-
-## Historial
-
-- 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).

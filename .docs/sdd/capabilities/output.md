@@ -1,7 +1,8 @@
 # Capacidad — output
 
-Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada
-línea está en `session-state.md` (L1) y en `usage.md` (L2).
+## Propósito
+
+Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada línea está en `session-state.md` (L1) y en `usage.md` (L2).
 
 ## Requisitos
 
@@ -54,7 +55,3 @@ El color del porcentaje y el gradiente de las barras están en `usage.md`.
 - **Límites**: dos líneas. Pasa a ser configurable con el módulo de configurabilidad (ver `roadmap.md`). No hay ancho máximo: una línea más larga que el terminal no se trunca.
 - **Avisos**: no aplica.
 - **Regla ante conflicto**: no aplica.
-
-## Historial
-
-- 2026-09-20 — release v1.0.0 — ADDED todos los requisitos. Capacidad detectada al revisar el volcado inicial antes de cerrar la release; describe la versión inicial.

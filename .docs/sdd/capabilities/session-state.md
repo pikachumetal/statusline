@@ -1,8 +1,8 @@
 # Capacidad — session-state
 
-La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo
-y con qué modos activos. Los segmentos van separados por `│`, en este orden:
-perfil, ubicación, modelo, caveman, ponytail, velocity.
+## Propósito
+
+La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo y con qué modos activos. Los segmentos van separados por `│`, en este orden: perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ## Requisitos
 
@@ -95,8 +95,3 @@ Modos válidos: `lite`, `full`, `ultra`, `review`.
 - AND si los dos son cero o faltan, el segmento no aparece
 
 Velocity sale del JSON de la sesión, no de `git`.
-
-## Historial
-
-- 2026-09-20 — patch 0000 (`worktree-name`) — MODIFIED Ubicación con git (antes: el worktree se tomaba del JSON y el repo era la carpeta raíz del árbol de trabajo).
-- 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).
