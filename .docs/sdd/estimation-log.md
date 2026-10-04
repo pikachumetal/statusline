@@ -10,6 +10,7 @@
 | 2026-10-04 | 0010 | frontend | 0.3 | 0.15 | 0.5 | 4076k | 99k | no aplica | sin precio | 20261004-141040-feature-0010-sub-block-bars |
 | 2026-10-04 | 0011 | frontend | 0.3 | 0.3 | 1 | 4402k | 222k | no aplica | sin precio | 20261004-143157-feature-0011-pace-marker |
 | 2026-10-04 | 0013 | frontend | 0.3 | 0.25 | 0.83 | 4132k | 156k | no aplica | sin precio | 20261004-151215-feature-0013-cost-per-hour |
+| 2026-10-04 | 0014 | patch | — | 0.2 | — | — | — | — | — | 20261004-152212-patch-0014-caveman-modes |
 
 **Factor de calibración** (ratio mediano real/estimado, 4 artefactos): **0.82** · media 0.78
 
@@ -24,6 +25,6 @@
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 5 | 2 | 0.82 | — | — |
+| sin publicar | 6 | 2.2 | 0.82 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.

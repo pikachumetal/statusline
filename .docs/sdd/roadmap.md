@@ -58,6 +58,7 @@ en preparación
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
+| 2026-10-04 | 0014 | 🧪 validación diferida a el próximo refresco del statusline en `~\.claude` tras instalar — el icono de caveman desaparece con caveman 3.x · rama `chore/0014-caveman-modes` · [patch](specs/20261004-152212-patch-0014-caveman-modes/patch.md) |
 | 2026-10-04 | 0009 | Wrapper de Orca: registro SDD, test independiente de la máquina y excepción a la regla 1 · rama `chore/0009-orca-wrapper` · [patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md) |
 
 ## Releases cerradas

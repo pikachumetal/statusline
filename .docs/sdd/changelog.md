@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- **0014** — El icono `🗿` de caveman vuelve a pintarse con caveman 3.x, que escribe los modos `caveman`, `ultracave` y `megacave`. → [ref](specs/20261004-152212-patch-0014-caveman-modes/)
 - **0013** — Un `total_cost_usd` no numérico ya no hace fallar el statusline: el coste se pinta como `$0.00`. → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0008** — Un `resets_at` no numérico ya no pinta `NaN` en las ventanas de 5h y semanal: el segmento degrada como si el campo no estuviera. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
 

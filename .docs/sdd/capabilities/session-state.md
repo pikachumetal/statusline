@@ -54,16 +54,12 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 
 ### Modo caveman
 
-> Cobertura: parcial. Con test el modo y su ocultación; sin test el sufijo de ahorro.
-
 - GIVEN el flag `.caveman-active` con un modo válido
 - WHEN se pinta la L1
 - THEN se muestra `🗿 <modo>`
+- AND los modos válidos son los de caveman 3.x (`caveman`, `ultracave`, `megacave`) y los de 2.x (`lite`, `full`, `ultra`, `wenyan-lite`, `wenyan`, `wenyan-full`, `wenyan-ultra`, `commit`, `review`, `compress`)
 - AND si existe `.caveman-statusline-suffix`, su contenido se añade detrás del modo
 - AND con `CAVEMAN_STATUSLINE_SAVINGS=0` el sufijo no se muestra
-
-Modos válidos: `lite`, `full`, `ultra`, `wenyan-lite`, `wenyan`, `wenyan-full`,
-`wenyan-ultra`, `commit`, `review`, `compress`.
 
 ### Modo ponytail
 

@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-04
 branch: chore/0014-caveman-modes
-commit: <hash>
+commit: 7518296
 ---
 
 # Patch 0014 — el icono de caveman desaparece con caveman 3.x
@@ -42,6 +42,8 @@ Reproducido en RED: con `CLAUDE_CONFIG_DIR` temporal y `.caveman-active = cavema
 | 1 | RED: perfil temporal con `caveman` → sin `🗿` | ✅ falla con `AssertionError: caveman caveman visible` |
 | 2 | GREEN: `caveman`, `ultracave`, `megacave` y `lite` → `🗿 <modo>`; `off` → sin `🗿` | ✅ `statusline.test.js OK` |
 | 3 | Ejecución real con el perfil `~\.claude` | ✅ L1 `… │ 🗿 caveman │ 🦥 full` |
+
+Validación diferida: 2026-10-04 · «he perdido el icono de caveman» · disparador: el próximo refresco del statusline en `~\.claude` tras instalar, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
