@@ -4,7 +4,7 @@ feature: 0005
 title: Icono de alerta en las ventanas de cuota
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:

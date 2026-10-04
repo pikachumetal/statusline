@@ -15,32 +15,33 @@
 | 2026-10-04 | 0015 | patch | — | 0.1 | — | — | — | — | — | 20261004-170112-patch-0015-timing-tests |
 | 2026-10-04 | 0003 | patch | — | 0.15 | — | — | — | — | — | 20261004-175801-patch-0003-empty-location |
 | 2026-10-04 | 0004 | patch | — | 0.3 | — | — | — | — | — | 20261004-182241-patch-0004-node-semver |
+| 2026-10-04 | 0005 | frontend | 0.2 | 0.2 | 1 | 4155k | 210k | no aplica | sin precio | 20261004-185434-feature-0005-quota-alert-icon |
 
-**Factor de calibración** (ratio mediano real/estimado, 5 artefactos): **0.83** · media 0.83
+**Factor de calibración** (ratio mediano real/estimado, 6 artefactos): **0.92** · media 0.86
 
-- p25–p75: 0.8–1
+- p25–p75: 0.81–1
 - p80: 1 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
-- Dentro de ±25 %: 80 % · sobreestimadas: 20 % · infraestimadas: 0 %
-- Error absoluto (h): media 0.08 · mediana 0.05
+- Dentro de ±25 %: 83 % · sobreestimadas: 17 % · infraestimadas: 0 %
+- Error absoluto (h): media 0.07 · mediana 0.02
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tramo del ratio | n | % |
 | --- | --- | --- |
 | <0.5 | 0 | 0 % |
-| 0.5–0.8 | 1 | 20 % |
-| 0.8–1.25 | 4 | 80 % |
+| 0.5–0.8 | 1 | 17 % |
+| 0.8–1.25 | 5 | 83 % |
 | 1.25–2 | 0 | 0 % |
 | ≥2 | 0 | 0 % |
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
 | backend | 1 | 1 | — |
-| frontend | 3 | 0.83 | — |
+| frontend | 4 | 0.92 | — |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 10 | 3.05 | 0.83 | — | — |
+| sin publicar | 11 | 3.25 | 0.92 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.

@@ -62,8 +62,9 @@ huérfano. `statusline.js` sigue sin escribir ficheros.
 
 Vigentes:
 
-- Umbrales visuales del contexto: 🟢 por debajo del 20 %, 🟡 por debajo del
-  70 %, 🔥 por debajo del 90 % y 🚨 a partir de ahí.
+- Umbrales visuales del contexto y de las ventanas de 5h y semanal: 🟢 por
+  debajo del 20 %, 🟡 por debajo del 70 %, 🔥 por debajo del 90 % y 🚨 a partir
+  de ahí.
 - Gradiente en las barras de la ventana de 5h y la semanal.
 - El porcentaje del contexto, de la ventana de 5h y de la semanal cambia de
   color con los mismos cortes (20 %, 70 %, 90 %).
@@ -73,8 +74,6 @@ Vigentes:
 Pendientes de implementar (ver `roadmap.md`). Hasta que su task se cierre, el
 comportamiento vigente es el de arriba:
 
-- Icono de alerta para las ventanas de 5h y semanal, como el que ya tiene el
-  contexto. El color del porcentaje ya existe; falta solo el icono.
 - Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo.
 
 ### 5. Regla ante conflicto — respondida
