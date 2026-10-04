@@ -40,6 +40,9 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **Gradiente por posición, no por valor.** El color de cada bloque de una barra
   depende de su posición en la barra (verde, amarillo, rojo). El color del
   porcentaje sí depende del valor (`levelColor`).
+- **La celda de corte de una barra lleva fondo gris.** El sub-bloque de octavos
+  solo ocupa parte de la celda; sin fondo propio, el resto mostraría el color de
+  la terminal y partiría la barra.
 
 ## Referencia externa
 

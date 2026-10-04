@@ -8,6 +8,8 @@
 
 ### Changed
 
+- **0010** — Las barras del contexto, la ventana de 5h y la semanal pintan la celda de corte con un sub-bloque de octavos (`▏▎▍▌▋▊▉`): 8 veces más resolución con el mismo ancho. Un 34 % y un 38 % ya no se pintan igual. → [ref](specs/20261004-141040-feature-0010-sub-block-bars/)
+
 - **0008** — La ventana semanal pinta el tiempo transcurrido (`⏳ 4d13h`) y la cuenta atrás hasta el reset (`↻2d10h`), en días y horas. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
 
 ### Fixed
