@@ -25,6 +25,7 @@ cada fila es el `<id>` de su carpeta en `specs/`.
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | Task | Pendiente |
 | 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | Task | Pendiente |
 | 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | Task | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |
+| 0009 | Wrapper de Orca (`statusline-orca.cmd`): registro SDD de la integración de `252c34c`, test del instalador independiente de la máquina y excepción a la regla 1 | Petición del usuario el 2026-10-04 | Patch | ✅ 2026-10-04 ([patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md)) |
 
 Action items de proceso de la retro anterior, a comprobar al cerrar: A1 (commits
 con rutas explícitas, nunca `git add -A`) y A3 (una pregunta sin respuesta se
@@ -78,3 +79,4 @@ técnica», con su referencia (`#N`). Los issues no sustituyen a este roadmap.
 | --- | --- | --- | --- |
 | 2026-09-20 | 0000 — el worktree se pinta con el id interno de git | `chore/worktree-name` | `20260920-160436-patch-0000-worktree-name` |
 | 2026-09-20 | 0000 — `install.ps1` falla al escapar la ruta y no distingue un update | `chore/installer-update` | `20260920-161940-patch-0000-installer-update` |
+| 2026-10-04 | 0009 — wrapper de Orca: registro SDD, test independiente de la máquina y excepción a la regla 1 | `chore/0009-orca-wrapper` | `20261004-113838-patch-0009-orca-wrapper` |
