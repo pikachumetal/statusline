@@ -255,9 +255,13 @@ if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
     const { spawnSync } = require('child_process');
     const script = path.join(__dirname, 'statusline.js');
-    const run = (dir, extra = {}) => spawnSync(process.execPath, [script], {
-        input: '{}', encoding: 'utf8', timeout: 5000, env: { ...process.env, CLAUDE_CONFIG_DIR: dir, ...extra },
-    }).stdout;
+    // CAVEMAN_STATUSLINE_SAVINGS fijo: el valor exportado por el usuario no puede cambiar el resultado.
+    const launch = (env) => {
+        const r = spawnSync(process.execPath, [script], { input: '{}', encoding: 'utf8', timeout: 10000, env });
+        assert.ok(r.status === 0 && typeof r.stdout === 'string', `statusline.js falló: status ${r.status}, ${r.error || r.stderr}`);
+        return r.stdout;
+    };
+    const run = (dir, extra = {}) => launch({ ...process.env, CAVEMAN_STATUSLINE_SAVINGS: '1', CLAUDE_CONFIG_DIR: dir, ...extra });
     const l1 = (dir, extra) => cells(run(dir, extra).split('\n')[0]);
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-env-'));
     try {
@@ -267,6 +271,10 @@ if (process.platform === 'win32') {
         const dotClaude = path.join(root, 'home', '.claude');
         fs.mkdirSync(dotClaude, { recursive: true });
         assert.ok(!l1(dotClaude).includes('🧪'), 'perfil .claude oculto');
+        // Sin CLAUDE_CONFIG_DIR: el home apunta a un temporal para no leer el ~/.claude real.
+        const { CLAUDE_CONFIG_DIR: _omit, ...noProfile } = process.env;
+        const home = path.join(root, 'home');
+        assert.ok(!cells(launch({ ...noProfile, USERPROFILE: home, HOME: home })).includes('🧪'), 'sin CLAUDE_CONFIG_DIR no hay perfil');
 
         // Valor de un flag.
         const flag = path.join(profile, '.ponytail-active');
@@ -294,16 +302,18 @@ if (process.platform === 'win32') {
         else console.log('  (symlink no permitido en este sistema: test del symlink omitido)');
         fs.rmSync(flag, { force: true });
 
-        // El statusline nunca escribe en el perfil.
-        const before = fs.readdirSync(profile).sort().join('|');
-        run(profile);
-        assert.strictEqual(fs.readdirSync(profile).sort().join('|'), before, 'el perfil no cambia al pintar');
-
         // Saneado del sufijo de ahorro: sin caracteres de control ni secuencias ANSI ajenas.
         fs.writeFileSync(path.join(profile, '.caveman-active'), 'lite');
-        fs.writeFileSync(path.join(profile, '.caveman-statusline-suffix'), '\x1b[31mX\x07');
+        fs.writeFileSync(path.join(profile, '.ponytail-active'), 'full');
+        fs.writeFileSync(path.join(profile, '.caveman-statusline-suffix'), '\x1b[31mX\x07\tY\rZ\n');
         const raw = run(profile).split('\n')[0];
-        assert.ok(cells(raw).includes('🗿 lite [31mX') && !raw.includes('\x1b[31mX') && !raw.includes('\x07'), 'sufijo sin escape ni control');
+        assert.ok(cells(raw).includes('🗿 lite [31mXYZ') && !raw.includes('\x1b[31mX') && !/[\x07\t\r]/.test(raw), 'sufijo sin escape ni control');
+
+        // El statusline nunca escribe en el perfil: mismos ficheros y mismo contenido tras pintar.
+        const snapshot = () => fs.readdirSync(profile).sort().map((f) => `${f}=${fs.readFileSync(path.join(profile, f), 'utf8')}`).join('|');
+        const before = snapshot();
+        run(profile);
+        assert.strictEqual(snapshot(), before, 'el perfil no cambia al pintar');
         assert.ok(!l1(profile, { CAVEMAN_STATUSLINE_SAVINGS: '0' }).includes('[31mX'), 'sufijo oculto con CAVEMAN_STATUSLINE_SAVINGS=0');
     } finally {
         fs.rmSync(root, { recursive: true, force: true });
@@ -324,11 +334,16 @@ if (process.platform === 'win32') {
     const detached = (sha) => (args) => (args.includes('--git-dir') ? PATHS : args.includes('--short') && args[0] === 'rev-parse' ? sha : null);
     assert.strictEqual(readGit({ cwd: '/code/proj' }, detached('abc1234')).branch, 'abc1234', 'detached HEAD pinta el hash corto');
     assert.strictEqual(readGit({ cwd: '/code/proj' }, detached(null)).branch, '?', 'sin hash, ?');
+    for (const [sha, shown] of [['abc1234', 'abc1234'], [null, '?']]) {
+        const line = cells(render({ cwd: '/code/proj' }, { ...env, git: readGit({ cwd: '/code/proj' }, detached(sha)) }, NOW).split('\n')[0]);
+        assert.ok(line.startsWith(`proj  ${shown} │`), `L1 en detached HEAD con ${shown}`);
+    }
 }
 
-// Color del porcentaje: mismos cortes que el icono.
-for (const [pct, color] of [[10, '80;200;120'], [50, '220;200;0'], [80, '255;140;0'], [95, '220;60;40']]) {
-    assert.ok(render({ context_window: { used_percentage: pct } }, env, NOW).includes(`\x1b[38;2;${color}m${pct}%`), `color del ${pct} %`);
+// Color del porcentaje: mismos cortes que el icono, en el contexto y en las dos ventanas.
+for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200;0'], [70, '255;140;0'], [89, '255;140;0'], [90, '220;60;40']]) {
+    const out = render({ context_window: { used_percentage: pct }, rate_limits: { five_hour: { used_percentage: pct }, seven_day: { used_percentage: pct } } }, env, NOW);
+    assert.strictEqual(out.split(`\x1b[38;2;${color}m${pct}%`).length - 1, 3, `color del ${pct} % en contexto, 5h y 7d`);
 }
 
 // Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, modelo magenta.
@@ -355,8 +370,11 @@ if (process.platform === 'win32') {
         fs.mkdirSync(hooks, { recursive: true });
         fs.writeFileSync(path.join(hooks, 'claude-statusline.cmd'), '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\n');
         const input = '{"model":{"display_name":"Orca test"}}';
+        // Sin proto en el USERPROFILE de prueba, statusline.cmd usa el node del PATH: el de este test.
+        const pathKey = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
+        const pathWithNode = `${path.dirname(process.execPath)};${process.env[pathKey]}`;
         const run = spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
-            input, encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home, TEMP: temp, TMP: temp },
+            input, encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home, TEMP: temp, TMP: temp, [pathKey]: pathWithNode },
         });
         assert.strictEqual(run.status, 0, 'wrapper de Orca sale con 0');
         assert.ok(cells(run.stdout).includes('🤖 Orca test'), 'wrapper de Orca pinta el statusline');
