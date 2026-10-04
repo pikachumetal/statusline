@@ -35,16 +35,12 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 
 ### Lanzador
 
-> Cobertura: sin test.
-
 - GIVEN `statusline.cmd` y `statusline.js` en la misma carpeta
 - WHEN Claude Code ejecuta `statusline.cmd`
-- THEN si existe `%USERPROFILE%\.proto\tools\node`, lanza `statusline.js` con el `node.exe` de la primera versión que encuentre, en orden alfabético descendente del nombre de la carpeta
+- THEN si existe `%USERPROFILE%\.proto\tools\node`, lanza `statusline.js` con el `node.exe` de la versión más alta por SemVer (`26.10.0` antes que `26.9.0`, y `26.x` antes que `9.x`); una carpeta sin `node.exe` se ignora y un nombre que no es versión cuenta como `0.0.0`
+- AND usa el `node.exe` real de proto y no su shim, que a veces inyecta una línea NDJSON en stdout que ensuciaría el statusline
 - AND si no hay proto, usa el `node` del PATH
 - AND el código de salida es siempre 0
-
-Se usa el `node.exe` real de proto y no su shim porque el shim inyecta a veces
-una línea NDJSON en stdout que ensuciaría el statusline.
 
 ### Wrapper de Orca
 

@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- **0004** — `statusline.cmd` arranca el Node de proto de versión más alta por SemVer: con `26.9.0` y `26.10.0` instaladas usaba la `26.9.0`. → [ref](specs/20261004-182241-patch-0004-node-semver/)
 - **0003** — Con stdin vacío o inválido la L1 ya no empieza con un separador suelto: sin directorio de proyecto, el segmento de ubicación no aparece. → [ref](specs/20261004-175801-patch-0003-empty-location/)
 - **0015** — Los tests de tiempo de `git` y del render ya no dan falsos rojos con la máquina cargada, y el render completo no puede colgar la suite. → [ref](specs/20261004-170112-patch-0015-timing-tests/)
 - **0014** — El icono `🗿` de caveman vuelve a pintarse con caveman 3.x, que escribe los modos `caveman`, `ultracave` y `megacave`. → [ref](specs/20261004-152212-patch-0014-caveman-modes/)

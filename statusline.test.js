@@ -159,6 +159,25 @@ assert.ok(costL2({ total_cost_usd: 'abc', total_duration_ms: 12 * 60000 }).inclu
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
+// Lanzador: elige el Node de proto de versión más alta por SemVer, no por nombre de carpeta.
+// Solo la 26.10.0 es un node.exe de verdad; las demás son hostname.exe, que no pinta el statusline.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-proto-'));
+    const base = path.join(home, '.proto', 'tools', 'node');
+    try {
+        for (const v of ['9.0.0', '26.9.0', '26.10.0', 'globals']) fs.mkdirSync(path.join(base, v), { recursive: true });
+        for (const v of ['9.0.0', '26.9.0']) fs.copyFileSync(path.join(process.env.SystemRoot, 'System32', 'hostname.exe'), path.join(base, v, 'node.exe'));
+        const real = path.join(base, '26.10.0', 'node.exe');
+        try { fs.linkSync(process.execPath, real); } catch { fs.copyFileSync(process.execPath, real); }
+        const run = spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline.cmd')], { input: '{}', encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home } });
+        assert.ok(run.stdout.includes('🤖'), `statusline.cmd usa la 26.10.0, no la 9.0.0 ni la 26.9.0: «${run.stdout.trim()}»`);
+    } finally {
+        fs.rmSync(home, { recursive: true, force: true });
+    }
+}
+
 // Instalador: solo Windows (install.ps1 necesita pwsh). Instalación limpia y update sobre una ya hecha.
 if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');

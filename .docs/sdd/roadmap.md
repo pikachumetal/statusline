@@ -14,7 +14,7 @@ en preparación
 | 0001 | `readGit` sin bloqueo de hasta 6 s, y presupuesto de tiempo total del render comprobado con un test | Deuda técnica + módulo «Presupuesto de tiempo» (regla 3) | `statusline.js` (`readGit`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-152728-feature-0001-git-time-budget/walkthrough.md)) |
 | 0002 | Dar test a los 10 requisitos marcados «sin test» en `capabilities/` | Action item A2 del [acta de la v1.0.0](releases/v1.0.0/feedback.md) + deuda técnica | `statusline.test.js` | ⏳ |
 | 0003 | Con stdin inválido la L1 no empieza con un segmento vacío | Deuda técnica · patch | `statusline.js` (render de la L1) | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-175801-patch-0003-empty-location/patch.md)) |
-| 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica · patch | `statusline.cmd` | ⏳ |
+| 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica · patch | `statusline.cmd` | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-182241-patch-0004-node-semver/patch.md)) |
 | 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | `statusline.js` (render de las ventanas) | ⏳ |
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | `statusline.js` (`render`) | ⏳ |
 | 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | `README.md` | ⏳ |
@@ -53,12 +53,13 @@ en preparación
 | El `↻` semanal pinta `24h00m` cuando faltan algo menos de 24 h: `fmtDuration` redondea los minutos a 1440 y no pasa al formato en días | Cosmético: `24h00m` en vez de `1d00h` durante unos segundos | Actuar: redondear antes de elegir el formato largo o corto; patch |
 | El reloj de sesión pinta `⏱️ NaNm` con un `total_duration_ms` no numérico (`InfinityhNaNm` con `Infinity`): `renderLine2` usa `\|\| 0` en vez de `Number.isFinite`. Además, un coste negativo pinta `$-1.00` (Important y Minor de la revisión final de la 0013) | Bajo: Claude Code manda un número; ensucia la L2 si no | Actuar: `Number.isFinite` en el reloj y `Math.max(0, …)` en el coste, con sus asserts; patch |
 | **[Patch 0015, 2026-10-04: saldada — [patch](specs/20261004-170112-patch-0015-timing-tests/patch.md)]** Tests de tiempo de la 0001 frágiles: el del presupuesto deja 150 ms de margen (`took <= 2150`) y el del render completo usa `spawnSync` sin `timeout` ni comprobación de salida; `git()` sin timeout por defecto (Minor de la revisión final de la 0001) | Medio: un falso rojo en una máquina cargada bloquea un commit (regla 1) | Actuar: margen de ~2500 ms, `timeout: 5000` y stdout no vacío; patch |
-| `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Actuar: ordenar por versión, o respetar la versión fijada por proto. Patch 0004 |
+| **[Patch 0004, 2026-10-04: saldada — [patch](specs/20261004-182241-patch-0004-node-semver/patch.md)]** `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Actuar: ordenar por versión, o respetar la versión fijada por proto. Patch 0004 |
 
 ## Patches
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
+| 2026-10-04 | 0004 | 🧪 validación diferida a smoke de la release 1.1.0 — el lanzador elige el Node de proto por nombre, no por versión · rama `chore/0004-node-semver` · [patch](specs/20261004-182241-patch-0004-node-semver/patch.md) |
 | 2026-10-04 | 0003 | 🧪 validación diferida a smoke de la release 1.1.0 — la L1 empieza con un segmento vacío sin directorio de proyecto · rama `chore/0003-empty-location` · [patch](specs/20261004-175801-patch-0003-empty-location/patch.md) |
 | 2026-10-04 | 0015 | 🧪 validación diferida a smoke de la release 1.1.0 — tests de tiempo sin falsos rojos · rama `chore/0015-timing-tests` · [patch](specs/20261004-170112-patch-0015-timing-tests/patch.md) |
 | 2026-10-04 | 0014 | 🧪 validación diferida a el próximo refresco del statusline en `~\.claude` tras instalar — el icono de caveman desaparece con caveman 3.x · rama `chore/0014-caveman-modes` · [patch](specs/20261004-152212-patch-0014-caveman-modes/patch.md) |
