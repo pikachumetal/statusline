@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0005** — Las ventanas de 5h y semanal pintan el mismo icono de nivel que el contexto (🟢 🟡 🔥 🚨) delante de su etiqueta: `🚨 5h` con un 92 % gastado. → [ref](specs/20261004-185434-feature-0005-quota-alert-icon/)
 - **0001** — Todas las llamadas a `git` de un refresco comparten un presupuesto de 2000 ms: con un `git` lento, el statusline tarda como mucho 2 s en `git` en vez de 6 s. Un test mide el presupuesto y el render completo. → [ref](specs/20261004-152728-feature-0001-git-time-budget/)
 - **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0011** — Las barras de 5h y semanal pintan un marcador de ritmo (`┃`) en la celda del tiempo transcurrido de la ventana: si el relleno pasa de la marca, la cuota se gasta más rápido que el reloj. → [ref](specs/20261004-143157-feature-0011-pace-marker/)

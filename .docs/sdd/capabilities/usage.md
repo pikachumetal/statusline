@@ -29,22 +29,24 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 - GIVEN un JSON con `rate_limits.five_hour`
 - WHEN se pinta la L2
-- THEN se muestra `5h`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con la hora local de reset (`HH:MM`)
+- THEN se muestra el icono de nivel del porcentaje, `5h`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con la hora local de reset (`HH:MM`)
+- AND el icono de nivel es 🟢 por debajo del 20 %, 🟡 por debajo del 70 %, 🔥 por debajo del 90 % y 🚨 a partir del 90 %: un 34 % pinta `🟡 5h`, un 95 % pinta `🚨 5h`
 - AND el tiempo transcurrido es 5 h menos lo que falta para `resets_at`, acotado entre 0 y 5 h
 - AND la barra lleva el marcador de ritmo en la celda del transcurrido sobre 5 h: con 1h23m transcurridas (27,7 %) y un 34 % gastado, la barra es `██┃█████`
-- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo `5h`, la barra sin marcador y el porcentaje
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo el icono, `5h`, la barra sin marcador y el porcentaje
 - AND sin `rate_limits.five_hour` el segmento no aparece
 
 ### Ventana semanal
 
 - GIVEN un JSON con `rate_limits.seven_day`
 - WHEN se pinta la L2
-- THEN se muestra `7d`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con el tiempo que queda hasta `resets_at`
+- THEN se muestra el icono de nivel del porcentaje, `7d`, `⏳` y el tiempo transcurrido de la ventana, una barra de 8 bloques, el porcentaje y `↻` con el tiempo que queda hasta `resets_at`
+- AND el icono de nivel sigue los mismos cortes que en la ventana de 5h: un 38 % pinta `🟡 7d`, un 10 % pinta `🟢 7d`, un 75 % pinta `🔥 7d`
 - AND el tiempo transcurrido es 7 días menos lo que falta para `resets_at`, acotado entre 0 y 7 días
 - AND el tiempo que queda es lo que falta para `resets_at`, acotado a 0 por abajo
 - AND la barra lleva el marcador de ritmo en la celda del transcurrido sobre 7 días: con 6 días transcurridos (85,7 %) y un 38 % gastado, la barra es `██████┃█`; con el reset vencido, el marcador va en la última celda
 - AND con un `resets_at` a más de 7 días, el transcurrido es 0 y el marcador va en la primera celda
-- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo `7d`, la barra sin marcador y el porcentaje
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo el icono, `7d`, la barra sin marcador y el porcentaje
 - AND sin `rate_limits.seven_day` el segmento no aparece
 
 ### Formato de duración larga
@@ -90,5 +92,5 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - **Dónde viven los datos**: no aplica. Todo llega en el JSON del stdin.
 - **Idioma de los nombres**: las etiquetas que se pintan (`5h`, `7d`) van en inglés.
 - **Límites**: barra del contexto de 10 bloques; barras de cuota de 8 bloques; porcentajes acotados entre 0 y 100.
-- **Avisos**: solo visuales: el icono del contexto y el color del porcentaje. Las ventanas de 5h y semanal no tienen icono de alerta (pendiente en `roadmap.md`). El `↻` de la ventana semanal es una cuenta atrás, no una hora local; el de la ventana de 5h sigue siendo la hora local.
+- **Avisos**: solo visuales: el icono de nivel (contexto, ventana de 5h y semanal) y el color del porcentaje, con los mismos cortes. El `↻` de la ventana semanal es una cuenta atrás, no una hora local; el de la ventana de 5h sigue siendo la hora local.
 - **Regla ante conflicto**: no aplica. Cada dato tiene una sola fuente.

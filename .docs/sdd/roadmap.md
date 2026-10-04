@@ -15,7 +15,7 @@ en preparación
 | 0002 | Dar test a los 10 requisitos marcados «sin test» en `capabilities/` | Action item A2 del [acta de la v1.0.0](releases/v1.0.0/feedback.md) + deuda técnica | `statusline.test.js` | ⏳ |
 | 0003 | Con stdin inválido la L1 no empieza con un segmento vacío | Deuda técnica · patch | `statusline.js` (render de la L1) | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-175801-patch-0003-empty-location/patch.md)) |
 | 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica · patch | `statusline.cmd` | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-182241-patch-0004-node-semver/patch.md)) |
-| 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | `statusline.js` (render de las ventanas) | ⏳ |
+| 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | `statusline.js` (render de las ventanas) | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-185434-feature-0005-quota-alert-icon/walkthrough.md)) |
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | `statusline.js` (`render`) | ⏳ |
 | 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | `README.md` | ⏳ |
 | 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | `statusline.js`, `statusline.test.js` | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |

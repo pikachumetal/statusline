@@ -156,6 +156,13 @@ assert.ok(!costL2({ total_cost_usd: 0.2, total_duration_ms: 4 * 60000 }).include
 assert.ok(!costL2({ total_cost_usd: 0, total_duration_ms: 60 * 60000 }).includes('/h'), 'sin coste por hora con coste 0');
 assert.ok(!costL2({ total_cost_usd: 0.47, total_duration_ms: 'x' }).includes('/h'), 'sin duración numérica');
 assert.ok(costL2({ total_cost_usd: 'abc', total_duration_ms: 12 * 60000 }).includes('💰 $0.00'), 'coste no numérico');
+
+// Icono de nivel en las ventanas, con los mismos cortes que el contexto.
+const windows = (five, week) => cells(render({ rate_limits: { five_hour: { used_percentage: five }, seven_day: { used_percentage: week } } }, env, NOW).split('\n')[1]);
+assert.ok(cells(l2).includes('🟡 5h ⏳ 1h23m') && cells(l2).includes('🟡 7d ⏳ 6d00h'), 'icono en las ventanas del fixture');
+assert.ok(windows(95, 10).includes('🚨 5h') && windows(95, 10).includes('🟢 7d'), 'icono 🚨 y 🟢');
+assert.ok(windows(90, 75).includes('🚨 5h') && windows(90, 75).includes('🔥 7d'), 'icono en el corte del 90');
+assert.ok(windows('x', 'x').includes('🟢 5h') && windows('x', 'x').includes('🟢 7d'), 'icono con porcentaje no numérico');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
