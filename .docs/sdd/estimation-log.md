@@ -11,20 +11,33 @@
 | 2026-10-04 | 0011 | frontend | 0.3 | 0.3 | 1 | 4402k | 222k | no aplica | sin precio | 20261004-143157-feature-0011-pace-marker |
 | 2026-10-04 | 0013 | frontend | 0.3 | 0.25 | 0.83 | 4132k | 156k | no aplica | sin precio | 20261004-151215-feature-0013-cost-per-hour |
 | 2026-10-04 | 0014 | patch | — | 0.2 | — | — | — | — | — | 20261004-152212-patch-0014-caveman-modes |
+| 2026-10-04 | 0001 | backend | 0.3 | 0.3 | 1 | 5858k | 211k | no aplica | sin precio | 20261004-152728-feature-0001-git-time-budget |
 
-**Factor de calibración** (ratio mediano real/estimado, 4 artefactos): **0.82** · media 0.78
+**Factor de calibración** (ratio mediano real/estimado, 5 artefactos): **0.83** · media 0.83
 
-- n insuficiente (hacen falta 5)
+- p25–p75: 0.8–1
+- p80: 1 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
+- Dentro de ±25 %: 80 % · sobreestimadas: 20 % · infraestimadas: 0 %
+- Error absoluto (h): media 0.08 · mediana 0.05
 - Tendencia: n insuficiente (hacen falta 20)
+
+| Tramo del ratio | n | % |
+| --- | --- | --- |
+| <0.5 | 0 | 0 % |
+| 0.5–0.8 | 1 | 20 % |
+| 0.8–1.25 | 4 | 80 % |
+| 1.25–2 | 0 | 0 % |
+| ≥2 | 0 | 0 % |
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
+| backend | 1 | 1 | — |
 | frontend | 3 | 0.83 | — |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 6 | 2.2 | 0.82 | — | — |
+| sin publicar | 7 | 2.5 | 0.83 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.

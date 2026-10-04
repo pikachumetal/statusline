@@ -35,8 +35,11 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
   Claude Code. `current_dir` sigue al cwd de la shell y cambia durante la sesión.
 - **Hardening al leer flags** (`readSmallFile`): sin symlinks, máximo 64 bytes
   y whitelist de valores. Es el mismo criterio que usa `caveman-badge.js`.
-- **`git` nunca bloquea ni ensucia:** `--no-optional-locks`, timeout y stderr
-  descartado. Si falla, devuelve `null` y el segmento se omite.
+- **`git` nunca bloquea ni ensucia:** `--no-optional-locks`, stderr descartado
+  y un plazo compartido por todas las llamadas de `readGit` (cifra en
+  `capabilities/input.md`). Si falla o se agota el plazo, devuelve `null` y el
+  segmento degrada. `readGit` recibe el ejecutor de `git` como parámetro para
+  poder medir el plazo con un `git` lento simulado.
 - **Gradiente por posición, no por valor.** El color de cada bloque de una barra
   depende de su posición en la barra (verde, amarillo, rojo). El color del
   porcentaje sí depende del valor (`levelColor`).

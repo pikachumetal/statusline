@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0001** — Todas las llamadas a `git` de un refresco comparten un presupuesto de 2000 ms: con un `git` lento, el statusline tarda como mucho 2 s en `git` en vez de 6 s. Un test mide el presupuesto y el render completo. → [ref](specs/20261004-152728-feature-0001-git-time-budget/)
 - **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0011** — Las barras de 5h y semanal pintan un marcador de ritmo (`┃`) en la celda del tiempo transcurrido de la ventana: si el relleno pasa de la marca, la cuota se gasta más rápido que el reloj. → [ref](specs/20261004-143157-feature-0011-pace-marker/)
 - **0010** — Las barras del contexto, la ventana de 5h y la semanal pintan la celda de corte con un sub-bloque de octavos (`▏▎▍▌▋▊▉`): 8 veces más resolución con el mismo ancho. Un 34 % y un 38 % ya no se pintan igual. → [ref](specs/20261004-141040-feature-0010-sub-block-bars/)

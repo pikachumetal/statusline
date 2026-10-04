@@ -48,20 +48,15 @@ huérfano. `statusline.js` sigue sin escribir ficheros.
 - **README:** bilingüe (castellano e inglés). La forma concreta —un fichero con
   dos secciones o `README.md` más `README.en.md`— la decide la task que lo traduzca.
 
-### 3. Límites — respondida en parte
-
-Vigentes:
+### 3. Límites — respondida
 
 - Sin dependencias npm.
-- Cada llamada a `git` lleva timeout (hoy `timeout: 2000` ms).
+- Todas las llamadas a `git` de un refresco comparten un presupuesto de tiempo,
+  y el statusline completo tiene un tope comprobado con un test. Las cifras viven
+  en `capabilities/input.md` («Consulta a git»).
 - Todo fichero externo que se lea tiene un tope de 64 bytes.
 - Número de líneas: 2 por defecto. No es un tope fijo: pasa a ser configurable
   cuando llegue el módulo de configurabilidad (ver `roadmap.md`).
-
-Pendiente:
-
-- Presupuesto de tiempo total del render. Deseable, sin cifra. Se fija cuando
-  exista un test que lo mida.
 
 ### 4. Avisos — respondida
 
