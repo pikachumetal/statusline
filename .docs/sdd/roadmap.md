@@ -17,7 +17,7 @@ en preparación
 | 0004 | `statusline.cmd` elige la versión de Node de proto por SemVer, no por nombre de carpeta | Deuda técnica · patch | `statusline.cmd` | 🧪 validación diferida a smoke de la release 1.1.0 ([patch](specs/20261004-182241-patch-0004-node-semver/patch.md)) |
 | 0005 | Icono de alerta en las ventanas de 5h y semanal | Módulo «Avisos de cuota» (regla 4) | `statusline.js` (render de las ventanas) | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-185434-feature-0005-quota-alert-icon/walkthrough.md)) |
 | 0006 | Marcador `⚠` cuando un segmento falla | Módulo «Errores visibles» (regla 4) | `statusline.js` (`render`) | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-203701-feature-0006-failed-segment-mark/walkthrough.md)) |
-| 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | `README.md` | ⏳ |
+| 0007 | README bilingüe | Módulo «README bilingüe» (regla 2) | `README.md` | 🧪 validación diferida a smoke de la release 1.1.0 ([walkthrough](specs/20261004-220000-feature-0007-bilingual-readme/walkthrough.md)) |
 | 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | `statusline.js`, `statusline.test.js` | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |
 | 0009 | Wrapper de Orca (`statusline-orca.cmd`): registro SDD de la integración de `252c34c`, test del instalador independiente de la máquina y excepción a la regla 1 | Petición del usuario el 2026-10-04 · patch | `install.ps1`, `statusline-orca.cmd`, `statusline.test.js` | ✅ 2026-10-04 ([patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md)) |
 

@@ -4,7 +4,7 @@ feature: 0007
 title: README bilingüe
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-05
 author: Claude (unattended)
 approvers:

@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0007** — README en castellano (`README.md`) y en inglés (`README.en.md`), al día con lo entregado desde la v1.0.0. → [ref](specs/20261004-220000-feature-0007-bilingual-readme/)
 - **0002** — Tienen test los requisitos que no lo tenían: perfil, valor y hardening de los ficheros flag, saneado del sufijo de ahorro, precedencia de `project_dir`, detached HEAD, color del porcentaje, reset de color por segmento y wrapper de Orca. → [ref](specs/20261004-214415-feature-0002-untested-requirements/)
 - **0006** — Un segmento que falla al pintarse deja un `⚠` gris en su sitio y el resto de la línea se pinta igual. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
 - **0005** — Las ventanas de 5h y semanal pintan el mismo icono de nivel que el contexto (🟢 🟡 🔥 🚨) delante de su etiqueta: `🚨 5h` con un 92 % gastado. → [ref](specs/20261004-185434-feature-0005-quota-alert-icon/)
