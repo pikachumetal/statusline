@@ -82,11 +82,9 @@ Modos válidos: `lite`, `full`, `ultra`, `review`.
 
 ### Velocity
 
-> Cobertura: con test.
-
 - GIVEN un JSON con `cost.total_lines_added` y `cost.total_lines_removed`
 - WHEN al menos uno de los dos es mayor que cero
 - THEN se muestra `+<añadidas> -<eliminadas>` como último segmento de la L1
 - AND si los dos son cero o faltan, el segmento no aparece
-
-Velocity sale del JSON de la sesión, no de `git`.
+- AND un valor que no sea un número finito y positivo cuenta como 0: `{}` añadidas y 2 eliminadas pintan `+0 -2`
+- AND velocity sale del JSON de la sesión, no de `git`

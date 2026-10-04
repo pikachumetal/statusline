@@ -90,7 +90,10 @@ function fmtSpan(ms) {
 
 // Un resets_at que no sea un epoch numérico se trata como ausente: pintar NaN
 // sería pintar basura (constitution, regla 3).
-const resetMs = (epochSeconds) => (Number.isFinite(epochSeconds) ? epochSeconds * 1000 : null);
+const resetMs = (epochSeconds) => {
+    const ms = Number.isFinite(epochSeconds) ? epochSeconds * 1000 : NaN;
+    return Number.isNaN(new Date(ms).getTime()) ? null : ms;
+};
 
 function fmtClock(epochSeconds) {
     const d = new Date(epochSeconds * 1000);
@@ -191,9 +194,12 @@ function renderWhere(data, env) {
     return out;
 }
 
+// Un contador del JSON que no sea un número finito y positivo cuenta como 0.
+const count = (n) => (Number.isFinite(n) && n > 0 ? n : 0);
+
 // Velocity viene de cost, no de git: se muestra siempre que haya cambios.
 function renderVelocity(data) {
-    const add = data.cost?.total_lines_added || 0, del = data.cost?.total_lines_removed || 0;
+    const add = count(data.cost?.total_lines_added), del = count(data.cost?.total_lines_removed);
     if (!add && !del) return null;
     return `${C.green}+${add}${RESET} ${C.red}-${del}${RESET}`;
 }
@@ -224,6 +230,7 @@ function renderLine1(data, env) {
     ];
     return parts.filter(Boolean).join(SEP);
 }
+
 function renderFiveHour(five, now) {
     const pct = clamp(five.used_percentage);
     const reset = resetMs(five.resets_at);
@@ -256,7 +263,7 @@ function renderSevenDay(week, now) {
 const MIN_RATE_MS = 5 * 60000;
 
 function renderCost(cost) {
-    const usd = Number.isFinite(cost?.total_cost_usd) ? cost.total_cost_usd : 0;
+    const usd = count(cost?.total_cost_usd);
     const ms = cost?.total_duration_ms;
     let s = `💰 $${usd.toFixed(2)}`;
     if (Number.isFinite(ms) && ms >= MIN_RATE_MS && usd > 0) s += ` · $${(usd / (ms / 3600000)).toFixed(2)}/h`;
@@ -269,7 +276,7 @@ function renderLine2(data, now) {
         return `${levelEmoji(pct)} ${bar(pct, CONTEXT_WIDTH)} ${pctText(pct)}`;
     };
     const parts = [
-        segment(() => `⏱️ ${fmtDuration(data.cost?.total_duration_ms || 0)}`),
+        segment(() => `⏱️ ${fmtDuration(count(data.cost?.total_duration_ms))}`),
         segment(ctx),
         segment(() => (data.rate_limits?.five_hour ? renderFiveHour(data.rate_limits.five_hour, now) : null)),
         segment(() => (data.rate_limits?.seven_day ? renderSevenDay(data.rate_limits.seven_day, now) : null)),
@@ -277,6 +284,7 @@ function renderLine2(data, now) {
     ];
     return parts.filter(Boolean).join(SEP);
 }
+
 function render(data, env, now = Date.now()) {
     return `${renderLine1(data, env)}\n${renderLine2(data, now)}`;
 }

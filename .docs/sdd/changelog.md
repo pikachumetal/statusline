@@ -18,6 +18,7 @@
 
 ### Fixed
 
+- **0016** — Un valor del JSON de tipo inesperado ya no pinta basura: el reloj, el coste y velocity lo cuentan como 0 (antes `⏱️ NaNm`, `$-1.00`, `+[object Object]`) y un `resets_at` fuera de rango se trata como ausente (antes `↻NaN:NaN`). → [ref](specs/20261004-204410-patch-0016-json-garbage/)
 - **0006** — Un `project_dir` no textual o un stdin JSON que no es un objeto (`null`, `3`, `[]`) ya no tiran el statusline entero. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
 - **0004** — `statusline.cmd` arranca el Node de proto de versión más alta por SemVer: con `26.9.0` y `26.10.0` instaladas usaba la `26.9.0`. → [ref](specs/20261004-182241-patch-0004-node-semver/)
 - **0003** — Con stdin vacío o inválido la L1 ya no empieza con un separador suelto: sin directorio de proyecto, el segmento de ubicación no aparece. → [ref](specs/20261004-175801-patch-0003-empty-location/)

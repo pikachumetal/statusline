@@ -173,8 +173,23 @@ assert.ok(windows('x', 'x').includes('🟢 5h') && windows('x', 'x').includes('�
     assert.ok(!cells(render(fixture, env, NOW)).includes('⚠'), 'sin fallos no hay marcador');
     for (const input of ['null', '3', '"x"', '[]', '{"workspace":{"project_dir":123}}']) {
         const out = spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input, encoding: 'utf8', timeout: 5000 });
-        assert.ok(out.status === 0 && cells(out.stdout).includes('🤖 ?'), `stdin ${input} pinta`);
+        const text = cells(out.stdout);
+        assert.ok(out.status === 0 && out.stderr === '' && text.includes('🤖 ?'), `stdin ${input} pinta`);
+        assert.ok(['⏱️ 0m', '0%', '$0.00'].every((s) => text.includes(s)), `stdin ${input} con valores por defecto`);
+        if (input !== '{"workspace":{"project_dir":123}}') assert.ok(!text.includes('⚠'), `stdin ${input} sin ⚠`);
     }
+}
+
+// Valores del JSON de tipo inesperado: se tratan como ausentes, nunca se pinta basura.
+{
+    const garbage = (data) => cells(render(data, env, NOW));
+    for (const ms of ['x', 1e999, {}]) assert.ok(garbage({ cost: { total_duration_ms: ms } }).includes('⏱️ 0m'), `reloj con ${JSON.stringify(ms)}`);
+    assert.ok(garbage({ cost: { total_cost_usd: -1 } }).includes('💰 $0.00'), 'coste negativo');
+    assert.ok(!garbage({ cost: { total_lines_added: {}, total_lines_removed: 'x' } }).includes('object'), 'velocity con tipos raros oculto');
+    assert.ok(garbage({ cost: { total_lines_added: {}, total_lines_removed: 2 } }).includes('+0 -2'), 'velocity con un tipo raro');
+    const far = garbage({ rate_limits: { five_hour: { used_percentage: 10, resets_at: 1e308 } } });
+    assert.ok(!far.includes('NaN') && !far.includes('↻') && !far.includes('┃'), `resets_at fuera de rango como ausente: «${far.split('\n')[1]}»`);
+    for (const s of ['NaN', 'Infinity', 'undefined', 'object']) assert.ok(!garbage({ cost: { total_duration_ms: 1e999, total_cost_usd: -5, total_lines_added: [], total_lines_removed: {} }, rate_limits: { five_hour: { used_percentage: 'x', resets_at: 1e308 }, seven_day: { used_percentage: {}, resets_at: 1e308 } } }).includes(s), `sin ${s}`);
 }
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
