@@ -7,7 +7,7 @@ solution: dev-lead
 status: done
 created: 2026-10-04
 branch: chore/0015-timing-tests
-commit: <hash>
+commit: adf17cc
 ---
 
 # Patch 0015 — tests de tiempo sin falsos rojos
@@ -37,6 +37,8 @@ Comprobado que existe lo que se da por existente: `took <= 2150` y el `spawnSync
 | --- | --- | --- |
 | 1 | `node statusline.test.js` con los tres cambios | ✅ `statusline.test.js OK` |
 | 2 | Sin RED: el cambio relaja un margen y añade guardas; no hay comportamiento nuevo que poner en rojo | — |
+
+Validación diferida: 2026-10-04 · «si,por favor» · disparador: smoke de la release 1.1.0, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
