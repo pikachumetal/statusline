@@ -198,26 +198,32 @@ function renderVelocity(data) {
     return `${C.green}+${add}${RESET} ${C.red}-${del}${RESET}`;
 }
 
-function renderLine1(data, env) {
-    const parts = [];
-    if (env.profile) parts.push(`${C.magenta}🧪 ${env.profile}${RESET}`);
-    const where = renderWhere(data, env);
-    if (where) parts.push(where);
-
-    let model = `${C.magenta}🤖 ${data.model?.display_name || '?'}${RESET}`;
-    if (data.effort?.level) model += ` ${C.dim}(${data.effort.level})${RESET}`;
-    parts.push(model);
-
-    if (env.flags.caveman) {
-        const savings = env.flags.savings ? ` ${C.dim}${env.flags.savings}${RESET}` : '';
-        parts.push(`🗿 ${env.flags.caveman}${savings}`);
-    }
-    if (env.flags.ponytail) parts.push(`🦥 ${env.flags.ponytail}`);
-    const velocity = renderVelocity(data);
-    if (velocity) parts.push(velocity);
-    return parts.join(SEP);
+// Un segmento que lanza no tira el statusline: deja un ⚠ en su sitio. Sin datos no es un fallo:
+// esos segmentos devuelven null y se omiten.
+const FAILED = `${C.gray}⚠${RESET}`;
+function segment(fn) {
+    try { return fn(); } catch { return FAILED; }
 }
 
+function renderLine1(data, env) {
+    const parts = [
+        env.profile ? `${C.magenta}🧪 ${env.profile}${RESET}` : null,
+        segment(() => renderWhere(data, env)),
+        segment(() => {
+            let model = `${C.magenta}🤖 ${data.model?.display_name || '?'}${RESET}`;
+            if (data.effort?.level) model += ` ${C.dim}(${data.effort.level})${RESET}`;
+            return model;
+        }),
+        segment(() => {
+            if (!env.flags.caveman) return null;
+            const savings = env.flags.savings ? ` ${C.dim}${env.flags.savings}${RESET}` : '';
+            return `🗿 ${env.flags.caveman}${savings}`;
+        }),
+        segment(() => (env.flags.ponytail ? `🦥 ${env.flags.ponytail}` : null)),
+        segment(() => renderVelocity(data)),
+    ];
+    return parts.filter(Boolean).join(SEP);
+}
 function renderFiveHour(five, now) {
     const pct = clamp(five.used_percentage);
     const reset = resetMs(five.resets_at);
@@ -258,19 +264,19 @@ function renderCost(cost) {
 }
 
 function renderLine2(data, now) {
-    const parts = [`⏱️ ${fmtDuration(data.cost?.total_duration_ms || 0)}`];
-
-    const ctx = clamp(data.context_window?.used_percentage);
-    parts.push(`${levelEmoji(ctx)} ${bar(ctx, CONTEXT_WIDTH)} ${pctText(ctx)}`);
-
-    if (data.rate_limits?.five_hour) parts.push(renderFiveHour(data.rate_limits.five_hour, now));
-
-    if (data.rate_limits?.seven_day) parts.push(renderSevenDay(data.rate_limits.seven_day, now));
-
-    parts.push(renderCost(data.cost));
-    return parts.join(SEP);
+    const ctx = () => {
+        const pct = clamp(data.context_window?.used_percentage);
+        return `${levelEmoji(pct)} ${bar(pct, CONTEXT_WIDTH)} ${pctText(pct)}`;
+    };
+    const parts = [
+        segment(() => `⏱️ ${fmtDuration(data.cost?.total_duration_ms || 0)}`),
+        segment(ctx),
+        segment(() => (data.rate_limits?.five_hour ? renderFiveHour(data.rate_limits.five_hour, now) : null)),
+        segment(() => (data.rate_limits?.seven_day ? renderSevenDay(data.rate_limits.seven_day, now) : null)),
+        segment(() => renderCost(data.cost)),
+    ];
+    return parts.filter(Boolean).join(SEP);
 }
-
 function render(data, env, now = Date.now()) {
     return `${renderLine1(data, env)}\n${renderLine2(data, now)}`;
 }
@@ -278,6 +284,7 @@ function render(data, env, now = Date.now()) {
 function main() {
     let data = {};
     try { data = JSON.parse(fs.readFileSync(0, 'utf8')); } catch { /* stdin vacío o inválido: render con defaults */ }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) data = {};
     process.stdout.write(render(data, readEnv(data)));
 }
 

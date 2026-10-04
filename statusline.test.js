@@ -163,6 +163,19 @@ assert.ok(cells(l2).includes('🟡 5h ⏳ 1h23m') && cells(l2).includes('🟡 7d
 assert.ok(windows(95, 10).includes('🚨 5h') && windows(95, 10).includes('🟢 7d'), 'icono 🚨 y 🟢');
 assert.ok(windows(90, 75).includes('🚨 5h') && windows(90, 75).includes('🔥 7d'), 'icono en el corte del 90');
 assert.ok(windows('x', 'x').includes('🟢 5h') && windows('x', 'x').includes('🟢 7d'), 'icono con porcentaje no numérico');
+
+// Un segmento que lanza un error pinta ⚠ en su sitio y no tira el statusline.
+{
+    const { spawnSync } = require('child_process'), path = require('path');
+    const broken = cells(render({ workspace: { project_dir: 123 } }, env, NOW));
+    assert.ok(broken.split('\n')[0].startsWith('⚠ │ 🤖 ?'), `segmento que falla pinta ⚠: «${broken.split('\n')[0]}»`);
+    assert.ok(broken.split('\n')[1].includes('💰 $0.00'), 'el resto se pinta igual');
+    assert.ok(!cells(render(fixture, env, NOW)).includes('⚠'), 'sin fallos no hay marcador');
+    for (const input of ['null', '3', '"x"', '[]', '{"workspace":{"project_dir":123}}']) {
+        const out = spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input, encoding: 'utf8', timeout: 5000 });
+        assert.ok(out.status === 0 && cells(out.stdout).includes('🤖 ?'), `stdin ${input} pinta`);
+    }
+}
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
