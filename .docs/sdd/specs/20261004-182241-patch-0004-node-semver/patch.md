@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-04
 branch: chore/0004-node-semver
-commit: <hash>
+commit: 97e78b6
 ---
 
 # Patch 0004 — el lanzador elige el Node de proto por nombre, no por versión
