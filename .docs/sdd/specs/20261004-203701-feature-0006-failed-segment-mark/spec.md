@@ -4,7 +4,7 @@ feature: 0006
 title: Marcador ⚠ cuando un segmento falla
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:

@@ -20,6 +20,9 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **`render` es pura.** Recibe `data`, `env` y `now` como parámetros. No lee
   ficheros, no llama a `git` y no consulta el reloj. Por eso los tests la
   ejercitan sin mocks. Todo acceso al exterior vive en `readEnv` y en `main`.
+- **Cada segmento se pinta dentro de `segment()`.** Si lanza, deja `⚠` en su
+  sitio; si no tiene datos, devuelve `null` y se omite. Un segmento nuevo que
+  no pase por `segment()` puede volver a tirar el statusline entero.
 - **Un segmento, una función `render*`.** Devuelve el texto del segmento, o
   `null` si no hay nada que pintar.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente

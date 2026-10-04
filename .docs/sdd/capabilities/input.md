@@ -8,12 +8,9 @@ De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variab
 
 ### Stdin vacío o inválido
 
-> Cobertura: sin test.
-
-- GIVEN un stdin vacío o que no es JSON válido
+- GIVEN un stdin vacío, que no es JSON válido, o un JSON que no es un objeto (`null`, `3`, `"x"`, `[]`)
 - WHEN Claude Code ejecuta el statusline
-- THEN el statusline pinta sus dos líneas con valores por defecto (modelo `?`,
-  contexto 🟢 0 %, reloj `0m`, coste `$0.00`) y termina sin error
+- THEN el statusline pinta sus dos líneas con valores por defecto (modelo `?`, contexto 🟢 0 %, reloj `0m`, coste `$0.00`) y termina sin error
 
 ### Campo ausente en el JSON
 
