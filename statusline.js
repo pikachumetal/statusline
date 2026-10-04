@@ -98,7 +98,11 @@ function fmtClock(epochSeconds) {
 }
 
 // ---------- entorno (git, flags, perfil) ----------
-function git(args, cwd, timeout) {
+// Un plazo para todas las llamadas del refresco: con un timeout por llamada, un git lento
+// sumaba hasta 6 s en cada refresco.
+const GIT_BUDGET_MS = 2000;
+
+function git(args, cwd, timeout = GIT_BUDGET_MS) {
     try {
         return execFileSync('git', ['-C', cwd, '--no-optional-locks', ...args], {
             encoding: 'utf8', timeout, stdio: ['ignore', 'pipe', 'ignore'],
@@ -118,10 +122,6 @@ function gitNames(top, commonDir, gitDir) {
     const linked = path.resolve(gitDir) !== common;
     return { repo: path.basename(repoRoot).replace(/\.git$/, ''), worktree: linked ? path.basename(top) : null };
 }
-
-// Un plazo para todas las llamadas del refresco: con un timeout por llamada, un git lento
-// sumaba hasta 6 s en cada refresco.
-const GIT_BUDGET_MS = 2000;
 
 function readGit(data, run = git) {
     const cwd = projectDir(data);
