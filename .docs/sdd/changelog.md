@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0011** — Las barras de 5h y semanal pintan un marcador de ritmo (`┃`) en la celda del tiempo transcurrido de la ventana: si el relleno pasa de la marca, la cuota se gasta más rápido que el reloj. → [ref](specs/20261004-143157-feature-0011-pace-marker/)
 - **0010** — Las barras del contexto, la ventana de 5h y la semanal pintan la celda de corte con un sub-bloque de octavos (`▏▎▍▌▋▊▉`): 8 veces más resolución con el mismo ancho. Un 34 % y un 38 % ya no se pintan igual. → [ref](specs/20261004-141040-feature-0010-sub-block-bars/)
 
@@ -15,6 +16,7 @@
 
 ### Fixed
 
+- **0013** — Un `total_cost_usd` no numérico ya no hace fallar el statusline: el coste se pinta como `$0.00`. → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0008** — Un `resets_at` no numérico ya no pinta `NaN` en las ventanas de 5h y semanal: el segmento degrada como si el campo no estuviera. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
 
 ## [1.0.0] - 2026-09-20
