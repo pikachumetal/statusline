@@ -182,7 +182,9 @@ function readEnv(data) {
 
 // ---------- render ----------
 function renderWhere(data, env) {
-    let out = `${BOLD}${C.orange}${env.git ? env.git.repo : path.basename(projectDir(data))}${RESET}`;
+    const name = env.git ? env.git.repo : path.basename(projectDir(data));
+    if (!name) return null;
+    let out = `${BOLD}${C.orange}${name}${RESET}`;
     if (!env.git) return out;
     out += ` ${C.green}${BRANCH_ICON} ${env.git.branch}${RESET}`;
     if (env.git.worktree) out += ` 🌳 ${env.git.worktree}`;
@@ -199,7 +201,8 @@ function renderVelocity(data) {
 function renderLine1(data, env) {
     const parts = [];
     if (env.profile) parts.push(`${C.magenta}🧪 ${env.profile}${RESET}`);
-    parts.push(renderWhere(data, env));
+    const where = renderWhere(data, env);
+    if (where) parts.push(where);
 
     let model = `${C.magenta}🤖 ${data.model?.display_name || '?'}${RESET}`;
     if (data.effort?.level) model += ` ${C.dim}(${data.effort.level})${RESET}`;
