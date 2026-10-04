@@ -308,6 +308,10 @@ if (process.platform === 'win32') {
         fs.writeFileSync(path.join(profile, '.caveman-statusline-suffix'), '\x1b[31mX\x07\tY\rZ\n');
         const raw = run(profile).split('\n')[0];
         assert.ok(cells(raw).includes('🗿 lite [31mXYZ') && !raw.includes('\x1b[31mX') && !/[\x07\t\r]/.test(raw), 'sufijo sin escape ni control');
+        // DEL y los C1 (U+0080–U+009F; U+009B es un CSI de un carácter) también son controles.
+        fs.writeFileSync(path.join(profile, '.caveman-statusline-suffix'), 'A\x7fB\u009b31mC\u0085D');
+        const c1 = run(profile).split('\n')[0];
+        assert.ok(cells(c1).includes('🗿 lite AB31mCD') && !/[\x7f-\x9f]/.test(c1), `sufijo sin DEL ni C1: «${JSON.stringify(cells(c1))}»`);
 
         // El statusline nunca escribe en el perfil: mismos ficheros y mismo contenido tras pintar.
         const snapshot = () => fs.readdirSync(profile).sort().map((f) => `${f}=${fs.readFileSync(path.join(profile, f), 'utf8')}`).join('|');
