@@ -37,10 +37,19 @@ function gradientAt(t) {
     return rgb(...from.map((v, i) => Math.round(v + (to[i] - v) * u)));
 }
 
+// La celda de corte lleva fondo gris para que el sub-bloque no deje un hueco del color de la terminal.
+const EIGHTHS = '▏▎▍▌▋▊▉';
+const GRAY_BG = `${ESC}48;2;60;60;60m`;
+
 function bar(pct, width) {
-    const filled = Math.round(clamp(pct) / 100 * width);
+    const eighths = Math.round(clamp(pct) / 100 * width * 8);
+    const full = Math.floor(eighths / 8), rest = eighths % 8;
     let out = '';
-    for (let i = 0; i < width; i++) out += (i < filled ? gradientAt(i / (width - 1)) : C.gray) + '█';
+    for (let i = 0; i < width; i++) {
+        if (i < full) out += gradientAt(i / (width - 1)) + '█';
+        else if (i === full && rest > 0) out += GRAY_BG + gradientAt(i / (width - 1)) + EIGHTHS[rest - 1] + RESET;
+        else out += C.gray + '█';
+    }
     return out + RESET;
 }
 

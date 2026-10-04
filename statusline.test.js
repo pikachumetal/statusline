@@ -71,6 +71,18 @@ assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
 
 assert.strictEqual((bar(50, 10).match(/█/g) || []).length, 10, 'barra de 10 bloques');
 assert.ok(bar(0, 10).includes('38;2;60;60;60'), 'bloque vacío gris');
+
+// Sub-bloques: la celda de corte pinta el resto en octavos, sin cambiar el ancho.
+const cells = (s) => s.replace(/\x1b\[[0-9;]*m/g, '');
+const grayCells = (s) => (s.match(/38;2;60;60;60m█/g) || []).length;
+assert.strictEqual(cells(bar(47, 10)), '████▊█████', '47 % en 10: 4 llenos, ▊, 5 vacíos');
+assert.strictEqual(cells(bar(34, 8)), '██▊█████', '34 % en 8: 2 llenos, ▊, 5 vacíos');
+assert.strictEqual(cells(bar(38, 8)), '████████', '38 % en 8: 3 llenos, 5 vacíos');
+assert.strictEqual(grayCells(bar(38, 8)), 5, '38 %: 5 vacías grises');
+assert.ok(bar(34, 8).includes('48;2;60;60;60m'), 'sub-bloque sobre fondo gris');
+for (const v of ['x', -5]) assert.strictEqual(grayCells(bar(v, 8)), 8, `bar acota ${v}`);
+for (const v of [150, 99.9]) assert.strictEqual(cells(bar(v, 8)), '████████', `bar satura ${v}`);
+assert.strictEqual(cells(bar(1, 8)), '▏███████', 'bar pinta el octavo mínimo');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
