@@ -69,6 +69,24 @@ assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: 
 const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
 assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
 
+// Modos de caveman 3.x (caveman, ultracave, megacave) y los antiguos, leídos del flag del perfil.
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-flags-'));
+    try {
+        for (const mode of ['caveman', 'ultracave', 'megacave', 'lite']) {
+            fs.writeFileSync(path.join(dir, '.caveman-active'), mode);
+            const out = spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: '{}', encoding: 'utf8', env: { ...process.env, CLAUDE_CONFIG_DIR: dir } }).stdout;
+            assert.ok(out.includes(`🗿 ${mode}`), `caveman ${mode} visible`);
+        }
+        fs.writeFileSync(path.join(dir, '.caveman-active'), 'off');
+        assert.ok(!spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: '{}', encoding: 'utf8', env: { ...process.env, CLAUDE_CONFIG_DIR: dir } }).stdout.includes('🗿'), 'caveman off por flag oculto');
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+}
+
 assert.strictEqual((bar(50, 10).match(/█/g) || []).length, 10, 'barra de 10 bloques');
 assert.ok(bar(0, 10).includes('38;2;60;60;60'), 'bloque vacío gris');
 
