@@ -17,15 +17,10 @@ Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada l�
 
 ### Separador de segmentos
 
-> Cobertura: sin test.
-
 - GIVEN una línea con varios segmentos
 - WHEN se pinta
 - THEN los segmentos van separados por `│` en gris, con un espacio a cada lado
 - AND un segmento que no tiene nada que mostrar no deja separador ni hueco
-
-Excepción conocida: con stdin inválido el segmento de ubicación queda vacío y sí
-deja su separador (L1 empieza por ` │`). Está en la tabla de deuda de `roadmap.md`.
 
 ### Color
 

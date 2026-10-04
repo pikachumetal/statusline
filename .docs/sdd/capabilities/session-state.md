@@ -37,11 +37,10 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 
 ### Ubicación sin git
 
-> Cobertura: con test.
-
 - GIVEN un directorio de proyecto que no es un repo git, o un `git` que no responde
 - WHEN se pinta la L1
 - THEN se muestra solo el nombre del directorio, sin icono de branch ni worktree
+- AND sin directorio de proyecto (stdin vacío o inválido) el segmento no aparece, ni su separador
 
 ### Modelo y effort
 

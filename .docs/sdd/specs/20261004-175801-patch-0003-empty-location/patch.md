@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-04
 branch: chore/0003-empty-location
-commit: <hash>
+commit: 85f1ccb
 ---
 
 # Patch 0003 — la L1 empieza con un segmento vacío sin directorio de proyecto
@@ -40,6 +40,8 @@ Reproducido en RED: `render({}, env, NOW)` da la L1 `« │ 🤖 ? │ 🗿 lite
 | 2 | GREEN: `node statusline.test.js` | ✅ `statusline.test.js OK` |
 | 3 | Ejecución real con stdin `xx` | ✅ L1 `🤖 ? │ 🗿 caveman │ 🦥 full` |
 | 4 | Ejecución real en este repo (sin regresión) | ✅ L1 `statusline  chore/0003-empty-location │ 🤖 ? │ …` |
+
+Validación diferida: 2026-10-04 · «ok, sigue» · disparador: smoke de la release 1.1.0, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 

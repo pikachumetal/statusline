@@ -13,6 +13,7 @@
 | 2026-10-04 | 0014 | patch | — | 0.2 | — | — | — | — | — | 20261004-152212-patch-0014-caveman-modes |
 | 2026-10-04 | 0001 | backend | 0.3 | 0.3 | 1 | 5858k | 211k | no aplica | sin precio | 20261004-152728-feature-0001-git-time-budget |
 | 2026-10-04 | 0015 | patch | — | 0.1 | — | — | — | — | — | 20261004-170112-patch-0015-timing-tests |
+| 2026-10-04 | 0003 | patch | — | 0.15 | — | — | — | — | — | 20261004-175801-patch-0003-empty-location |
 
 **Factor de calibración** (ratio mediano real/estimado, 5 artefactos): **0.83** · media 0.83
 
@@ -39,6 +40,6 @@
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 8 | 2.6 | 0.83 | — | — |
+| sin publicar | 9 | 2.75 | 0.83 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.
