@@ -33,6 +33,11 @@ todo sale de cuatro fuentes:
 Hoy no se permite caché. Si un segmento futuro la necesita, esa task abre esta
 regla de forma explícita.
 
+Excepción (patch 0009): el wrapper opcional `statusline-orca.cmd` guarda el
+stdin en un temporal de `%TEMP%` para pasárselo a `statusline.cmd` y a Orca, y
+lo borra al acabar. Si Claude Code mata el proceso antes, el temporal queda
+huérfano. `statusline.js` sigue sin escribir ficheros.
+
 ### 2. Idioma de los nombres — respondida
 
 - **En inglés:** código, variables de entorno propias, claves de configuración

@@ -79,10 +79,18 @@ if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
     const { spawnSync } = require('child_process');
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
-    const install = () => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir], { encoding: 'utf8' });
-    const orca = fs.existsSync(path.join(os.homedir(), '.orca', 'agent-hooks', 'claude-statusline.cmd'));
-    const cmd = path.join(dir, 'hooks', orca ? 'statusline-orca.cmd' : 'statusline.cmd');
+    // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
+    const noOrca = path.join(dir, 'no-orca.cmd');
+    const install = (orcaHook = noOrca) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
+    const cmd = path.join(dir, 'hooks', 'statusline.cmd');
     try {
+        // Con Orca: el bloque apunta al wrapper que le reenvía el JSON.
+        const orcaHook = path.join(dir, 'claude-statusline.cmd');
+        fs.writeFileSync(orcaHook, '@echo off');
+        const withOrca = install(orcaHook);
+        const orcaCmd = path.join(dir, 'hooks', 'statusline-orca.cmd');
+        assert.ok(withOrca.stdout.includes(`"\\"${orcaCmd.replace(/\\/g, '\\\\')}\\""`), 'con Orca el bloque apunta a statusline-orca.cmd');
+
         const fresh = install();
         assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');

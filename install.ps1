@@ -1,6 +1,10 @@
 # Instala el statusline en un directorio de configuración de Claude Code.
 # Uso: .\install.ps1 [-ConfigDir "$HOME\.claude-gco"]
-param([string]$ConfigDir = (Join-Path $HOME '.claude'))
+# -OrcaHook existe para los tests: fija si se ve Orca sin depender de la máquina.
+param(
+    [string]$ConfigDir = (Join-Path $HOME '.claude'),
+    [string]$OrcaHook = (Join-Path $HOME '.orca\agent-hooks\claude-statusline.cmd')
+)
 
 $hooks = Join-Path $ConfigDir 'hooks'
 New-Item -ItemType Directory -Force $hooks | Out-Null
@@ -8,8 +12,7 @@ foreach ($f in 'statusline.js', 'statusline.cmd', 'statusline-orca.cmd', 'status
     Copy-Item (Join-Path $PSScriptRoot $f) $hooks -Force
 }
 # Con Orca instalado, el wrapper pinta el statusline y además le reenvía el JSON (rate_limits).
-$orca = Join-Path $HOME '.orca\agent-hooks\claude-statusline.cmd'
-$cmd = Join-Path $hooks $(if (Test-Path $orca) { 'statusline-orca.cmd' } else { 'statusline.cmd' })
+$cmd = Join-Path $hooks $(if (Test-Path $OrcaHook) { 'statusline-orca.cmd' } else { 'statusline.cmd' })
 $settings = Join-Path $ConfigDir 'settings.json'
 Write-Host "Ficheros copiados en $hooks"
 
