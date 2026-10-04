@@ -161,8 +161,10 @@ function readEnv(data) {
         git: readGit(data),
         profile: profile && profile !== '.claude' ? profile : null,
         flags: {
+            // caveman 3.x escribe caveman/ultracave/megacave; los modos 2.x siguen en perfiles sin actualizar.
             caveman: readFlag(path.join(claudeDir, '.caveman-active'),
-                ['lite', 'full', 'ultra', 'wenyan-lite', 'wenyan', 'wenyan-full', 'wenyan-ultra', 'commit', 'review', 'compress']),
+                ['caveman', 'ultracave', 'megacave',
+                    'lite', 'full', 'ultra', 'wenyan-lite', 'wenyan', 'wenyan-full', 'wenyan-ultra', 'commit', 'review', 'compress']),
             ponytail: readFlag(path.join(claudeDir, '.ponytail-active'), ['lite', 'full', 'ultra', 'review']),
             savings: readSavingsSuffix(claudeDir),
         },
