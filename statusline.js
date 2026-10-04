@@ -98,10 +98,10 @@ function fmtClock(epochSeconds) {
 }
 
 // ---------- entorno (git, flags, perfil) ----------
-function git(args, cwd) {
+function git(args, cwd, timeout) {
     try {
         return execFileSync('git', ['-C', cwd, '--no-optional-locks', ...args], {
-            encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'ignore'],
+            encoding: 'utf8', timeout, stdio: ['ignore', 'pipe', 'ignore'],
         }).trim();
     } catch { return null; }
 }
@@ -119,12 +119,21 @@ function gitNames(top, commonDir, gitDir) {
     return { repo: path.basename(repoRoot).replace(/\.git$/, ''), worktree: linked ? path.basename(top) : null };
 }
 
-function readGit(data) {
+// Un plazo para todas las llamadas del refresco: con un timeout por llamada, un git lento
+// sumaba hasta 6 s en cada refresco.
+const GIT_BUDGET_MS = 2000;
+
+function readGit(data, run = git) {
     const cwd = projectDir(data);
     if (!cwd) return null;
-    const paths = git(['rev-parse', '--path-format=absolute', '--show-toplevel', '--git-common-dir', '--git-dir'], cwd);
+    const deadline = Date.now() + GIT_BUDGET_MS;
+    const call = (args) => {
+        const left = deadline - Date.now();
+        return left > 0 ? run(args, cwd, left) : null;
+    };
+    const paths = call(['rev-parse', '--path-format=absolute', '--show-toplevel', '--git-common-dir', '--git-dir']);
     if (!paths) return null;
-    const branch = git(['symbolic-ref', '--short', 'HEAD'], cwd) || git(['rev-parse', '--short', 'HEAD'], cwd) || '?';
+    const branch = call(['symbolic-ref', '--short', 'HEAD']) || call(['rev-parse', '--short', 'HEAD']) || '?';
     return { ...gitNames(...paths.split(/\r?\n/)), branch };
 }
 
@@ -269,5 +278,5 @@ function main() {
     process.stdout.write(render(data, readEnv(data)));
 }
 
-module.exports = { render, bar, gitNames, gradientAt, GRAY_BG, RESET };
+module.exports = { render, bar, gitNames, readGit, gradientAt, GRAY_BG, RESET };
 if (require.main === module) main();

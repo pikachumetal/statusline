@@ -1,7 +1,7 @@
 'use strict';
 // Self-check del statusline: node hooks/statusline.test.js
 const assert = require('assert');
-const { render, bar, gitNames, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
+const { render, bar, gitNames, readGit, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
 
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
@@ -65,6 +65,29 @@ const mainTree = gitNames('/code/git/proj', '/code/git/proj/.git', '/code/git/pr
 assert.deepStrictEqual(mainTree, { repo: 'proj', worktree: null }, 'árbol principal: sin worktree');
 const submodule = gitNames('/code/git/proj/sub', '/code/git/proj/.git/modules/sub', '/code/git/proj/.git/modules/sub');
 assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: no es un worktree');
+
+// Presupuesto de git: todas las llamadas de un refresco comparten 2000 ms.
+{
+    const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.max(0, ms));
+    const PATHS = '/code/proj\n/code/proj/.git\n/code/proj/.git';
+    const slow = (args, cwd, timeout) => {
+        if (args.includes('--git-dir')) { sleep(Math.min(1500, timeout)); return timeout >= 1500 ? PATHS : null; }
+        sleep(timeout);
+        return null;
+    };
+    const t0 = Date.now();
+    const slowGit = readGit({ cwd: '/code/proj' }, slow);
+    const took = Date.now() - t0;
+    assert.ok(took <= 2150, `readGit con git lento cabe en el presupuesto (${took} ms)`);
+    assert.deepStrictEqual(slowGit, { repo: 'proj', worktree: null, branch: '?' }, 'readGit con presupuesto agotado');
+    const fast = (args) => (args.includes('--git-dir') ? PATHS : args[0] === 'symbolic-ref' ? 'main' : null);
+    assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, fast), { repo: 'proj', worktree: null, branch: 'main' }, 'readGit con git rápido');
+
+    const { spawnSync } = require('child_process'), path = require('path');
+    const t1 = Date.now();
+    spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: JSON.stringify({ cwd: __dirname }) });
+    assert.ok(Date.now() - t1 < 3000, 'statusline completo por debajo de 3000 ms');
+}
 
 const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
 assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
