@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-04
 branch: chore/0017-suffix-c1
-commit: <hash>
+commit: 25ce726
 ---
 
 # Patch 0017 — el saneado del sufijo deja pasar DEL y los C1
