@@ -4,7 +4,7 @@ feature: 0011
 title: Marcador de ritmo en las barras de cuota
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:
