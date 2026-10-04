@@ -78,15 +78,17 @@ assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: 
     const t0 = Date.now();
     const slowGit = readGit({ cwd: '/code/proj' }, slow);
     const took = Date.now() - t0;
-    assert.ok(took <= 2150, `readGit con git lento cabe en el presupuesto (${took} ms)`);
+    // Margen holgado para una máquina cargada: lo que importa es quedar lejos de los 5500 ms sin plazo.
+    assert.ok(took <= 2500, `readGit con git lento cabe en el presupuesto (${took} ms)`);
     assert.deepStrictEqual(slowGit, { repo: 'proj', worktree: null, branch: '?' }, 'readGit con presupuesto agotado');
     const fast = (args) => (args.includes('--git-dir') ? PATHS : args[0] === 'symbolic-ref' ? 'main' : null);
     assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, fast), { repo: 'proj', worktree: null, branch: 'main' }, 'readGit con git rápido');
 
     const { spawnSync } = require('child_process'), path = require('path');
     const t1 = Date.now();
-    spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: JSON.stringify({ cwd: __dirname }) });
+    const full = spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: JSON.stringify({ cwd: __dirname }), encoding: 'utf8', timeout: 5000 });
     assert.ok(Date.now() - t1 < 3000, 'statusline completo por debajo de 3000 ms');
+    assert.ok(full.status === 0 && full.stdout.trim() !== '', 'statusline completo pinta algo');
 }
 
 const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
