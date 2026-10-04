@@ -91,6 +91,10 @@ assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: 
     assert.ok(full.status === 0 && full.stdout.trim() !== '', 'statusline completo pinta algo');
 }
 
+// Sin git ni directorio de proyecto (stdin vacío o inválido) la L1 no abre con un segmento vacío.
+const bareL1 = render({}, env, NOW).split('\n')[0].replace(/\x1b\[[0-9;]*m/g, '');
+assert.ok(bareL1.startsWith('🤖 ?'), `L1 sin ubicación empieza por el modelo: «${bareL1}»`);
+
 const offEnv ={ ...env, flags: { caveman: null, ponytail: null } };
 assert.ok(!render(fixture, offEnv, NOW).includes('🗿'), 'caveman off oculto');
 

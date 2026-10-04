@@ -12,11 +12,11 @@
 - **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
 - **0011** — Las barras de 5h y semanal pintan un marcador de ritmo (`┃`) en la celda del tiempo transcurrido de la ventana: si el relleno pasa de la marca, la cuota se gasta más rápido que el reloj. → [ref](specs/20261004-143157-feature-0011-pace-marker/)
 - **0010** — Las barras del contexto, la ventana de 5h y la semanal pintan la celda de corte con un sub-bloque de octavos (`▏▎▍▌▋▊▉`): 8 veces más resolución con el mismo ancho. Un 34 % y un 38 % ya no se pintan igual. → [ref](specs/20261004-141040-feature-0010-sub-block-bars/)
-
 - **0008** — La ventana semanal pinta el tiempo transcurrido (`⏳ 4d13h`) y la cuenta atrás hasta el reset (`↻2d10h`), en días y horas. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
 
 ### Fixed
 
+- **0003** — Con stdin vacío o inválido la L1 ya no empieza con un separador suelto: sin directorio de proyecto, el segmento de ubicación no aparece. → [ref](specs/20261004-175801-patch-0003-empty-location/)
 - **0015** — Los tests de tiempo de `git` y del render ya no dan falsos rojos con la máquina cargada, y el render completo no puede colgar la suite. → [ref](specs/20261004-170112-patch-0015-timing-tests/)
 - **0014** — El icono `🗿` de caveman vuelve a pintarse con caveman 3.x, que escribe los modos `caveman`, `ultracave` y `megacave`. → [ref](specs/20261004-152212-patch-0014-caveman-modes/)
 - **0013** — Un `total_cost_usd` no numérico ya no hace fallar el statusline: el coste se pinta como `$0.00`. → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
