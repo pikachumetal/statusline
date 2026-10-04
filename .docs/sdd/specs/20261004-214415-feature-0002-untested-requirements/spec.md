@@ -4,7 +4,7 @@ feature: 0002
 title: Tests de los requisitos sin cobertura
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:

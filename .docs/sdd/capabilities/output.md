@@ -24,7 +24,7 @@ Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada l�
 
 ### Color
 
-> Cobertura: parcial. Con test solo el gris de los bloques vacíos de una barra.
+> Cobertura: con test.
 
 - GIVEN un terminal con truecolor
 - WHEN se pinta el statusline
@@ -36,7 +36,7 @@ El color del porcentaje y el gradiente de las barras están en `usage.md`.
 
 ### Iconos
 
-> Cobertura: parcial. Con test la presencia de los iconos de L1 y L2 y la ausencia del icono de branch sin git.
+> Cobertura: con test del glifo de branch y de los emojis; el símbolo roto sin nerd font es del terminal.
 
 - GIVEN un terminal con una nerd font
 - WHEN se pinta el statusline

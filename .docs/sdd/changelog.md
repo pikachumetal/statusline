@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0002** — Tienen test los requisitos que no lo tenían: perfil, valor y hardening de los ficheros flag, saneado del sufijo de ahorro, precedencia de `project_dir`, detached HEAD, color del porcentaje, reset de color por segmento y wrapper de Orca. → [ref](specs/20261004-214415-feature-0002-untested-requirements/)
 - **0006** — Un segmento que falla al pintarse deja un `⚠` gris en su sitio y el resto de la línea se pinta igual. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
 - **0005** — Las ventanas de 5h y semanal pintan el mismo icono de nivel que el contexto (🟢 🟡 🔥 🚨) delante de su etiqueta: `🚨 5h` con un 92 % gastado. → [ref](specs/20261004-185434-feature-0005-quota-alert-icon/)
 - **0001** — Todas las llamadas a `git` de un refresco comparten un presupuesto de 2000 ms: con un `git` lento, el statusline tarda como mucho 2 s en `git` en vez de 6 s. Un test mide el presupuesto y el render completo. → [ref](specs/20261004-152728-feature-0001-git-time-budget/)

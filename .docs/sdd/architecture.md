@@ -30,7 +30,13 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **Un campo numérico del JSON se valida con `Number.isFinite` antes de operar
   con él.** Comprobarlo por truthy deja pasar un string o un objeto y el segmento
   acaba pintando `NaN`. Es el caso de `resets_at` en las dos ventanas de cuota.
-- **Exports:** solo `render` y `bar`, que son lo que usan los tests.
+- **Los tests que lanzan `statusline.js` fijan el entorno que lee:**
+  `CLAUDE_CONFIG_DIR`, `CAVEMAN_STATUSLINE_SAVINGS`, `USERPROFILE`/`HOME` y
+  `TEMP` apuntan a temporales o a valores fijos; heredarlos del usuario hace que
+  la suite dependa de su máquina.
+- **Exports:** solo lo que usan los tests: `render`, `bar`, `gitNames`,
+  `readGit` (con su ejecutor de `git` inyectable) y `gradientAt`, `GRAY_BG` y
+  `RESET` para comprobar los colores.
 
 ## Decisiones técnicas
 

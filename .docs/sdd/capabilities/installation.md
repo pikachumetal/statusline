@@ -44,6 +44,8 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 
 ### Wrapper de Orca
 
+> Cobertura: con test (solo en Windows).
+
 - GIVEN `statusline-orca.cmd` y `statusline.cmd` en la misma carpeta
 - WHEN Claude Code ejecuta `statusline-orca.cmd` con el JSON de la sesión por stdin
 - THEN guarda el stdin en un temporal de `%TEMP%` y se lo pasa a `statusline.cmd`, que pinta
