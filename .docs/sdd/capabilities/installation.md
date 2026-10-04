@@ -7,21 +7,18 @@ Windows tiene instalador y lanzador.
 
 ### Copia de ficheros al perfil
 
-> Cobertura: con test (solo en Windows).
-
 - GIVEN el repo clonado en una máquina Windows con PowerShell 7+
 - WHEN se ejecuta `.\install.ps1`, con o sin `-ConfigDir <perfil>`
-- THEN `statusline.js`, `statusline.cmd` y `statusline.test.js` se copian a `<perfil>\hooks`
+- THEN `statusline.js`, `statusline.cmd`, `statusline-orca.cmd` y `statusline.test.js` se copian a `<perfil>\hooks`
 - AND el perfil por defecto es `~/.claude`
 - AND la carpeta `hooks` se crea si no existe, y los ficheros que ya hubiera se sobrescriben
 
 ### El instalador no toca settings.json
 
-> Cobertura: con test (solo en Windows).
-
 - GIVEN una instalación en un perfil
 - WHEN `install.ps1` termina
 - THEN muestra por pantalla el bloque `statusLine` que hay que pegar en `<perfil>\settings.json`, con la ruta del `.cmd` ya escapada, `padding: 0` y `refreshInterval: 10`
+- AND el `.cmd` es `statusline-orca.cmd` si existe el hook de Orca (`-OrcaHook`, por defecto `~\.orca\agent-hooks\claude-statusline.cmd`), y `statusline.cmd` si no
 - AND no crea ni modifica `settings.json`
 
 ### Update sobre una instalación existente
@@ -47,6 +44,14 @@ Windows tiene instalador y lanzador.
 
 Se usa el `node.exe` real de proto y no su shim porque el shim inyecta a veces
 una línea NDJSON en stdout que ensuciaría el statusline.
+
+### Wrapper de Orca
+
+- GIVEN `statusline-orca.cmd` y `statusline.cmd` en la misma carpeta
+- WHEN Claude Code ejecuta `statusline-orca.cmd` con el JSON de la sesión por stdin
+- THEN guarda el stdin en un temporal de `%TEMP%` y se lo pasa a `statusline.cmd`, que pinta
+- AND si existe `%USERPROFILE%\.orca\agent-hooks\claude-statusline.cmd`, le pasa el mismo JSON y descarta su salida
+- AND borra el temporal y sale con 0
 
 ## Reglas de la capacidad
 

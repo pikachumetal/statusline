@@ -7,7 +7,7 @@ solution: dev-lead
 status: done
 created: 2026-10-04
 branch: chore/0009-orca-wrapper
-commit: <hash>
+commit: ca803d2
 ---
 
 # Patch 0009 — wrapper de Orca
@@ -50,6 +50,8 @@ Qué hace la integración (registro retroactivo): Orca trae su propio hook de st
 | --- | --- | --- |
 | 1 | RED: test nuevo «con Orca el bloque apunta a statusline-orca.cmd» antes de añadir `-OrcaHook` | ✅ falla con `AssertionError: con Orca el bloque apunta a statusline-orca.cmd` |
 | 2 | GREEN: `node statusline.test.js` con las dos ramas (hook de Orca falso que existe y ruta inexistente) | ✅ `statusline.test.js OK` |
+
+Validado: 2026-10-04 · «si» · no detalló qué probó
 
 ## 5. Tiempo (ligero)
 
