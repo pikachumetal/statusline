@@ -65,7 +65,7 @@ function levelColor(pct) {
     return C.red;
 }
 
-function contextEmoji(pct) {
+function levelEmoji(pct) {
     if (pct < 20) return '🟢';
     if (pct < 70) return '🟡';
     if (pct < 90) return '🔥';
@@ -221,7 +221,7 @@ function renderLine1(data, env) {
 function renderFiveHour(five, now) {
     const pct = clamp(five.used_percentage);
     const reset = resetMs(five.resets_at);
-    let s = `${C.dim}5h${RESET}`;
+    let s = `${levelEmoji(pct)} ${C.dim}5h${RESET}`;
     let pace = null;
     if (reset !== null) {
         const elapsed = Math.max(0, Math.min(FIVE_HOURS_MS, FIVE_HOURS_MS - (reset - now)));
@@ -239,7 +239,7 @@ function renderSevenDay(week, now) {
     const reset = resetMs(week.resets_at);
     const left = reset === null ? null : Math.max(0, reset - now);
     const elapsed = left === null ? null : Math.max(0, Math.min(SEVEN_DAYS_MS, SEVEN_DAYS_MS - left));
-    let s = `${C.dim}7d${RESET}`;
+    let s = `${levelEmoji(pct)} ${C.dim}7d${RESET}`;
     if (elapsed !== null) s += ` ⏳ ${fmtSpan(elapsed)}`;
     s += ` ${bar(pct, USAGE_WIDTH, elapsed === null ? null : elapsed / SEVEN_DAYS_MS * 100)} ${pctText(pct)}`;
     if (left !== null) s += ` ${C.dim}↻${fmtSpan(left)}${RESET}`;
@@ -261,7 +261,7 @@ function renderLine2(data, now) {
     const parts = [`⏱️ ${fmtDuration(data.cost?.total_duration_ms || 0)}`];
 
     const ctx = clamp(data.context_window?.used_percentage);
-    parts.push(`${contextEmoji(ctx)} ${bar(ctx, CONTEXT_WIDTH)} ${pctText(ctx)}`);
+    parts.push(`${levelEmoji(ctx)} ${bar(ctx, CONTEXT_WIDTH)} ${pctText(ctx)}`);
 
     if (data.rate_limits?.five_hour) parts.push(renderFiveHour(data.rate_limits.five_hour, now));
 
