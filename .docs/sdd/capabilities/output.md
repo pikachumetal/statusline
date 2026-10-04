@@ -43,6 +43,14 @@ El color del porcentaje y el gradiente de las barras están en `usage.md`.
 - THEN el icono de branch es el glifo U+E0A0 de la nerd font, y el resto de iconos son emojis
 - AND sin nerd font el icono de branch se ve como un símbolo roto: es un requisito del terminal, no se degrada (ver `mission.md`)
 
+### Segmento que falla
+
+- GIVEN un segmento que lanza un error al pintarse
+- WHEN se pinta su línea
+- THEN en su lugar se pinta `⚠` en gris, con su separador, y el resto de segmentos se pinta igual
+- AND con `{"workspace":{"project_dir":123}}` la L1 es `⚠ │ 🤖 ? │ …` y la L2 se pinta entera
+- AND un segmento sin datos no es un fallo: se omite o usa su valor por defecto, sin `⚠`
+
 ## Reglas de la capacidad
 
 - **Dónde viven los datos**: no aplica. Solo se escribe en stdout.

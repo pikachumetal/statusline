@@ -68,13 +68,11 @@ Vigentes:
 - Gradiente en las barras de la ventana de 5h y la semanal.
 - El porcentaje del contexto, de la ventana de 5h y de la semanal cambia de
   color con los mismos cortes (20 %, 70 %, 90 %).
-- Si un segmento falla (no hay `git`, falta un dato), se omite sin avisar.
+- Si a un segmento le falta un dato (no hay `git`, el JSON no lo trae), se omite
+  o usa su valor por defecto, sin avisar.
+- Si un segmento falla al pintarse (lanza un error), se pinta un `⚠` discreto en
+  su sitio y el resto de segmentos se pinta igual.
 - No hay texto de aviso ni nada que interrumpa.
-
-Pendientes de implementar (ver `roadmap.md`). Hasta que su task se cierre, el
-comportamiento vigente es el de arriba:
-
-- Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo.
 
 ### 5. Regla ante conflicto — respondida
 

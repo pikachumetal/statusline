@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **0006** — Un segmento que falla al pintarse deja un `⚠` gris en su sitio y el resto de la línea se pinta igual. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
 - **0005** — Las ventanas de 5h y semanal pintan el mismo icono de nivel que el contexto (🟢 🟡 🔥 🚨) delante de su etiqueta: `🚨 5h` con un 92 % gastado. → [ref](specs/20261004-185434-feature-0005-quota-alert-icon/)
 - **0001** — Todas las llamadas a `git` de un refresco comparten un presupuesto de 2000 ms: con un `git` lento, el statusline tarda como mucho 2 s en `git` en vez de 6 s. Un test mide el presupuesto y el render completo. → [ref](specs/20261004-152728-feature-0001-git-time-budget/)
 - **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
@@ -17,6 +18,7 @@
 
 ### Fixed
 
+- **0006** — Un `project_dir` no textual o un stdin JSON que no es un objeto (`null`, `3`, `[]`) ya no tiran el statusline entero. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
 - **0004** — `statusline.cmd` arranca el Node de proto de versión más alta por SemVer: con `26.9.0` y `26.10.0` instaladas usaba la `26.9.0`. → [ref](specs/20261004-182241-patch-0004-node-semver/)
 - **0003** — Con stdin vacío o inválido la L1 ya no empieza con un separador suelto: sin directorio de proyecto, el segmento de ubicación no aparece. → [ref](specs/20261004-175801-patch-0003-empty-location/)
 - **0015** — Los tests de tiempo de `git` y del render ya no dan falsos rojos con la máquina cargada, y el render completo no puede colgar la suite. → [ref](specs/20261004-170112-patch-0015-timing-tests/)
