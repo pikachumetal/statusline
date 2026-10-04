@@ -21,6 +21,17 @@ en preparación
 | 0008 | Tiempo transcurrido y cuenta atrás de reset en la ventana semanal | Petición del usuario el 2026-09-20 | `statusline.js`, `statusline.test.js` | ✅ 2026-09-21 ([walkthrough](specs/20260920-215837-task-0008-weekly-reset/walkthrough.md)) |
 | 0009 | Wrapper de Orca (`statusline-orca.cmd`): registro SDD de la integración de `252c34c`, test del instalador independiente de la máquina y excepción a la regla 1 | Petición del usuario el 2026-10-04 · patch | `install.ps1`, `statusline-orca.cmd`, `statusline.test.js` | ✅ 2026-10-04 ([patch](specs/20261004-113838-patch-0009-orca-wrapper/patch.md)) |
 
+## Release 2.0.0
+
+en preparación
+
+| id | Feature | Origen | Ficheros que toca | Estado |
+| --- | --- | --- | --- | --- |
+| 0010 | Barras con sub-bloques (`▏▎▍▌▋▊▉█`): 8 veces más resolución con el mismo ancho | Petición del usuario el 2026-10-04 | `statusline.js` (`bar`), `statusline.test.js` | ⏳ |
+| 0011 | Marcador de ritmo en las barras de 5h y 7d: dónde estarías si gastaras uniforme hasta el reset, desde `used_percentage` y `resets_at` · tras 0010 | Petición del usuario el 2026-10-04 | `statusline.js` (`bar`, render de las ventanas), `statusline.test.js` | ⏳ |
+| 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | ⏳ |
+| 0013 | Coste por hora (`$/h`) junto al coste, desde `total_cost_usd` y `total_duration_ms` | Petición del usuario el 2026-10-04 | `statusline.js` (render del coste), `statusline.test.js` | ⏳ |
+
 ## Backlog
 
 | # | Ítem | Origen |
