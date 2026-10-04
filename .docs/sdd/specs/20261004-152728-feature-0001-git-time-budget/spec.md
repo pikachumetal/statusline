@@ -4,7 +4,7 @@ feature: 0001
 title: Presupuesto de tiempo de git y del render
 mode: full
 profile: unattended
-status: approved
+status: done
 created: 2026-10-04
 author: Claude (unattended)
 approvers:
