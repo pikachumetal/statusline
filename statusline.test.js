@@ -80,11 +80,13 @@ if (process.platform === 'win32') {
     const { spawnSync } = require('child_process');
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     const install = () => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir], { encoding: 'utf8' });
-    const cmd = path.join(dir, 'hooks', 'statusline.cmd');
+    const orca = fs.existsSync(path.join(os.homedir(), '.orca', 'agent-hooks', 'claude-statusline.cmd'));
+    const cmd = path.join(dir, 'hooks', orca ? 'statusline-orca.cmd' : 'statusline.cmd');
     try {
         const fresh = install();
         assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');
+        assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline-orca.cmd')), 'copia statusline-orca.cmd');
         assert.ok(fresh.stdout.includes(`"\\"${cmd.replace(/\\/g, '\\\\')}\\""`), 'bloque statusLine con la ruta escapada');
         assert.ok(!fs.existsSync(path.join(dir, 'settings.json')), 'no crea settings.json');
 
