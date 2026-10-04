@@ -45,8 +45,9 @@ huérfano. `statusline.js` sigue sin escribir ficheros.
 - **En castellano:** `.docs/sdd/`, comentarios del código y commits.
 - **Nombres de fichero de `.docs/sdd/`:** en inglés kebab-case, incluidas las
   capacidades (`capabilities/<capability>.md`). Solo el contenido va en castellano.
-- **README:** bilingüe (castellano e inglés). La forma concreta —un fichero con
-  dos secciones o `README.md` más `README.en.md`— la decide la task que lo traduzca.
+- **README:** bilingüe, en dos ficheros: `README.md` en castellano y
+  `README.en.md` en inglés, con el enlace al otro idioma en la primera línea.
+  Los dos dicen lo mismo, sección por sección.
 
 ### 3. Límites — respondida
 

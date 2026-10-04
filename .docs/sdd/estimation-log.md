@@ -20,20 +20,21 @@
 | 2026-10-04 | 0016 | patch | — | 0.3 | — | — | — | — | — | 20261004-204410-patch-0016-json-garbage |
 | 2026-10-04 | 0002 | chore | 0.5 | 0.6 | 1.2 | 9802k | 497k | no aplica | sin precio | 20261004-214415-feature-0002-untested-requirements |
 | 2026-10-04 | 0017 | patch | — | 0.1 | — | — | — | — | — | 20261004-215710-patch-0017-suffix-c1 |
+| 2026-10-05 | 0007 | docs | 0.3 | 0.15 | 0.5 | 5874k | 223k | no aplica | sin precio | 20261004-220000-feature-0007-bilingual-readme |
 
-**Factor de calibración** (ratio mediano real/estimado, 8 artefactos): **1** · media 0.94
+**Factor de calibración** (ratio mediano real/estimado, 9 artefactos): **1** · media 0.89
 
-- p25–p75: 0.83–1.04
-- p80: 1.1 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
-- Dentro de ±25 %: 88 % · sobreestimadas: 13 % · infraestimadas: 0 %
-- Error absoluto (h): media 0.07 · mediana 0.05
+- p25–p75: 0.8–1
+- p80: 1.07 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
+- Dentro de ±25 %: 78 % · sobreestimadas: 22 % · infraestimadas: 0 %
+- Error absoluto (h): media 0.08 · mediana 0.05
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tramo del ratio | n | % |
 | --- | --- | --- |
 | <0.5 | 0 | 0 % |
-| 0.5–0.8 | 1 | 13 % |
-| 0.8–1.25 | 7 | 88 % |
+| 0.5–0.8 | 2 | 22 % |
+| 0.8–1.25 | 7 | 78 % |
 | 1.25–2 | 0 | 0 % |
 | ≥2 | 0 | 0 % |
 
@@ -41,12 +42,13 @@
 | --- | --- | --- | --- |
 | backend | 2 | 1.08 | — |
 | chore | 1 | 1.2 | — |
+| docs | 1 | 0.5 | — |
 | frontend | 4 | 0.92 | — |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 15 | 4.6 | 1 | — | — |
+| sin publicar | 16 | 4.75 | 1 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.
