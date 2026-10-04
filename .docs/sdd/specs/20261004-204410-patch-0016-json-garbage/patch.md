@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-04
 branch: chore/0016-json-garbage
-commit: <hash>
+commit: 911f08f
 ---
 
 # Patch 0016 — valores del JSON de tipo inesperado pintan basura

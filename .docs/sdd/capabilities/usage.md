@@ -8,12 +8,10 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 ### Reloj de sesión
 
-> Cobertura: con test.
-
 - GIVEN un JSON con `cost.total_duration_ms`
 - WHEN se pinta la L2
 - THEN se muestra `⏱️` y la duración redondeada al minuto: `12m` por debajo de una hora, `1h05m` a partir de una hora
-- AND sin el campo se muestra `0m`
+- AND sin el campo, o con un valor que no sea un número finito y positivo (`"x"`, `1e999`, `{}`), se muestra `0m`
 
 ### Contexto
 
@@ -33,7 +31,7 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - AND el icono de nivel es 🟢 por debajo del 20 %, 🟡 por debajo del 70 %, 🔥 por debajo del 90 % y 🚨 a partir del 90 %: un 34 % pinta `🟡 5h`, un 95 % pinta `🚨 5h`
 - AND el tiempo transcurrido es 5 h menos lo que falta para `resets_at`, acotado entre 0 y 5 h
 - AND la barra lleva el marcador de ritmo en la celda del transcurrido sobre 5 h: con 1h23m transcurridas (27,7 %) y un 34 % gastado, la barra es `██┃█████`
-- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo el icono, `5h`, la barra sin marcador y el porcentaje
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico o no dé una fecha válida (`1e308`), se muestran solo el icono, `5h`, la barra sin marcador y el porcentaje
 - AND sin `rate_limits.five_hour` el segmento no aparece
 
 ### Ventana semanal
@@ -46,7 +44,7 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - AND el tiempo que queda es lo que falta para `resets_at`, acotado a 0 por abajo
 - AND la barra lleva el marcador de ritmo en la celda del transcurrido sobre 7 días: con 6 días transcurridos (85,7 %) y un 38 % gastado, la barra es `██████┃█`; con el reset vencido, el marcador va en la última celda
 - AND con un `resets_at` a más de 7 días, el transcurrido es 0 y el marcador va en la primera celda
-- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico, se muestran solo el icono, `7d`, la barra sin marcador y el porcentaje
+- AND sin `resets_at`, o con un `resets_at` que no sea un epoch numérico o no dé una fecha válida (`1e308`), se muestran solo el icono, `7d`, la barra sin marcador y el porcentaje
 - AND sin `rate_limits.seven_day` el segmento no aparece
 
 ### Formato de duración larga
@@ -63,7 +61,7 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 - GIVEN un JSON con `cost.total_cost_usd`
 - WHEN se pinta la L2
 - THEN se muestra `💰 $` y el coste con dos decimales
-- AND sin el campo, o con un valor que no sea un número finito, se muestra `$0.00`
+- AND sin el campo, o con un valor que no sea un número finito y positivo (un texto, `-1`), se muestra `$0.00`
 - AND con `cost.total_duration_ms` de 5 minutos o más y coste mayor que 0, se añade ` · $` y el coste por hora con dos decimales seguido de `/h`: $0.47 en 12 minutos es `💰 $0.47 · $2.35/h`
 - AND con menos de 5 minutos, sin duración numérica o con coste 0, no se muestra el coste por hora: $0.20 en 4 minutos es `💰 $0.20`
 

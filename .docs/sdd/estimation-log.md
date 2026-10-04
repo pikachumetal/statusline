@@ -17,6 +17,7 @@
 | 2026-10-04 | 0004 | patch | — | 0.3 | — | — | — | — | — | 20261004-182241-patch-0004-node-semver |
 | 2026-10-04 | 0005 | frontend | 0.2 | 0.2 | 1 | 4155k | 210k | no aplica | sin precio | 20261004-185434-feature-0005-quota-alert-icon |
 | 2026-10-04 | 0006 | backend | 0.3 | 0.35 | 1.17 | 7288k | 285k | no aplica | sin precio | 20261004-203701-feature-0006-failed-segment-mark |
+| 2026-10-04 | 0016 | patch | — | 0.3 | — | — | — | — | — | 20261004-204410-patch-0016-json-garbage |
 
 **Factor de calibración** (ratio mediano real/estimado, 7 artefactos): **1** · media 0.9
 
@@ -43,6 +44,6 @@
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 12 | 3.6 | 1 | — | — |
+| sin publicar | 13 | 3.9 | 1 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.
