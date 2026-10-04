@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-05
+
+### Added
+
+- **0009** — Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), `install.ps1` copia y propone el wrapper `statusline-orca.cmd`, que pinta el statusline y reenvía el mismo JSON a Orca para que lea `rate_limits`. La integración entró sin registro SDD en `252c34c`; el patch la documenta. → [ref](specs/20261004-113838-patch-0009-orca-wrapper/)
+
+### Changed
+
+- **0007** — README en castellano (`README.md`) y en inglés (`README.en.md`), al día con lo entregado desde la v1.0.0. → [ref](specs/20261004-220000-feature-0007-bilingual-readme/)
+- **0002** — Tienen test los requisitos que no lo tenían: perfil, valor y hardening de los ficheros flag, saneado del sufijo de ahorro, precedencia de `project_dir`, detached HEAD, color del porcentaje, reset de color por segmento y wrapper de Orca. → [ref](specs/20261004-214415-feature-0002-untested-requirements/)
+- **0006** — Un segmento que falla al pintarse deja un `⚠` gris en su sitio y el resto de la línea se pinta igual. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
+- **0005** — Las ventanas de 5h y semanal pintan el mismo icono de nivel que el contexto (🟢 🟡 🔥 🚨) delante de su etiqueta: `🚨 5h` con un 92 % gastado. → [ref](specs/20261004-185434-feature-0005-quota-alert-icon/)
+- **0001** — Todas las llamadas a `git` de un refresco comparten un presupuesto de 2000 ms: con un `git` lento, el statusline tarda como mucho 2 s en `git` en vez de 6 s. Un test mide el presupuesto y el render completo. → [ref](specs/20261004-152728-feature-0001-git-time-budget/)
+- **0013** — El segmento de coste añade el coste por hora a partir de 5 minutos de sesión (`💰 $0.47 · $2.35/h`). → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
+- **0011** — Las barras de 5h y semanal pintan un marcador de ritmo (`┃`) en la celda del tiempo transcurrido de la ventana: si el relleno pasa de la marca, la cuota se gasta más rápido que el reloj. → [ref](specs/20261004-143157-feature-0011-pace-marker/)
+- **0010** — Las barras del contexto, la ventana de 5h y la semanal pintan la celda de corte con un sub-bloque de octavos (`▏▎▍▌▋▊▉`): 8 veces más resolución con el mismo ancho. Un 34 % y un 38 % ya no se pintan igual. → [ref](specs/20261004-141040-feature-0010-sub-block-bars/)
+- **0008** — La ventana semanal pinta el tiempo transcurrido (`⏳ 4d13h`) y la cuenta atrás hasta el reset (`↻2d10h`), en días y horas. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
+
+### Fixed
+
+- **0017** — El sufijo de ahorro de caveman se sanea también de `DEL` y de los controles C1 (`U+0080`–`U+009F`): un `.caveman-statusline-suffix` manipulado ya no puede colar un CSI de un carácter (`U+009B`) en la terminal. → [ref](specs/20261004-215710-patch-0017-suffix-c1/)
+- **0016** — Un valor del JSON de tipo inesperado ya no pinta basura: el reloj, el coste y velocity lo cuentan como 0 (antes `⏱️ NaNm`, `$-1.00`, `+[object Object]`) y un `resets_at` fuera de rango se trata como ausente (antes `↻NaN:NaN`). → [ref](specs/20261004-204410-patch-0016-json-garbage/)
+- **0006** — Un `project_dir` no textual o un stdin JSON que no es un objeto (`null`, `3`, `[]`) ya no tiran el statusline entero. → [ref](specs/20261004-203701-feature-0006-failed-segment-mark/)
+- **0004** — `statusline.cmd` arranca el Node de proto de versión más alta por SemVer: con `26.9.0` y `26.10.0` instaladas usaba la `26.9.0`. → [ref](specs/20261004-182241-patch-0004-node-semver/)
+- **0003** — Con stdin vacío o inválido la L1 ya no empieza con un separador suelto: sin directorio de proyecto, el segmento de ubicación no aparece. → [ref](specs/20261004-175801-patch-0003-empty-location/)
+- **0015** — Los tests de tiempo de `git` y del render ya no dan falsos rojos con la máquina cargada, y el render completo no puede colgar la suite. → [ref](specs/20261004-170112-patch-0015-timing-tests/)
+- **0014** — El icono `🗿` de caveman vuelve a pintarse con caveman 3.x, que escribe los modos `caveman`, `ultracave` y `megacave`. → [ref](specs/20261004-152212-patch-0014-caveman-modes/)
+- **0013** — Un `total_cost_usd` no numérico ya no hace fallar el statusline: el coste se pinta como `$0.00`. → [ref](specs/20261004-151215-feature-0013-cost-per-hour/)
+- **0008** — Un `resets_at` no numérico ya no pinta `NaN` en las ventanas de 5h y semanal: el segmento degrada como si el campo no estuviera. → [ref](specs/20260920-215837-task-0008-weekly-reset/)
+
 ## [1.0.0] - 2026-09-20
 
 Primera release. Documenta lo hecho hasta la fecha.

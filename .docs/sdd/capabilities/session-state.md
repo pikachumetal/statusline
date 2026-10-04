@@ -1,14 +1,14 @@
 # Capacidad — session-state
 
-La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo
-y con qué modos activos. Los segmentos van separados por `│`, en este orden:
-perfil, ubicación, modelo, caveman, ponytail, velocity.
+## Propósito
+
+La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo y con qué modos activos. Los segmentos van separados por `│`, en este orden: perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ## Requisitos
 
 ### Perfil
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN la variable `CLAUDE_CONFIG_DIR` definida y apuntando a un directorio que no se llama `.claude`
 - WHEN se pinta la L1
@@ -28,7 +28,7 @@ perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ### Ubicación en detached HEAD
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN un repo en detached HEAD
 - WHEN se pinta la L1
@@ -37,11 +37,10 @@ perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ### Ubicación sin git
 
-> Cobertura: con test.
-
 - GIVEN un directorio de proyecto que no es un repo git, o un `git` que no responde
 - WHEN se pinta la L1
 - THEN se muestra solo el nombre del directorio, sin icono de branch ni worktree
+- AND sin directorio de proyecto (stdin vacío o inválido) el segmento no aparece, ni su separador
 
 ### Modelo y effort
 
@@ -54,16 +53,12 @@ perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ### Modo caveman
 
-> Cobertura: parcial. Con test el modo y su ocultación; sin test el sufijo de ahorro.
-
 - GIVEN el flag `.caveman-active` con un modo válido
 - WHEN se pinta la L1
 - THEN se muestra `🗿 <modo>`
+- AND los modos válidos son los de caveman 3.x (`caveman`, `ultracave`, `megacave`) y los de 2.x (`lite`, `full`, `ultra`, `wenyan-lite`, `wenyan`, `wenyan-full`, `wenyan-ultra`, `commit`, `review`, `compress`)
 - AND si existe `.caveman-statusline-suffix`, su contenido se añade detrás del modo
 - AND con `CAVEMAN_STATUSLINE_SAVINGS=0` el sufijo no se muestra
-
-Modos válidos: `lite`, `full`, `ultra`, `wenyan-lite`, `wenyan`, `wenyan-full`,
-`wenyan-ultra`, `commit`, `review`, `compress`.
 
 ### Modo ponytail
 
@@ -77,7 +72,7 @@ Modos válidos: `lite`, `full`, `ultra`, `review`.
 
 ### Valor de un flag
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN un fichero flag que existe
 - WHEN su primera línea está vacía
@@ -87,16 +82,9 @@ Modos válidos: `lite`, `full`, `ultra`, `review`.
 
 ### Velocity
 
-> Cobertura: con test.
-
 - GIVEN un JSON con `cost.total_lines_added` y `cost.total_lines_removed`
 - WHEN al menos uno de los dos es mayor que cero
 - THEN se muestra `+<añadidas> -<eliminadas>` como último segmento de la L1
 - AND si los dos son cero o faltan, el segmento no aparece
-
-Velocity sale del JSON de la sesión, no de `git`.
-
-## Historial
-
-- 2026-09-20 — patch 0000 (`worktree-name`) — MODIFIED Ubicación con git (antes: el worktree se tomaba del JSON y el repo era la carpeta raíz del árbol de trabajo).
-- 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).
+- AND un valor que no sea un número finito y positivo cuenta como 0: `{}` añadidas y 2 eliminadas pintan `+0 -2`
+- AND velocity sale del JSON de la sesión, no de `git`

@@ -1,14 +1,50 @@
 # Roadmap — statusline
 
-## Estado
+## Próximo
 
-El producto se queda como está (ver `mission.md`). Lo que sigue son módulos
-identificados sin compromiso de fecha ni de orden. La partición fina en tasks
-se hace cuando `capabilities/` madure.
+| # | Ítem | Estado |
+| --- | --- | --- |
 
-## Releases
+## Release 2.0.0
 
-### v1.0.0 — 2026-09-20 (publicada)
+en preparación
+
+| id | Feature | Origen | Ficheros que toca | Estado |
+| --- | --- | --- | --- | --- |
+| 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | ⏳ |
+
+## Backlog
+
+| # | Ítem | Origen |
+| --- | --- | --- |
+| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Módulo identificado, candidato a `v2.0.0` |
+| B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado, candidato a `v2.0.0` |
+| B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado, candidato a `v2.0.0` |
+| B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
+
+## Deuda técnica
+
+| Ítem | Impacto | Destino |
+| --- | --- | --- |
+| Tests pendientes tras la 0002: colores atenuados del resto de fragmentos (perfil, effort, sufijo, `5h`/`7d`, reset, coste) y velocity verde/rojo; el `cwd` que recibe `git` según la precedencia; el wrapper de Orca descartando la salida del hook y sin hook (Minor #5, #9, #10 de la revisión final de la 0002) | Bajo: esos detalles pueden romperse sin que falle la suite | Actuar: asserts en los bloques de la 0002; patch |
+| El `↻` semanal pinta `24h00m` cuando faltan algo menos de 24 h: `fmtDuration` redondea los minutos a 1440 y no pasa al formato en días | Cosmético: `24h00m` en vez de `1d00h` durante unos segundos | Actuar: redondear antes de elegir el formato largo o corto; patch |
+
+## Patches
+
+| Fecha | Id | Descripción |
+| --- | --- | --- |
+
+## Releases cerradas
+
+### v1.1.0 — 2026-10-05
+
+Presupuesto de tiempo de `git` (0001), tests de los requisitos sin cobertura (0002), icono de nivel en las ventanas de cuota (0005), marcador `⚠` cuando un segmento falla (0006) y README en castellano e inglés (0007). Entran también, planificadas para la 2.0.0 y ya integradas: barras con sub-bloques (0010), marcador de ritmo (0011) y coste por hora (0013). Ya estaban cerradas al abrirla la cuenta atrás semanal (0008) y el registro del wrapper de Orca (0009). Patches: 0003, 0004, 0014, 0015, 0016 y 0017. Antes, la migración del kit SDD de la 1.1.0 a la 2.3.1. El estado de git en la L1 sigue en la 2.0.0.
+
+[changelog](changelog.md) · [retro](releases/v1.1.0/retro.md)
+
+smoke: 2026-10-05 · 0 hallazgos (suite completa en 7 s; lanzador instalado con un caso real, stdin `null` y `project_dir` numérico; guion del dev-lead en su sesión; 0 corregidos)
+
+### v1.0.0 — 2026-09-20
 
 Primera release: la versión inicial del statusline (con walkthrough
 retroactivo), la init SDD con cinco capacidades y los patches `worktree-name` e `installer-update`. Sin pendientes
@@ -17,36 +53,3 @@ vivos: todo su scope estaba hecho al abrirla.
 [release notes](releases/v1.0.0/release-notes.md) · [changelog](changelog.md) · [acta](releases/v1.0.0/feedback.md)
 
 smoke: 2026-09-20 · 1 hallazgo (el bug de `install.ps1`, corregido dentro de la release)
-
-## Módulos identificados
-
-| Módulo | Qué es | Estado |
-| --- | --- | --- |
-| Avisos de cuota | Icono de alerta en las ventanas de 5h y semanal, como el del contexto. El color del porcentaje ya existe. | Pendiente (regla 4 de `constitution.md`) |
-| Errores visibles | Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo sin avisar. | Pendiente (regla 4) |
-| Presupuesto de tiempo | Tope de tiempo total del render, comprobado con un test. Sin cifra todavía. | Pendiente (regla 3) |
-| README bilingüe | Castellano e inglés. La forma (un fichero o dos) la decide su task. | Pendiente (regla 2) |
-| Configurabilidad | Elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Sin compromiso |
-| Segmentos nuevos | Sin lista concreta todavía. | Sin compromiso |
-| Lanzador para macOS y Linux | Hoy se configura a mano. | Sin compromiso |
-
-## Deuda técnica
-
-| Deuda | Impacto | Vía de mejora |
-| --- | --- | --- |
-| `readGit` hace hasta 3 llamadas a `git`, cada una con 2 s de timeout | 6 s de bloqueo en el peor caso, en cada refresco | Una sola llamada a `git` que devuelva todo, o un timeout global. Es lo que acota el módulo «Presupuesto de tiempo». |
-| Requisitos sin test: stdin inválido, perfil, detached HEAD, valor y hardening de flags, precedencia de `project_dir`, color del porcentaje, y `statusline.cmd` (`install.ps1` tiene test desde el patch `installer-update`) | Un cambio puede romperlos sin que `node statusline.test.js` lo detecte. Cada capacidad marca su cobertura. | Tests de `readEnv` con un directorio temporal como perfil; para el instalador, un test de PowerShell o una comprobación manual documentada. |
-| Con stdin inválido la L1 empieza con un segmento de ubicación vacío (` │ 🤖 ?`) | Cosmético | Omitir el segmento de ubicación si no hay directorio de proyecto. |
-| `statusline.cmd` elige la versión de Node de proto por orden alfabético del nombre de carpeta, no por SemVer | Hoy elige bien (`26.9.0`). Una `9.x` instalada ganaría a una `26.x`. | Ordenar por versión, o respetar la versión fijada por proto. |
-
-## Issues de GitHub
-
-Un issue se triagea y acaba como fila de «Módulos identificados» o de «Deuda
-técnica», con su referencia (`#N`). Los issues no sustituyen a este roadmap.
-
-## Patches
-
-| Fecha | Patch | Rama | Carpeta |
-| --- | --- | --- | --- |
-| 2026-09-20 | 0000 — el worktree se pinta con el id interno de git | `chore/worktree-name` | `20260920-160436-patch-0000-worktree-name` |
-| 2026-09-20 | 0000 — `install.ps1` falla al escapar la ruta y no distingue un update | `chore/installer-update` | `20260920-161940-patch-0000-installer-update` |

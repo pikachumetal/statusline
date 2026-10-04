@@ -33,6 +33,11 @@ todo sale de cuatro fuentes:
 Hoy no se permite caché. Si un segmento futuro la necesita, esa task abre esta
 regla de forma explícita.
 
+Excepción (patch 0009): el wrapper opcional `statusline-orca.cmd` guarda el
+stdin en un temporal de `%TEMP%` para pasárselo a `statusline.cmd` y a Orca, y
+lo borra al acabar. Si Claude Code mata el proceso antes, el temporal queda
+huérfano. `statusline.js` sigue sin escribir ficheros.
+
 ### 2. Idioma de los nombres — respondida
 
 - **En inglés:** código, variables de entorno propias, claves de configuración
@@ -40,42 +45,35 @@ regla de forma explícita.
 - **En castellano:** `.docs/sdd/`, comentarios del código y commits.
 - **Nombres de fichero de `.docs/sdd/`:** en inglés kebab-case, incluidas las
   capacidades (`capabilities/<capability>.md`). Solo el contenido va en castellano.
-- **README:** bilingüe (castellano e inglés). La forma concreta —un fichero con
-  dos secciones o `README.md` más `README.en.md`— la decide la task que lo traduzca.
+- **README:** bilingüe, en dos ficheros: `README.md` en castellano y
+  `README.en.md` en inglés, con el enlace al otro idioma en la primera línea.
+  Los dos dicen lo mismo, sección por sección.
 
-### 3. Límites — respondida en parte
-
-Vigentes:
+### 3. Límites — respondida
 
 - Sin dependencias npm.
-- Cada llamada a `git` lleva timeout (hoy `timeout: 2000` ms).
+- Todas las llamadas a `git` de un refresco comparten un presupuesto de tiempo,
+  y el statusline completo tiene un tope comprobado con un test. Las cifras viven
+  en `capabilities/input.md` («Consulta a git»).
 - Todo fichero externo que se lea tiene un tope de 64 bytes.
 - Número de líneas: 2 por defecto. No es un tope fijo: pasa a ser configurable
   cuando llegue el módulo de configurabilidad (ver `roadmap.md`).
-
-Pendiente:
-
-- Presupuesto de tiempo total del render. Deseable, sin cifra. Se fija cuando
-  exista un test que lo mida.
 
 ### 4. Avisos — respondida
 
 Vigentes:
 
-- Umbrales visuales del contexto: 🟢 por debajo del 20 %, 🟡 por debajo del
-  70 %, 🔥 por debajo del 90 % y 🚨 a partir de ahí.
+- Umbrales visuales del contexto y de las ventanas de 5h y semanal: 🟢 por
+  debajo del 20 %, 🟡 por debajo del 70 %, 🔥 por debajo del 90 % y 🚨 a partir
+  de ahí.
 - Gradiente en las barras de la ventana de 5h y la semanal.
 - El porcentaje del contexto, de la ventana de 5h y de la semanal cambia de
   color con los mismos cortes (20 %, 70 %, 90 %).
-- Si un segmento falla (no hay `git`, falta un dato), se omite sin avisar.
+- Si a un segmento le falta un dato (no hay `git`, el JSON no lo trae), se omite
+  o usa su valor por defecto, sin avisar.
+- Si un segmento falla al pintarse (lanza un error), se pinta un `⚠` discreto en
+  su sitio y el resto de segmentos se pinta igual.
 - No hay texto de aviso ni nada que interrumpa.
-
-Pendientes de implementar (ver `roadmap.md`). Hasta que su task se cierre, el
-comportamiento vigente es el de arriba:
-
-- Icono de alerta para las ventanas de 5h y semanal, como el que ya tiene el
-  contexto. El color del porcentaje ya existe; falta solo el icono.
-- Marcador discreto (`⚠`) cuando un segmento falla, en vez de omitirlo.
 
 ### 5. Regla ante conflicto — respondida
 
@@ -108,6 +106,11 @@ crearse. Se pinta el nombre de la carpeta del worktree.
 
 - **Changelog:** solo técnico, en `.docs/sdd/changelog.md`. No hay changelog
   para cliente.
+- **Numeración:** propia, porque no hay gestor de tickets. Una sola secuencia de
+  cuatro dígitos (`0001`, `0002`…) compartida por tasks y patches. El id se asigna
+  en `roadmap.md` cuando el item entra en una release, y es el `<id>` de su carpeta
+  en `specs/` y de su rama (`feature/0001-<slug>`). Un id no se reutiliza. Los tres
+  registros anteriores a esta regla conservan `0000`.
 - **Tickets:** no hay gestor. La fuente de tasks es `roadmap.md`. Un issue de
   GitHub se triagea y acaba como entrada del roadmap con su referencia (`#N`).
 - **Datos y migraciones:** no aplican. El statusline no guarda estado propio.

@@ -1,7 +1,8 @@
 # Capacidad — output
 
-Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada
-línea está en `session-state.md` (L1) y en `usage.md` (L2).
+## Propósito
+
+Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada línea está en `session-state.md` (L1) y en `usage.md` (L2).
 
 ## Requisitos
 
@@ -16,19 +17,14 @@ línea está en `session-state.md` (L1) y en `usage.md` (L2).
 
 ### Separador de segmentos
 
-> Cobertura: sin test.
-
 - GIVEN una línea con varios segmentos
 - WHEN se pinta
 - THEN los segmentos van separados por `│` en gris, con un espacio a cada lado
 - AND un segmento que no tiene nada que mostrar no deja separador ni hueco
 
-Excepción conocida: con stdin inválido el segmento de ubicación queda vacío y sí
-deja su separador (L1 empieza por ` │`). Está en la tabla de deuda de `roadmap.md`.
-
 ### Color
 
-> Cobertura: parcial. Con test solo el gris de los bloques vacíos de una barra.
+> Cobertura: con test.
 
 - GIVEN un terminal con truecolor
 - WHEN se pinta el statusline
@@ -40,12 +36,20 @@ El color del porcentaje y el gradiente de las barras están en `usage.md`.
 
 ### Iconos
 
-> Cobertura: parcial. Con test la presencia de los iconos de L1 y L2 y la ausencia del icono de branch sin git.
+> Cobertura: con test del glifo de branch y de los emojis; el símbolo roto sin nerd font es del terminal.
 
 - GIVEN un terminal con una nerd font
 - WHEN se pinta el statusline
 - THEN el icono de branch es el glifo U+E0A0 de la nerd font, y el resto de iconos son emojis
 - AND sin nerd font el icono de branch se ve como un símbolo roto: es un requisito del terminal, no se degrada (ver `mission.md`)
+
+### Segmento que falla
+
+- GIVEN un segmento que lanza un error al pintarse
+- WHEN se pinta su línea
+- THEN en su lugar se pinta `⚠` en gris, con su separador, y el resto de segmentos se pinta igual
+- AND con `{"workspace":{"project_dir":123}}` la L1 es `⚠ │ 🤖 ? │ …` y la L2 se pinta entera
+- AND un segmento sin datos no es un fallo: se omite o usa su valor por defecto, sin `⚠`
 
 ## Reglas de la capacidad
 
@@ -54,7 +58,3 @@ El color del porcentaje y el gradiente de las barras están en `usage.md`.
 - **Límites**: dos líneas. Pasa a ser configurable con el módulo de configurabilidad (ver `roadmap.md`). No hay ancho máximo: una línea más larga que el terminal no se trunca.
 - **Avisos**: no aplica.
 - **Regla ante conflicto**: no aplica.
-
-## Historial
-
-- 2026-09-20 — release v1.0.0 — ADDED todos los requisitos. Capacidad detectada al revisar el volcado inicial antes de cerrar la release; describe la versión inicial.

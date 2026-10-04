@@ -20,11 +20,23 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **`render` es pura.** Recibe `data`, `env` y `now` como parámetros. No lee
   ficheros, no llama a `git` y no consulta el reloj. Por eso los tests la
   ejercitan sin mocks. Todo acceso al exterior vive en `readEnv` y en `main`.
+- **Cada segmento se pinta dentro de `segment()`.** Si lanza, deja `⚠` en su
+  sitio; si no tiene datos, devuelve `null` y se omite. Un segmento nuevo que
+  no pase por `segment()` puede volver a tirar el statusline entero.
 - **Un segmento, una función `render*`.** Devuelve el texto del segmento, o
   `null` si no hay nada que pintar.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente
   degrada su segmento, no rompe el render.
-- **Exports:** solo `render` y `bar`, que son lo que usan los tests.
+- **Un campo numérico del JSON se valida con `Number.isFinite` antes de operar
+  con él.** Comprobarlo por truthy deja pasar un string o un objeto y el segmento
+  acaba pintando `NaN`. Es el caso de `resets_at` en las dos ventanas de cuota.
+- **Los tests que lanzan `statusline.js` fijan el entorno que lee:**
+  `CLAUDE_CONFIG_DIR`, `CAVEMAN_STATUSLINE_SAVINGS`, `USERPROFILE`/`HOME` y
+  `TEMP` apuntan a temporales o a valores fijos; heredarlos del usuario hace que
+  la suite dependa de su máquina.
+- **Exports:** solo lo que usan los tests: `render`, `bar`, `gitNames`,
+  `readGit` (con su ejecutor de `git` inyectable) y `gradientAt`, `GRAY_BG` y
+  `RESET` para comprobar los colores.
 
 ## Decisiones técnicas
 
@@ -32,11 +44,19 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
   Claude Code. `current_dir` sigue al cwd de la shell y cambia durante la sesión.
 - **Hardening al leer flags** (`readSmallFile`): sin symlinks, máximo 64 bytes
   y whitelist de valores. Es el mismo criterio que usa `caveman-badge.js`.
-- **`git` nunca bloquea ni ensucia:** `--no-optional-locks`, timeout y stderr
-  descartado. Si falla, devuelve `null` y el segmento se omite.
+- **`git` nunca bloquea ni ensucia:** `--no-optional-locks`, stderr descartado
+  y un plazo compartido por todas las llamadas de `readGit` (cifra en
+  `capabilities/input.md`). Si falla o se agota el plazo, devuelve `null` y el
+  segmento degrada. `readGit` recibe el ejecutor de `git` como parámetro para
+  poder medir el plazo con un `git` lento simulado.
 - **Gradiente por posición, no por valor.** El color de cada bloque de una barra
   depende de su posición en la barra (verde, amarillo, rojo). El color del
   porcentaje sí depende del valor (`levelColor`).
+- **La celda de corte de una barra lleva fondo gris.** El sub-bloque de octavos
+  solo ocupa parte de la celda; sin fondo propio, el resto mostraría el color de
+  la terminal y partiría la barra.
+- **El marcador de ritmo lleva el color de su celda en el fondo.** Sustituye el
+  carácter de la celda por `┃`; el fondo conserva si esa celda estaba llena.
 
 ## Referencia externa
 

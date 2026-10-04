@@ -1,23 +1,20 @@
 # Capacidad — input
 
-De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las
-variables de entorno y los ficheros flag. Las reglas generales están en
-`constitution.md`; aquí está el comportamiento observable.
+## Propósito
+
+De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variables de entorno y los ficheros flag.
 
 ## Requisitos
 
 ### Stdin vacío o inválido
 
-> Cobertura: sin test.
-
-- GIVEN un stdin vacío o que no es JSON válido
+- GIVEN un stdin vacío, que no es JSON válido, o un JSON que no es un objeto (`null`, `3`, `"x"`, `[]`)
 - WHEN Claude Code ejecuta el statusline
-- THEN el statusline pinta sus dos líneas con valores por defecto (modelo `?`,
-  contexto 🟢 0 %, reloj `0m`, coste `$0.00`) y termina sin error
+- THEN el statusline pinta sus dos líneas con valores por defecto (modelo `?`, contexto 🟢 0 %, reloj `0m`, coste `$0.00`) y termina sin error
 
 ### Campo ausente en el JSON
 
-> Cobertura: parcial. Los tests cubren la ausencia de velocity y de `git`.
+> Cobertura: con test.
 
 - GIVEN un JSON válido al que le falta un campo que usa un segmento
 - WHEN se pinta el statusline
@@ -25,7 +22,7 @@ variables de entorno y los ficheros flag. Las reglas generales están en
 
 ### Directorio del proyecto
 
-> Cobertura: parcial. Los tests solo ejercitan `current_dir`.
+> Cobertura: con test.
 
 - GIVEN un JSON con varios directorios informados
 - WHEN el statusline decide sobre qué directorio consultar `git` y qué nombre mostrar
@@ -36,16 +33,17 @@ shell y cambia durante la sesión.
 
 ### Consulta a git
 
-> Cobertura: sin test.
-
 - GIVEN un directorio de proyecto
 - WHEN el statusline consulta `git`
-- THEN cada llamada usa `--no-optional-locks`, descarta stderr y tiene un timeout de 2000 ms
-- AND si `git` no existe, falla, tarda más que el timeout o el directorio no es un repo, la consulta devuelve vacío y no se propaga ningún error
+- THEN cada llamada usa `--no-optional-locks` y descarta stderr
+- AND todas las llamadas de un refresco comparten un presupuesto de 2000 ms: cada una tiene como timeout lo que queda, y si no queda nada no se lanza
+- AND con un `git` que tarda 1500 ms en dar las rutas y no responde a lo demás, la consulta entera acaba en 2000 ms o menos, no en 5500 ms
+- AND si `git` no existe, falla, agota el presupuesto o el directorio no es un repo, la consulta devuelve vacío y no se propaga ningún error
+- AND el statusline completo, lanzado en este repo, termina en menos de 3000 ms
 
 ### Lectura de ficheros flag
 
-> Cobertura: sin test.
+> Cobertura: con test. El symlink, solo si el sistema deja crearlo.
 
 - GIVEN un fichero flag de otro plugin dentro del perfil (`CLAUDE_CONFIG_DIR`, o `~/.claude` si no está definida)
 - WHEN el statusline lo lee
@@ -55,11 +53,12 @@ shell y cambia durante la sesión.
 
 ### Saneado del sufijo de ahorro
 
-> Cobertura: sin test.
+> Cobertura: con test.
 
 - GIVEN el fichero `.caveman-statusline-suffix` con caracteres de control o secuencias de escape
 - WHEN el statusline lo lee
 - THEN elimina los caracteres de control antes de pintarlo, de modo que un fichero externo no puede inyectar secuencias ANSI
+- AND son caracteres de control los C0 (`U+0000`–`U+001F`, `ESC` incluido), `DEL` (`U+007F`) y los C1 (`U+0080`–`U+009F`, `U+009B` incluido): `A␡B<CSI>31mC` se pinta `AB31mC`
 
 ## Reglas de la capacidad
 
@@ -68,7 +67,3 @@ shell y cambia durante la sesión.
 - **Límites**: 64 bytes por fichero flag; 2000 ms por llamada a `git`.
 - **Avisos**: ninguno. Una fuente que falla se trata como dato ausente.
 - **Regla ante conflicto**: el stdin manda; `git`, el entorno y los ficheros solo rellenan lo que el JSON no trae. Excepción: el nombre del worktree sale de `git` (ver `session-state.md`).
-
-## Historial
-
-- 2026-09-20 — init — ADDED todos los requisitos. Volcado inicial desde el código, a petición del usuario (excepción a la regla anti-proliferación 4).
