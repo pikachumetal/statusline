@@ -1,7 +1,7 @@
 'use strict';
 // Self-check del statusline: node hooks/statusline.test.js
 const assert = require('assert');
-const { render, bar, gitNames } = require('./statusline.js');
+const { render, bar, gitNames, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
 
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
@@ -83,6 +83,19 @@ assert.ok(bar(34, 8).includes('48;2;60;60;60m'), 'sub-bloque sobre fondo gris');
 for (const v of ['x', -5]) assert.strictEqual(grayCells(bar(v, 8)), 8, `bar acota ${v}`);
 for (const v of [150, 99.9]) assert.strictEqual(cells(bar(v, 8)), '████████', `bar satura ${v}`);
 assert.strictEqual(cells(bar(1, 8)), '▏███████', 'bar pinta el octavo mínimo');
+for (let r = 1; r <= 7; r++) assert.strictEqual(cells(bar(r * 100 / 64, 8))[0], '▏▎▍▌▋▊▉'[r - 1], `resto ${r}`);
+assert.ok(bar(34, 8).includes(`${GRAY_BG}${gradientAt(2 / 7)}▊${RESET}`), 'sub-bloque con el color de su celda y RESET');
+
+// Marcador de ritmo: dónde estarías gastando uniforme hasta el reset.
+const ESC_BG_GRAY = '\x1b[48;2;60;60;60m';
+assert.ok(cells(l2).includes('██┃█████'), '5h con marcador');
+assert.ok(cells(l2).includes('██████┃█'), 'semanal con marcador');
+assert.strictEqual(cells(bar(80, 8, 27.7)), '██┃███▍█', '80 % con ritmo 27,7 %');
+assert.ok(bar(80, 8, 27.7).includes(gradientAt(2 / 7).replace('38;2', '48;2')), 'marcador sobre gradiente');
+assert.ok(bar(0, 8, 0).startsWith(ESC_BG_GRAY) && cells(bar(0, 8, 0)) === '┃███████', 'marcador sobre gris en la primera celda');
+assert.strictEqual(cells(bar(38, 8, 100)), '███████┃', 'marcador en la última celda');
+assert.ok(!cells(bar(38, 8)).includes('┃'), 'sin ritmo no hay marcador');
+assert.ok(!cells(render(weekBare, env, NOW)).includes('┃'), 'sin marcador sin reset');
 assert.ok(render({ ...fixture, context_window: { used_percentage: 95 } }, env, NOW).includes('🚨'));
 assert.ok(render({ ...fixture, context_window: { used_percentage: 10 } }, env, NOW).includes('🟢'));
 
