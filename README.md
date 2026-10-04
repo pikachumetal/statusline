@@ -15,9 +15,9 @@ EasyClaw  main 🌳 feat-x │ 🤖 Fable 5.1 (medium) │ 🗿 caveman │ 🦥
 - **L2**: reloj de sesión, contexto, ventana de 5h, ventana semanal y coste.
 - **Icono de nivel** en el contexto y en las dos ventanas: 🟢 por debajo del 20 %, 🟡 por debajo del 70 %, 🔥 por debajo del 90 % y 🚨 a partir del 90 %. El porcentaje cambia de color con los mismos cortes.
 - **Barras** con gradiente truecolor por posición. La celda de corte se pinta con un sub-bloque (`▏▎▍▌▋▊▉`), así que la barra avanza por octavos de celda.
-- **Marcador de ritmo** `┃` en las barras de 5h y semanal: dónde estarías si gastaras la cuota a ritmo constante hasta el reset. Si el relleno pasa de la marca, la cuota se acaba antes que la ventana.
+- **Marcador de ritmo** `┃` en las barras de 5h y semanal: dónde estarías si gastaras la cuota a ritmo constante hasta el reset. Si el relleno pasa de la marca y sigues a ese ritmo, la cuota se acaba antes que la ventana.
 - **Reset** `↻`: la hora local en la ventana de 5h y la cuenta atrás en la semanal.
-- **Coste por hora** (`$/h`) a partir de 5 minutos de sesión.
+- **Coste por hora** (`$/h`) a partir de 5 minutos de sesión y con coste mayor que 0.
 - **Fallos**: un segmento que falla al pintarse deja un `⚠` gris en su sitio y el resto se pinta igual. Un dato que falta no es un fallo: su segmento se omite.
 
 Necesita una terminal con truecolor y una nerd font (el icono de branch es el glifo `U+E0A0`).
@@ -39,7 +39,7 @@ Ejecuta el mismo comando sobre el mismo perfil: sobrescribe los ficheros y, si `
 
 ## Orca
 
-Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), el bloque apunta a `statusline-orca.cmd`: pinta este statusline y reenvía el mismo JSON a Orca, que lee `rate_limits` sin pintar nada.
+Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), el bloque apunta a `statusline-orca.cmd`: pinta este statusline, reenvía el mismo JSON a Orca y descarta su salida.
 
 ## Test
 
