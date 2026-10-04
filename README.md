@@ -18,7 +18,9 @@ EasyClaw  main 🌳 feat-x │ 🤖 Fable 5.1 (medium) │ 🗿 lite │ 🦥 fu
 .\install.ps1 -ConfigDir "$HOME\.claude-gco"
 ```
 
-Copia `hooks/statusline.{js,cmd,test.js}` y muestra el bloque `statusLine` para `settings.json`.
+Copia `hooks/statusline.{js,cmd,test.js}` y `hooks/statusline-orca.cmd`, y muestra el bloque `statusLine` para `settings.json`.
+
+Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`) el bloque apunta a `statusline-orca.cmd`: pinta este statusline y reenvía el mismo JSON a Orca, que lee `rate_limits` sin pintar nada.
 
 Para actualizar, ejecuta el mismo comando sobre el mismo perfil: sobrescribe los ficheros y, si `settings.json` ya apunta al statusline, no pide pegar nada. Nunca modifica `settings.json`.
 
