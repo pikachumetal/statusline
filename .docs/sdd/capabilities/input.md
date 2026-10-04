@@ -58,6 +58,7 @@ shell y cambia durante la sesión.
 - GIVEN el fichero `.caveman-statusline-suffix` con caracteres de control o secuencias de escape
 - WHEN el statusline lo lee
 - THEN elimina los caracteres de control antes de pintarlo, de modo que un fichero externo no puede inyectar secuencias ANSI
+- AND son caracteres de control los C0 (`U+0000`–`U+001F`, `ESC` incluido), `DEL` (`U+007F`) y los C1 (`U+0080`–`U+009F`, `U+009B` incluido): `A␡B<CSI>31mC` se pinta `AB31mC`
 
 ## Reglas de la capacidad
 

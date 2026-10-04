@@ -19,6 +19,7 @@
 | 2026-10-04 | 0006 | backend | 0.3 | 0.35 | 1.17 | 7288k | 285k | no aplica | sin precio | 20261004-203701-feature-0006-failed-segment-mark |
 | 2026-10-04 | 0016 | patch | — | 0.3 | — | — | — | — | — | 20261004-204410-patch-0016-json-garbage |
 | 2026-10-04 | 0002 | chore | 0.5 | 0.6 | 1.2 | 9802k | 497k | no aplica | sin precio | 20261004-214415-feature-0002-untested-requirements |
+| 2026-10-04 | 0017 | patch | — | 0.1 | — | — | — | — | — | 20261004-215710-patch-0017-suffix-c1 |
 
 **Factor de calibración** (ratio mediano real/estimado, 8 artefactos): **1** · media 0.94
 
@@ -46,6 +47,6 @@
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
-| sin publicar | 14 | 4.5 | 1 | — | — |
+| sin publicar | 15 | 4.6 | 1 | — | — |
 
 > Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.

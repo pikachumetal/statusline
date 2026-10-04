@@ -162,7 +162,8 @@ function readSavingsSuffix(claudeDir) {
     try {
         const raw = readSmallFile(path.join(claudeDir, '.caveman-statusline-suffix'));
         if (raw === null) return null;
-        return raw.trimEnd().replace(/[\x00-\x1f\x1b]/g, '') || null;
+        // C0, DEL y C1: U+009B es un CSI de un carácter que algunas terminales interpretan.
+        return raw.trimEnd().replace(/[\x00-\x1f\x7f-\x9f]/g, '') || null;
     } catch { return null; }
 }
 
