@@ -1,7 +1,7 @@
 {
-  "version": "2.3.1",
+  "version": "2.3.2",
   "channel": "plugin",
-  "updated": "2026-10-04",
+  "updated": "2026-10-05",
   "ids": {
     "mode": "sequence"
   },
