@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-08
 branch: patch/0020-install-copy-error
-commit: <hash>
+commit: cf2a817
 ---
 
 # Patch 0020 — install.ps1 da por copiados ficheros que no ha podido copiar
@@ -44,6 +44,8 @@ La propuesta del dev-lead (`-ErrorAction Stop` en ese `Copy-Item`) actúa sobre 
 | 1 | Test nuevo antes del fix | ✅ en rojo: «copia fallida: código de salida distinto de 0» (`actual: 0`) |
 | 2 | Suite completa después del fix | ✅ `statusline.test.js OK`; instalación limpia, con Orca y update siguen en verde |
 | 3 | A mano: `install.ps1` sobre un perfil con `hooks\statusline.cmd` directorio | ✅ stdout vacío, `EXIT=1`; en `hooks` solo `statusline.js` y el directorio: no copia `statusline-orca.cmd` ni `statusline.test.js` |
+
+Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: field` · disparador: smoke de la release 2.0.0, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
