@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-08
 branch: patch/0018-weekly-reset-24h
-commit: <hash>
+commit: 6cab196
 ---
 
 # Patch 0018 — el ↻ semanal pinta 24h00m justo por debajo de 24 h
@@ -41,6 +41,8 @@ Reproducido en RED: `reset a 86370s falta ↻1d00h: «… 7d ⏳ 6d00h ███
 | 1 | RED: reset semanal a 23h59m30s | ✅ falla con `↻24h00m` |
 | 2 | GREEN: 23h59m30s → `↻1d00h`; bordes 23h59m00s → `↻23h59m` y 24h → `↻1d00h` | ✅ `statusline.test.js OK` |
 
+Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: field` · disparador: smoke de la release 2.0.0, a cargo del dev-lead
+
 ## 5. Tiempo (ligero)
 
 - Real: 0,1h
@@ -50,6 +52,9 @@ Reproducido en RED: `reset a 86370s falta ↻1d00h: «… 7d ⏳ 6d00h ███
 ### Capacidad: `usage`
 
 **MODIFIED — Formato de duración larga**
+
+> Cobertura: con test.
+
 - GIVEN una duración en milisegundos
 - WHEN se pinta el `⏳` o el `↻` de la ventana semanal
 - THEN la duración se redondea a minutos y, a partir de 24 h, se muestra en días y horas (`4d12h`), con las horas redondeadas hacia abajo
