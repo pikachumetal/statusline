@@ -28,6 +28,7 @@ en preparación
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
 | Tests pendientes tras la 0002: colores atenuados del resto de fragmentos (perfil, effort, sufijo, `5h`/`7d`, reset, coste) y velocity verde/rojo; el `cwd` que recibe `git` según la precedencia; el wrapper de Orca descartando la salida del hook y sin hook (Minor #5, #9, #10 de la revisión final de la 0002) | Bajo: esos detalles pueden romperse sin que falle la suite | Actuar: asserts en los bloques de la 0002; patch |
+| `install.ps1` imprime «Ficheros copiados» aunque un `Copy-Item` falle (p. ej. `statusline.cmd` bloqueado por la sesión que lo está usando): el bucle no corta en el primer error | Bajo: un update a medias se da por bueno | Actuar: `-ErrorAction Stop` en el `Copy-Item` (`install.ps1:12`); patch |
 
 ## Patches
 
