@@ -7,7 +7,7 @@ solution: dev-lead
 status: done
 created: 2026-10-08
 branch: patch/0019-missing-0002-tests
-commit: <hash>
+commit: c87a051
 ---
 
 # Patch 0019 — tests que faltan tras la 0002
@@ -47,6 +47,8 @@ Existe todo lo que la petición da por existente: los colores en `renderLine1`, 
 | 7 | Quitar el `if exist` del wrapper | Sobrevive: mutación equivalente. El `call` a un hook inexistente ya va a `>nul 2>&1` y el wrapper sale con `exit /b 0`, así que no cambia nada observable |
 
 Todas las mutaciones se deshicieron tras cada corrida: `git status` solo muestra `statusline.test.js`. Ningún test destapó un fallo real.
+
+Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: field` · disparador: smoke de la release 2.0.0, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
