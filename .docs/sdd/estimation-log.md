@@ -23,6 +23,7 @@
 | 2026-10-05 | 0007 | docs | 0.3 | 0.15 | 0.5 | 5874k | 223k | no aplica | sin precio | 20261004-220000-feature-0007-bilingual-readme |
 | 2026-10-08 | 0012 | backend | 1 | 0.15 | 0.15 | 11778k | 604k | no aplica | sin precio | 20261008-141230-feature-0012-git-status-l1 |
 | 2026-10-08 | 0018 | patch | — | 0.1 | — | — | — | — | — | 20261008-145214-patch-0018-weekly-reset-24h |
+| 2026-10-08 | 0019 | patch | — | 0.4 | — | — | — | — | — | 20261008-152437-patch-0019-missing-0002-tests |
 
 **Factor de calibración** (ratio mediano real/estimado, 10 artefactos): **0.92** · media 0.82
 
@@ -52,6 +53,6 @@
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
 | 1.1.0 | 16 | 4.75 | 1 | — | — |
-| sin publicar | 2 | 0.25 | 0.15 | — | — |
+| sin publicar | 3 | 0.65 | 0.15 | — | — |
 
 > Ver `estimation.md`.

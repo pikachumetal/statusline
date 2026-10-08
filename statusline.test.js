@@ -346,6 +346,25 @@ if (process.platform === 'win32') {
     assert.strictEqual(where({ workspace: { project_dir: '/a/proj', current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'proj', 'manda project_dir');
     assert.strictEqual(where({ workspace: { current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'cur', 'sin project_dir, current_dir');
     assert.strictEqual(where({ cwd: '/a/cwd' }), 'cwd', 'sin workspace, cwd');
+    // git recibe el mismo directorio, con la misma precedencia.
+    const gitCwd = (data) => { const seen = new Set(); readGit(data, (args, cwd) => { seen.add(cwd); return null; }); return [...seen]; };
+    assert.deepStrictEqual(gitCwd({ workspace: { project_dir: '/a/proj', current_dir: '/a/cur' }, cwd: '/a/cwd' }), ['/a/proj'], 'git en project_dir');
+    assert.deepStrictEqual(gitCwd({ workspace: { current_dir: '/a/cur' }, cwd: '/a/cwd' }), ['/a/cur'], 'git en current_dir sin project_dir');
+    assert.deepStrictEqual(gitCwd({ cwd: '/a/cwd' }), ['/a/cwd'], 'git en cwd sin workspace');
+    // De punta a punta: un project_dir fuera de git manda aunque cwd sea este repo.
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-nogit-'));
+    // El temporal puede colgar de un repo (en esta máquina %TEMP% lo es): git no sube más allá.
+    const gitEnvVars = { ...process.env, GIT_CEILING_DIRECTORIES: path.dirname(outside) };
+    try {
+        const l1 = (data) => cells(spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: JSON.stringify(data), cwd: __dirname, env: gitEnvVars, encoding: 'utf8', timeout: 5000 }).stdout.split('\n')[0]);
+        const noGit = l1({ workspace: { project_dir: outside }, cwd: __dirname });
+        assert.ok(noGit.includes(`${path.basename(outside)} │`) && !noGit.includes(''), `git corre en project_dir, no en cwd: «${noGit}»`);
+        assert.ok(l1({ workspace: { project_dir: __dirname }, cwd: outside }).includes(''), 'git corre en project_dir del repo');
+    } finally {
+        fs.rmSync(outside, { recursive: true, force: true });
+    }
 }
 
 // Detached HEAD: sin rama, el hash corto; sin hash, ?.
@@ -411,9 +430,10 @@ for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200
     assert.strictEqual(out.split(`\x1b[38;2;${color}m${pct}%`).length - 1, 3, `color del ${pct} % en contexto, 5h y 7d`);
 }
 
-// Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, modelo magenta.
+// Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, perfil y modelo magenta,
+// effort, sufijo, 5h/7d, reset y coste atenuados; velocity verde y rojo.
 {
-    const out = render(fixture, gitEnv, NOW);
+    const out = render(fixture, { ...gitEnv, profile: 'perfil', flags: { ...gitEnv.flags, savings: 'ahorro' } }, NOW);
     for (const seg of out.split('\n').flatMap((line) => line.split(/ \x1b\[38;2;60;60;60m│\x1b\[0m /))) {
         const lastColor = Math.max(seg.lastIndexOf('\x1b[38;2'), seg.lastIndexOf('\x1b[48;2'), seg.lastIndexOf('\x1b[1m'));
         assert.ok(lastColor === -1 || seg.lastIndexOf('\x1b[0m') > lastColor, `segmento sin reset final: «${cells(seg)}»`);
@@ -421,9 +441,16 @@ for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200
     assert.ok(out.includes('\x1b[1m\x1b[38;2;217;119;87mEasyClaw'), 'repo en negrita y naranja');
     assert.ok(out.includes('\x1b[38;2;80;200;120m main'), 'branch en verde');
     assert.ok(out.includes('\x1b[38;2;200;120;220m🤖 Fable 5.1'), 'modelo en magenta');
+    assert.ok(out.includes('\x1b[38;2;200;120;220m🧪 perfil'), 'perfil en magenta');
+    const DIM = '\x1b[38;2;130;130;130m';
+    for (const s of ['(medium)', 'ahorro', '5h', '7d', '💰 $0.47']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
+    assert.strictEqual(out.split(`${DIM}↻`).length - 1, 2, 'reset atenuado en 5h y 7d');
+    assert.ok(out.includes('\x1b[38;2;80;200;120m+156'), 'líneas añadidas en verde');
+    assert.ok(out.includes('\x1b[38;2;220;60;40m-23'), 'líneas eliminadas en rojo');
 }
 
-// Wrapper de Orca: pinta el statusline, reenvía el mismo JSON a Orca y borra su temporal.
+// Wrapper de Orca: pinta el statusline, reenvía el mismo JSON a Orca, descarta lo que Orca escribe
+// y borra su temporal; sin hook, pinta igual.
 if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
     const { spawnSync } = require('child_process');
@@ -432,19 +459,30 @@ if (process.platform === 'win32') {
     try {
         fs.mkdirSync(temp);
         const hooks = path.join(home, '.orca', 'agent-hooks');
+        const hook = path.join(hooks, 'claude-statusline.cmd');
         fs.mkdirSync(hooks, { recursive: true });
-        fs.writeFileSync(path.join(hooks, 'claude-statusline.cmd'), '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\n');
+        fs.writeFileSync(hook, '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\necho ORCA-OUT\r\necho ORCA-ERR 1>&2\r\n');
         const input = '{"model":{"display_name":"Orca test"}}';
         // Sin proto en el USERPROFILE de prueba, statusline.cmd usa el node del PATH: el de este test.
         const pathKey = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
         const pathWithNode = `${path.dirname(process.execPath)};${process.env[pathKey]}`;
-        const run = spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
+        const wrap = () => spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
             input, encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home, TEMP: temp, TMP: temp, [pathKey]: pathWithNode },
         });
+        const leftovers = () => fs.readdirSync(temp).filter((f) => f.startsWith('cc-statusline-'));
+        const run = wrap();
         assert.strictEqual(run.status, 0, 'wrapper de Orca sale con 0');
         assert.ok(cells(run.stdout).includes('🤖 Orca test'), 'wrapper de Orca pinta el statusline');
         assert.ok(fs.readFileSync(path.join(hooks, 'got.json'), 'utf8').includes('"Orca test"'), 'Orca recibe el mismo JSON');
-        assert.deepStrictEqual(fs.readdirSync(temp).filter((f) => f.startsWith('cc-statusline-')), [], 'el temporal se borra');
+        assert.ok(!run.stdout.includes('ORCA-OUT') && !run.stderr.includes('ORCA-ERR'), `la salida de Orca se descarta: «${run.stdout}» «${run.stderr}»`);
+        assert.deepStrictEqual(leftovers(), [], 'el temporal se borra');
+
+        fs.rmSync(hook);
+        const bare = wrap();
+        assert.strictEqual(bare.status, 0, 'sin hook de Orca sale con 0');
+        assert.strictEqual(bare.stdout, run.stdout, 'sin hook de Orca pinta lo mismo');
+        assert.strictEqual(bare.stderr, '', 'sin hook de Orca no escribe en stderr');
+        assert.deepStrictEqual(leftovers(), [], 'sin hook el temporal se borra');
     } finally {
         fs.rmSync(home, { recursive: true, force: true });
     }

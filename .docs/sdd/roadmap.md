@@ -13,6 +13,7 @@ en preparación
 | --- | --- | --- | --- | --- |
 | 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
 | 0018 | Patch: el `↻` semanal pinta `1d00h` y no `24h00m` justo por debajo de 24 h | Deuda técnica | `statusline.js` (`fmtSpan`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
+| 0019 | Patch: tests que faltaban tras la 0002 (colores atenuados y velocity, `cwd` de `git`, wrapper de Orca) | Deuda técnica | `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
 
 ## Backlog
 
@@ -27,7 +28,6 @@ en preparación
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
-| Tests pendientes tras la 0002: colores atenuados del resto de fragmentos (perfil, effort, sufijo, `5h`/`7d`, reset, coste) y velocity verde/rojo; el `cwd` que recibe `git` según la precedencia; el wrapper de Orca descartando la salida del hook y sin hook (Minor #5, #9, #10 de la revisión final de la 0002) | Bajo: esos detalles pueden romperse sin que falle la suite | Actuar: asserts en los bloques de la 0002; patch |
 | `install.ps1` imprime «Ficheros copiados» aunque un `Copy-Item` falle (p. ej. `statusline.cmd` bloqueado por la sesión que lo está usando): el bucle no corta en el primer error | Bajo: un update a medias se da por bueno | Actuar: `-ErrorAction Stop` en el `Copy-Item` (`install.ps1:12`); patch |
 
 ## Patches
@@ -35,6 +35,7 @@ en preparación
 | Fecha | Id | Descripción |
 | --- | --- | --- |
 | 2026-10-08 | [0018](specs/20261008-145214-patch-0018-weekly-reset-24h/) | 🧪 validación diferida a smoke de la release 2.0.0 — el `↻` semanal pinta `1d00h` y no `24h00m` cuando faltan algo menos de 24 h |
+| 2026-10-08 | [0019](specs/20261008-152437-patch-0019-missing-0002-tests/) | 🧪 validación diferida a smoke de la release 2.0.0 — tienen test los colores atenuados y velocity, el `cwd` que recibe `git` y el wrapper de Orca con y sin hook |
 
 ## Releases cerradas
 
