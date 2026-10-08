@@ -126,18 +126,40 @@ function gitNames(top, commonDir, gitDir) {
     return { repo: path.basename(repoRoot).replace(/\.git$/, ''), worktree: linked ? path.basename(top) : null };
 }
 
+// Cabeceras de `git status --porcelain=v2 --branch`; toda línea sin `#` es un cambio, incluidos
+// los ficheros sin seguimiento. Sin `branch.ab` (sin upstream, upstream borrado, detached) no hay ↑↓.
+function parseStatus(text) {
+    const header = {};
+    let dirty = false;
+    for (const line of text.split(/\r?\n/)) {
+        const m = /^# branch\.(\S+) (.*)$/.exec(line);
+        if (m) header[m[1]] = m[2];
+        else if (line && !line.startsWith('#')) dirty = true;
+    }
+    const ab = /^\+(\d+) -(\d+)$/.exec(header.ab || '');
+    const branch = header.head === '(detached)' ? (header.oid || '').slice(0, 7) : header.head;
+    return { branch: branch || '?', dirty, ahead: ab ? Number(ab[1]) : null, behind: ab ? Number(ab[2]) : null };
+}
+
+// Las rutas no salen de `git status`, así que son dos llamadas. Una llamada que vuelve vacía con el
+// plazo ya vencido, o que no se lanza, cuenta como presupuesto agotado: la L1 lo marca con ⚠.
 function readGit(data, run = git) {
     const cwd = projectDir(data);
     if (!cwd) return null;
     const deadline = Date.now() + GIT_BUDGET_MS;
+    let timedOut = false;
     const call = (args) => {
         const left = deadline - Date.now();
-        return left > 0 ? run(args, cwd, left) : null;
+        const out = left > 0 ? run(args, cwd, left) : null;
+        if (out === null && Date.now() >= deadline) timedOut = true;
+        return out;
     };
     const paths = call(['rev-parse', '--path-format=absolute', '--show-toplevel', '--git-common-dir', '--git-dir']);
-    if (!paths) return null;
-    const branch = call(['symbolic-ref', '--short', 'HEAD']) || call(['rev-parse', '--short', 'HEAD']) || '?';
-    return { ...gitNames(...paths.split(/\r?\n/)), branch };
+    if (!paths) return timedOut ? { timedOut } : null;
+    // ponytail: un status de más de 1 MB (maxBuffer de execFileSync) falla y la rama sale `?`; subir maxBuffer si llega a pasar.
+    const status = call(['status', '--porcelain=v2', '--branch']);
+    const state = status ? parseStatus(status) : { branch: '?', dirty: false, ahead: null, behind: null };
+    return { ...gitNames(...paths.split(/\r?\n/)), ...state, timedOut };
 }
 
 // Mismo hardening que caveman-badge.js: sin symlinks, máx 64 bytes, whitelist.
@@ -185,12 +207,19 @@ function readEnv(data) {
 }
 
 // ---------- render ----------
+// Las marcas van pegadas a la rama, que es lo que describen; con el presupuesto agotado, ⚠ en su sitio.
+function gitMarks(g) {
+    if (g.timedOut) return ` ${FAILED}`;
+    const arrows = (g.ahead > 0 ? `↑${g.ahead}` : '') + (g.behind > 0 ? `↓${g.behind}` : '');
+    return (g.dirty ? ` ${C.yellow}●${RESET}` : '') + (arrows ? ` ${C.dim}${arrows}${RESET}` : '');
+}
+
 function renderWhere(data, env) {
-    const name = env.git ? env.git.repo : path.basename(projectDir(data));
+    const name = env.git?.repo || path.basename(projectDir(data));
     if (!name) return null;
     let out = `${BOLD}${C.orange}${name}${RESET}`;
-    if (!env.git) return out;
-    out += ` ${C.green}${BRANCH_ICON} ${env.git.branch}${RESET}`;
+    if (!env.git?.repo) return env.git?.timedOut ? `${out} ${FAILED}` : out;
+    out += ` ${C.green}${BRANCH_ICON} ${env.git.branch}${RESET}${gitMarks(env.git)}`;
     if (env.git.worktree) out += ` 🌳 ${env.git.worktree}`;
     return out;
 }
@@ -297,5 +326,5 @@ function main() {
     process.stdout.write(render(data, readEnv(data)));
 }
 
-module.exports = { render, bar, gitNames, readGit, gradientAt, GRAY_BG, RESET };
+module.exports = { render, bar, gitNames, readGit, parseStatus, gradientAt, GRAY_BG, RESET };
 if (require.main === module) main();

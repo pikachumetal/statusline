@@ -11,7 +11,7 @@ en preparación
 
 | id | Feature | Origen | Ficheros que toca | Estado |
 | --- | --- | --- | --- | --- |
-| 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | ⏳ |
+| 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
 
 ## Backlog
 
