@@ -16,13 +16,13 @@ created: 2026-10-08
 
 | # | Task | Status | Commit | Notas |
 | --- | --- | --- | --- | --- |
-| 1 | `readGit` con `git status --porcelain=v2 --branch` | done | — | |
-| 2 | Marcas en la L1 | pending | — | |
+| 1 | `readGit` con `git status --porcelain=v2 --branch` | done | 26f642a | |
+| 2 | Marcas en la L1 | done | — | |
 
 ## Verificación por task
 
 - [x] Task 1 — `node statusline.test.js`
-- [ ] Task 2 — `node statusline.test.js`
+- [x] Task 2 — `node statusline.test.js`
 
 ## Fixes adicionales
 

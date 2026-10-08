@@ -374,6 +374,29 @@ if (process.platform === 'win32') {
         { branch: 'main', dirty: false, ahead: 3, behind: 4 }, 'parseStatus con CRLF');
 }
 
+// Estado de git junto a la rama: ● con cambios, ↑↓ frente al upstream, ⚠ con el presupuesto agotado.
+{
+    const B = '';
+    const at = (git, data = { cwd: '/code/proj' }) => render(data, { ...env, git }, NOW).split('\n')[0];
+    const base = { repo: 'proj', branch: 'main', worktree: null, dirty: true, ahead: 2, behind: 1, timedOut: false };
+    const full = at(base);
+    assert.ok(cells(full).startsWith(`proj ${B} main ● ↑2↓1 │`), `marcas junto a la rama: «${cells(full)}»`);
+    assert.ok(full.includes('\x1b[38;2;220;200;0m●'), '● en amarillo');
+    assert.ok(full.includes('\x1b[38;2;130;130;130m↑2↓1'), '↑↓ en gris atenuado');
+    assert.ok(cells(at({ ...base, behind: 0 })).startsWith(`proj ${B} main ● ↑2 │`), 'solo por delante: ↑2');
+    assert.ok(cells(at({ ...base, ahead: 0, behind: 0 })).startsWith(`proj ${B} main ● │`), '↑0↓0 no se pinta');
+    assert.ok(cells(at({ ...base, ahead: null, behind: null })).startsWith(`proj ${B} main ● │`), 'sin upstream no hay ↑↓');
+    assert.ok(cells(at({ ...base, dirty: false, ahead: 0, behind: 3 })).startsWith(`proj ${B} main ↓3 │`), 'limpio y por detrás: ↓3 sin ●');
+    assert.ok(cells(at({ ...base, behind: 0, worktree: 'feat-x' })).startsWith(`proj ${B} main ● ↑2 🌳 feat-x │`), 'marcas antes del worktree');
+    const late = at({ repo: 'proj', branch: '?', worktree: null, dirty: false, ahead: null, behind: null, timedOut: true });
+    assert.ok(cells(late).startsWith(`proj ${B} ? ⚠ │`), `presupuesto agotado tras las rutas: «${cells(late)}»`);
+    assert.ok(late.includes('\x1b[38;2;60;60;60m⚠'), '⚠ en gris');
+    assert.ok(cells(at({ timedOut: true })).startsWith('proj ⚠ │'), `presupuesto agotado en las rutas: «${cells(at({ timedOut: true }))}»`);
+    assert.ok(cells(at(null)).startsWith('proj │'), 'sin git: solo el nombre, sin ⚠');
+    const seg = full.split(/ \x1b\[38;2;60;60;60m│\x1b\[0m /)[0];
+    assert.ok(seg.lastIndexOf('\x1b[0m') > seg.lastIndexOf('\x1b[38;2'), 'la ubicación con marcas cierra su color');
+}
+
 // Color del porcentaje: mismos cortes que el icono, en el contexto y en las dos ventanas.
 for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200;0'], [70, '255;140;0'], [89, '255;140;0'], [90, '220;60;40']]) {
     const out = render({ context_window: { used_percentage: pct }, rate_limits: { five_hour: { used_percentage: pct }, seven_day: { used_percentage: pct } } }, env, NOW);

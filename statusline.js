@@ -207,12 +207,19 @@ function readEnv(data) {
 }
 
 // ---------- render ----------
+// Las marcas van pegadas a la rama, que es lo que describen; con el presupuesto agotado, ⚠ en su sitio.
+function gitMarks(g) {
+    if (g.timedOut) return ` ${FAILED}`;
+    const arrows = (g.ahead > 0 ? `↑${g.ahead}` : '') + (g.behind > 0 ? `↓${g.behind}` : '');
+    return (g.dirty ? ` ${C.yellow}●${RESET}` : '') + (arrows ? ` ${C.dim}${arrows}${RESET}` : '');
+}
+
 function renderWhere(data, env) {
-    const name = env.git ? env.git.repo : path.basename(projectDir(data));
+    const name = env.git?.repo || path.basename(projectDir(data));
     if (!name) return null;
     let out = `${BOLD}${C.orange}${name}${RESET}`;
-    if (!env.git) return out;
-    out += ` ${C.green}${BRANCH_ICON} ${env.git.branch}${RESET}`;
+    if (!env.git?.repo) return env.git?.timedOut ? `${out} ${FAILED}` : out;
+    out += ` ${C.green}${BRANCH_ICON} ${env.git.branch}${RESET}${gitMarks(env.git)}`;
     if (env.git.worktree) out += ` 🌳 ${env.git.worktree}`;
     return out;
 }
