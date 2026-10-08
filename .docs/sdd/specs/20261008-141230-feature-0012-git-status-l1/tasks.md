@@ -17,7 +17,10 @@ created: 2026-10-08
 | # | Task | Status | Commit | Notas |
 | --- | --- | --- | --- | --- |
 | 1 | `readGit` con `git status --porcelain=v2 --branch` | done | 26f642a | |
-| 2 | Marcas en la L1 | done | — | |
+| 2 | Marcas en la L1 | done | bcd2e2b | |
+
+Revisión final: sdd-kit:effort-high + opus, With fixes (1 Important, 2 Minor), sobre bcd2e2b
+Pasada de fix: juntada en el cierre, 1 hallazgo RED→GREEN
 
 ## Verificación por task
 

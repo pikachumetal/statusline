@@ -134,7 +134,7 @@ function parseStatus(text) {
     for (const line of text.split(/\r?\n/)) {
         const m = /^# branch\.(\S+) (.*)$/.exec(line);
         if (m) header[m[1]] = m[2];
-        else if (line) dirty = true;
+        else if (line && !line.startsWith('#')) dirty = true;
     }
     const ab = /^\+(\d+) -(\d+)$/.exec(header.ab || '');
     const branch = header.head === '(detached)' ? (header.oid || '').slice(0, 7) : header.head;

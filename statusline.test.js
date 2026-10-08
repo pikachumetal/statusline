@@ -369,6 +369,7 @@ if (process.platform === 'win32') {
         { branch: 'nou', dirty: false, ahead: null, behind: null }, 'parseStatus sin upstream');
     assert.deepStrictEqual(parseStatus(head('main', UP)),
         { branch: 'main', dirty: false, ahead: null, behind: null }, 'parseStatus upstream borrado');
+    assert.strictEqual(parseStatus(head('main', '# stash 2\n')).dirty, false, 'parseStatus: # stash (status.showStash) no es un cambio');
     assert.strictEqual(parseStatus('# branch.oid (initial)\n# branch.head main\n').branch, 'main', 'parseStatus rama sin commits');
     assert.deepStrictEqual(parseStatus(head('main', `${UP}# branch.ab +3 -4\n`).replace(/\n/g, '\r\n')),
         { branch: 'main', dirty: false, ahead: 3, behind: 4 }, 'parseStatus con CRLF');
