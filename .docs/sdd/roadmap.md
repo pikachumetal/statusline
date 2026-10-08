@@ -5,14 +5,24 @@
 | # | Ítem | Estado |
 | --- | --- | --- |
 
+## Release 2.0.0
+
+en preparación
+
+| id | Feature | Origen | Ficheros que toca | Estado |
+| --- | --- | --- | --- | --- |
+| 0022 | Segmentos con nombre y render guiado por un layout, con el de la v1.2.0 por defecto y sin cambio visible · `proposal: 0021` | B1 del backlog | `statusline.js` (`renderLine1`, `renderLine2`, `render`), `statusline.test.js` | ⏳ |
+| 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | ⏳ |
+
 ## Backlog
 
 | # | Ítem | Origen |
 | --- | --- | --- |
-| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Módulo identificado |
+| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. Planificada en la Release 2.0.0 como 0022 y 0023 (`proposal: 0021`). | Módulo identificado |
 | B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado |
 | B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado |
 | B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
+| B5 | Instalador que se salta los ficheros idénticos: hoy un update con una sesión abierta falla al copiar `statusline.cmd` en uso aunque no haya cambiado (la 0020 lo hace fallar con error en vez de darlo por copiado). | Visto al instalar la v1.2.0 en local |
 
 ## Deuda técnica
 
