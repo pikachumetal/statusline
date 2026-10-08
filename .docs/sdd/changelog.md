@@ -6,6 +6,10 @@
 
 - **0012** — La L1 pinta junto a la rama `●` (amarillo) si el working tree tiene cambios y `↑N↓M` (gris) si la rama va por delante o por detrás de su upstream: `statusline  main ● ↑1↓2`. Sale de un `git status --porcelain=v2 --branch` que sustituye a `symbolic-ref` y `rev-parse --short` (2 llamadas a `git` en vez de hasta 3). Si `git` agota el presupuesto de 2000 ms, pinta `⚠` en su sitio. → [ref](specs/20261008-141230-feature-0012-git-status-l1/)
 
+### Fixed
+
+- **0018** — El `↻` semanal pinta `1d00h` cuando faltan algo menos de 24 h, en vez de `24h00m`: el formato se elige con la duración ya redondeada a minutos. → [ref](specs/20261008-145214-patch-0018-weekly-reset-24h/)
+
 ## [1.1.0] - 2026-10-05
 
 ### Added

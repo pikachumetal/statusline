@@ -82,9 +82,12 @@ function fmtDuration(ms) {
 }
 
 // Duraciones de varios días (ventana semanal): en horas solas serían ilegibles.
+// Se redondea a minutos antes de elegir el formato, igual que fmtDuration: con
+// las horas truncadas, 23h59m30s elegía el corto y se pintaba `24h00m`.
 function fmtSpan(ms) {
-    const hours = Math.floor(Math.max(0, ms) / 3600000);
-    if (hours < 24) return fmtDuration(ms);
+    const mins = Math.max(0, Math.round(ms / 60000));
+    if (mins < 24 * 60) return fmtDuration(ms);
+    const hours = Math.floor(mins / 60);
     return `${Math.floor(hours / 24)}d${String(hours % 24).padStart(2, '0')}h`;
 }
 

@@ -33,6 +33,13 @@ const weekSoon = { ...fixture, rate_limits: { seven_day: { used_percentage: 38, 
 const soonL2 = render(weekSoon, env, NOW).split('\n')[1];
 for (const s of ['⏳ 6d22h', '↻2h00m']) assert.ok(soonL2.includes(s), `semanal corto falta ${s}`);
 
+// Patch 0018: el formato se elige con los minutos ya redondeados, nunca `24h00m`.
+for (const [secs, want] of [[23 * 3600 + 59 * 60 + 30, '↻1d00h'], [23 * 3600 + 59 * 60, '↻23h59m'], [24 * 3600, '↻1d00h']]) {
+    const edge = { ...fixture, rate_limits: { seven_day: { used_percentage: 38, resets_at: NOW / 1000 + secs } } };
+    const edgeL2 = render(edge, env, NOW).split('\n')[1];
+    assert.ok(edgeL2.includes(want), `reset a ${secs}s falta ${want}: «${edgeL2}»`);
+}
+
 // Sin resets_at el semanal degrada: solo 7d, barra y porcentaje.
 const weekBare = { ...fixture, rate_limits: { seven_day: { used_percentage: 38 } } };
 const bareL2 = render(weekBare, env, NOW).split('\n')[1];

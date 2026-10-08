@@ -53,8 +53,9 @@ La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por
 
 - GIVEN una duración en milisegundos
 - WHEN se pinta el `⏳` o el `↻` de la ventana semanal
-- THEN a partir de 24 h se muestra en días y horas (`4d12h`), con las horas redondeadas hacia abajo
+- THEN la duración se redondea a minutos y, a partir de 24 h, se muestra en días y horas (`4d12h`), con las horas redondeadas hacia abajo
 - AND por debajo de 24 h se muestra en el formato corto ya existente (`4h16m` o `16m`)
+- AND la duración que redondea a 24 h se pinta `1d00h`, nunca `24h00m`
 
 ### Coste
 
