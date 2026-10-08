@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-08
+
+### Changed
+
+- **0019** — Tienen test los detalles que la 0002 dejó sin assert: el perfil en magenta; effort, sufijo de ahorro, `5h`/`7d`, reset y coste atenuados; velocity en verde y rojo; el directorio en el que corre `git` según la precedencia de `project_dir`, `current_dir` y `cwd`; y el wrapper de Orca descartando la salida del hook y funcionando igual sin hook. → [ref](specs/20261008-152437-patch-0019-missing-0002-tests/)
+
+### Added
+
+- **0012** — La L1 pinta junto a la rama `●` (amarillo) si el working tree tiene cambios y `↑N↓M` (gris) si la rama va por delante o por detrás de su upstream: `statusline  main ● ↑1↓2`. Sale de un `git status --porcelain=v2 --branch` que sustituye a `symbolic-ref` y `rev-parse --short` (2 llamadas a `git` en vez de hasta 3). Si `git` agota el presupuesto de 2000 ms, pinta `⚠` en su sitio. → [ref](specs/20261008-141230-feature-0012-git-status-l1/)
+
+### Fixed
+
+- **0020** — `install.ps1` se para si no puede copiar un fichero (p. ej. `statusline.cmd` bloqueado por la sesión que lo usa): sale con código 1, el error nombra el fichero y ya no imprime «Ficheros copiados» ni el bloque `statusLine`. → [ref](specs/20261008-161514-patch-0020-install-copy-error/)
+- **0018** — El `↻` semanal pinta `1d00h` cuando faltan algo menos de 24 h, en vez de `24h00m`: el formato se elige con la duración ya redondeada a minutos. → [ref](specs/20261008-145214-patch-0018-weekly-reset-24h/)
+
 ## [1.1.0] - 2026-10-05
 
 ### Added

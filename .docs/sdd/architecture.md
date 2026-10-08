@@ -10,7 +10,7 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 
 1. `main()` lee el stdin y lo parsea. Si está vacío o es inválido, sigue con `{}`.
 2. `readEnv(data)` reúne todo lo que no viene en el JSON:
-   - `readGit`: repo, branch y worktree.
+   - `readGit`: repo, branch y worktree (de `rev-parse`) y estado del working tree y del upstream (de `git status --porcelain=v2 --branch`, que parsea `parseStatus`).
    - Perfil: el nombre del directorio de `CLAUDE_CONFIG_DIR`, salvo que sea el default.
    - Flags: `.caveman-active`, `.ponytail-active` y `.caveman-statusline-suffix`.
 3. `render(data, env, now)` compone las dos líneas y las escribe en stdout.
@@ -35,7 +35,7 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
   `TEMP` apuntan a temporales o a valores fijos; heredarlos del usuario hace que
   la suite dependa de su máquina.
 - **Exports:** solo lo que usan los tests: `render`, `bar`, `gitNames`,
-  `readGit` (con su ejecutor de `git` inyectable) y `gradientAt`, `GRAY_BG` y
+  `readGit` (con su ejecutor de `git` inyectable), `parseStatus` y `gradientAt`, `GRAY_BG` y
   `RESET` para comprobar los colores.
 
 ## Decisiones técnicas
@@ -46,8 +46,8 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
   y whitelist de valores. Es el mismo criterio que usa `caveman-badge.js`.
 - **`git` nunca bloquea ni ensucia:** `--no-optional-locks`, stderr descartado
   y un plazo compartido por todas las llamadas de `readGit` (cifra en
-  `capabilities/input.md`). Si falla o se agota el plazo, devuelve `null` y el
-  segmento degrada. `readGit` recibe el ejecutor de `git` como parámetro para
+  `capabilities/input.md`). Si falla, devuelve `null` y el segmento degrada; si
+  se agota el plazo, lo marca con `timedOut` y la L1 pinta `⚠`. `readGit` recibe el ejecutor de `git` como parámetro para
   poder medir el plazo con un `git` lento simulado.
 - **Gradiente por posición, no por valor.** El color de cada bloque de una barra
   depende de su posición en la barra (verde, amarillo, rojo). El color del

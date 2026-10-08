@@ -35,10 +35,11 @@ shell y cambia durante la sesión.
 
 - GIVEN un directorio de proyecto
 - WHEN el statusline consulta `git`
-- THEN cada llamada usa `--no-optional-locks` y descarta stderr
+- THEN hace como mucho dos llamadas: `rev-parse --path-format=absolute --show-toplevel --git-common-dir --git-dir` y, si la primera da rutas, `status --porcelain=v2 --branch`
+- AND cada llamada usa `--no-optional-locks` y descarta stderr
 - AND todas las llamadas de un refresco comparten un presupuesto de 2000 ms: cada una tiene como timeout lo que queda, y si no queda nada no se lanza
-- AND con un `git` que tarda 1500 ms en dar las rutas y no responde a lo demás, la consulta entera acaba en 2000 ms o menos, no en 5500 ms
-- AND si `git` no existe, falla, agota el presupuesto o el directorio no es un repo, la consulta devuelve vacío y no se propaga ningún error
+- AND con un `git` que tarda 1500 ms en dar las rutas y no responde a lo demás, la consulta entera acaba en 2000 ms o menos, no en 5500 ms, y queda marcada como presupuesto agotado
+- AND si `git` no existe, falla o el directorio no es un repo, la consulta devuelve vacío y no se propaga ningún error; si agota el presupuesto, devuelve lo que llegó a tiempo y la marca de presupuesto agotado
 - AND el statusline completo, lanzado en este repo, termina en menos de 3000 ms
 
 ### Lectura de ficheros flag

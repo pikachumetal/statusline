@@ -21,26 +21,30 @@
 | 2026-10-04 | 0002 | chore | 0.5 | 0.6 | 1.2 | 9802k | 497k | no aplica | sin precio | 20261004-214415-feature-0002-untested-requirements |
 | 2026-10-04 | 0017 | patch | — | 0.1 | — | — | — | — | — | 20261004-215710-patch-0017-suffix-c1 |
 | 2026-10-05 | 0007 | docs | 0.3 | 0.15 | 0.5 | 5874k | 223k | no aplica | sin precio | 20261004-220000-feature-0007-bilingual-readme |
+| 2026-10-08 | 0012 | backend | 1 | 0.15 | 0.15 | 11778k | 604k | no aplica | sin precio | 20261008-141230-feature-0012-git-status-l1 |
+| 2026-10-08 | 0018 | patch | — | 0.1 | — | — | — | — | — | 20261008-145214-patch-0018-weekly-reset-24h |
+| 2026-10-08 | 0019 | patch | — | 0.4 | — | — | — | — | — | 20261008-152437-patch-0019-missing-0002-tests |
+| 2026-10-08 | 0020 | patch | — | 0.2 | — | — | — | — | — | 20261008-161514-patch-0020-install-copy-error |
 
-**Factor de calibración** (ratio mediano real/estimado, 9 artefactos): **1** · media 0.89
+**Factor de calibración** (ratio mediano real/estimado, 10 artefactos): **0.92** · media 0.82
 
-- p25–p75: 0.8–1
-- p80: 1.07 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
-- Dentro de ±25 %: 78 % · sobreestimadas: 22 % · infraestimadas: 0 %
-- Error absoluto (h): media 0.08 · mediana 0.05
+- p25–p75: 0.57–1
+- p80: 1.03 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
+- Dentro de ±25 %: 70 % · sobreestimadas: 30 % · infraestimadas: 0 %
+- Error absoluto (h): media 0.15 · mediana 0.07
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tramo del ratio | n | % |
 | --- | --- | --- |
-| <0.5 | 0 | 0 % |
-| 0.5–0.8 | 2 | 22 % |
-| 0.8–1.25 | 7 | 78 % |
+| <0.5 | 1 | 10 % |
+| 0.5–0.8 | 2 | 20 % |
+| 0.8–1.25 | 7 | 70 % |
 | 1.25–2 | 0 | 0 % |
 | ≥2 | 0 | 0 % |
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
-| backend | 2 | 1.08 | — |
+| backend | 3 | 1 | — |
 | chore | 1 | 1.2 | — |
 | docs | 1 | 0.5 | — |
 | frontend | 4 | 0.92 | — |
@@ -50,5 +54,6 @@
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
 | 1.1.0 | 16 | 4.75 | 1 | — | — |
+| sin publicar | 4 | 0.85 | 0.15 | — | — |
 
-> Con menos de 10 tareas con ratio la calibración es orientativa. Ver `estimation.md`.
+> Ver `estimation.md`.

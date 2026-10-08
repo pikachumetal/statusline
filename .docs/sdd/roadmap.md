@@ -5,29 +5,19 @@
 | # | Ítem | Estado |
 | --- | --- | --- |
 
-## Release 2.0.0
-
-en preparación
-
-| id | Feature | Origen | Ficheros que toca | Estado |
-| --- | --- | --- | --- | --- |
-| 0012 | Estado de git en la L1: `●` con cambios y `↑↓` frente al remoto, con lo que devuelve un solo `git status --porcelain=v2 --branch` · tras 0001 | Petición del usuario el 2026-10-04 | `statusline.js` (`readGit`, render de la L1), `statusline.test.js` | ⏳ |
-
 ## Backlog
 
 | # | Ítem | Origen |
 | --- | --- | --- |
-| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Módulo identificado, candidato a `v2.0.0` |
-| B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado, candidato a `v2.0.0` |
-| B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado, candidato a `v2.0.0` |
+| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Módulo identificado |
+| B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado |
+| B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado |
 | B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
 
 ## Deuda técnica
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
-| Tests pendientes tras la 0002: colores atenuados del resto de fragmentos (perfil, effort, sufijo, `5h`/`7d`, reset, coste) y velocity verde/rojo; el `cwd` que recibe `git` según la precedencia; el wrapper de Orca descartando la salida del hook y sin hook (Minor #5, #9, #10 de la revisión final de la 0002) | Bajo: esos detalles pueden romperse sin que falle la suite | Actuar: asserts en los bloques de la 0002; patch |
-| El `↻` semanal pinta `24h00m` cuando faltan algo menos de 24 h: `fmtDuration` redondea los minutos a 1440 y no pasa al formato en días | Cosmético: `24h00m` en vez de `1d00h` durante unos segundos | Actuar: redondear antes de elegir el formato largo o corto; patch |
 
 ## Patches
 
@@ -35,6 +25,14 @@ en preparación
 | --- | --- | --- |
 
 ## Releases cerradas
+
+### v1.2.0 — 2026-10-08
+
+Estado de git en la L1: `●` con cambios y `↑↓` frente al upstream (0012). Patches: `↻` semanal a `1d00h` justo por debajo de 24 h (0018), tests que faltaban tras la 0002 (0019) e `install.ps1` parado si falla la copia de un fichero (0020). Se planificó como 2.0.0. Sale como 1.2.0 porque solo añade y corrige, sin romper compatibilidad. El 2.0.0 queda para la configurabilidad (B1), que sigue en el backlog con B2 y B3, sin versión candidata.
+
+[changelog](changelog.md)
+
+smoke: 2026-10-08 · 0 hallazgos (suite completa; L1 en un repo real por delante y por detrás del remoto, con cambios y sin upstream; `↻` con 23h59m55s; `install.ps1` con `statusline.cmd` bloqueado; 0 corregidos)
 
 ### v1.1.0 — 2026-10-05
 

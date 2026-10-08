@@ -22,9 +22,14 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 - GIVEN un directorio de proyecto dentro de un repo git
 - WHEN se pinta la L1
 - THEN se muestra el nombre del repo principal (la carpeta que contiene el `.git` común), el icono de branch y el nombre del branch
-- AND si el directorio está en un worktree enlazado, se añade `🌳` y el nombre de la carpeta del worktree
+- AND si el working tree tiene cambios (modificados, staged, sin seguimiento o en conflicto), tras el branch se añade `●` en amarillo (`220;200;0`): `proj  main ●`
+- AND si el branch tiene upstream, tras el branch (y tras `●` si lo hay) se añade en gris atenuado (`130;130;130`) `↑N` con N commits por delante y `↓M` con M por detrás, pegados, solo los que sean mayores que cero: `+2 -1` en `branch.ab` pinta `↑2↓1`, `+2 -0` pinta `↑2`, `+0 -0` no pinta nada
+- AND sin upstream, con el upstream borrado o en detached HEAD no se pinta `↑` ni `↓`
+- AND si el directorio está en un worktree enlazado, se añade `🌳` y el nombre de la carpeta del worktree, detrás de las marcas: `proj  main ● ↑2 🌳 feat-x`
 - AND dentro de un worktree enlazado el repo sigue siendo el principal, no la carpeta del worktree
 - AND el nombre del worktree sale de `git`, no del JSON: el JSON trae el id interno de git (`.git/worktrees/<id>`), que es ilegible si el worktree se movió tras crearse
+- AND si `git` agota el presupuesto después de dar las rutas, tras el branch se pinta `⚠` en gris en lugar de `●` y `↑↓`, y el branch es `?`: `proj  ? ⚠`
+- AND si `git status` falla sin agotar el presupuesto, el branch es `?`, sin `●`, `↑↓` ni `⚠`
 
 ### Ubicación en detached HEAD
 
@@ -32,14 +37,17 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 
 - GIVEN un repo en detached HEAD
 - WHEN se pinta la L1
-- THEN en lugar del nombre del branch se muestra el hash corto del commit
+- THEN en lugar del nombre del branch se muestra el hash corto del commit: los 7 primeros caracteres de `branch.oid` (`abc1234def…` pinta `abc1234`)
 - AND si tampoco se puede obtener el hash, se muestra `?`
 
 ### Ubicación sin git
 
-- GIVEN un directorio de proyecto que no es un repo git, o un `git` que no responde
+> Cobertura: con test.
+
+- GIVEN un directorio de proyecto que no es un repo git, o un `git` que falla
 - WHEN se pinta la L1
-- THEN se muestra solo el nombre del directorio, sin icono de branch ni worktree
+- THEN se muestra solo el nombre del directorio, sin icono de branch, worktree ni `⚠`
+- AND si `git` agota el presupuesto antes de dar las rutas, tras el nombre del directorio se pinta `⚠` en gris: `proj ⚠`
 - AND sin directorio de proyecto (stdin vacío o inválido) el segmento no aparece, ni su separador
 
 ### Modelo y effort

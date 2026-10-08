@@ -1,7 +1,7 @@
 'use strict';
 // Self-check del statusline: node hooks/statusline.test.js
 const assert = require('assert');
-const { render, bar, gitNames, readGit, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
+const { render, bar, gitNames, readGit, parseStatus, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
 
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
@@ -32,6 +32,13 @@ for (const s of ['⏳ 6d00h', '↻1d00h']) assert.ok(l2.includes(s), `semanal fa
 const weekSoon = { ...fixture, rate_limits: { seven_day: { used_percentage: 38, resets_at: NOW / 1000 + 2 * 3600 } } };
 const soonL2 = render(weekSoon, env, NOW).split('\n')[1];
 for (const s of ['⏳ 6d22h', '↻2h00m']) assert.ok(soonL2.includes(s), `semanal corto falta ${s}`);
+
+// Patch 0018: el formato se elige con los minutos ya redondeados, nunca `24h00m`.
+for (const [secs, want] of [[23 * 3600 + 59 * 60 + 30, '↻1d00h'], [23 * 3600 + 59 * 60, '↻23h59m'], [24 * 3600, '↻1d00h']]) {
+    const edge = { ...fixture, rate_limits: { seven_day: { used_percentage: 38, resets_at: NOW / 1000 + secs } } };
+    const edgeL2 = render(edge, env, NOW).split('\n')[1];
+    assert.ok(edgeL2.includes(want), `reset a ${secs}s falta ${want}: «${edgeL2}»`);
+}
 
 // Sin resets_at el semanal degrada: solo 7d, barra y porcentaje.
 const weekBare = { ...fixture, rate_limits: { seven_day: { used_percentage: 38 } } };
@@ -80,9 +87,18 @@ assert.deepStrictEqual(submodule, { repo: 'sub', worktree: null }, 'submódulo: 
     const took = Date.now() - t0;
     // Margen holgado para una máquina cargada: lo que importa es quedar lejos de los 5500 ms sin plazo.
     assert.ok(took <= 2500, `readGit con git lento cabe en el presupuesto (${took} ms)`);
-    assert.deepStrictEqual(slowGit, { repo: 'proj', worktree: null, branch: '?' }, 'readGit con presupuesto agotado');
-    const fast = (args) => (args.includes('--git-dir') ? PATHS : args[0] === 'symbolic-ref' ? 'main' : null);
-    assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, fast), { repo: 'proj', worktree: null, branch: 'main' }, 'readGit con git rápido');
+    assert.deepStrictEqual(slowGit, { repo: 'proj', worktree: null, branch: '?', dirty: false, ahead: null, behind: null, timedOut: true }, 'readGit con presupuesto agotado');
+    const STATUS = '# branch.oid abc1234def\n# branch.head main\n# branch.upstream origin/main\n# branch.ab +2 -1\n1 .M N... 100644 100644 100644 a b statusline.js\n';
+    const calls = [];
+    const fast = (args) => { calls.push(args); return args.includes('--git-dir') ? PATHS : args[0] === 'status' ? STATUS : null; };
+    assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, fast), { repo: 'proj', worktree: null, branch: 'main', dirty: true, ahead: 2, behind: 1, timedOut: false }, 'readGit con git rápido');
+    assert.strictEqual(calls.length, 2, 'readGit hace dos llamadas a git');
+    assert.deepStrictEqual(calls[1], ['status', '--porcelain=v2', '--branch'], 'la segunda llamada es git status');
+    const statusFails = (args) => (args.includes('--git-dir') ? PATHS : null);
+    assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, statusFails), { repo: 'proj', worktree: null, branch: '?', dirty: false, ahead: null, behind: null, timedOut: false }, 'git status que falla dentro de plazo');
+    const pathsTimeout = (args, cwd, timeout) => { sleep(timeout); return null; };
+    assert.deepStrictEqual(readGit({ cwd: '/code/proj' }, pathsTimeout), { timedOut: true }, 'presupuesto agotado en las rutas');
+    assert.strictEqual(readGit({ cwd: '/code/proj' }, () => null), null, 'rutas que fallan rápido: sin git');
 
     const { spawnSync } = require('child_process'), path = require('path');
     const t1 = Date.now();
@@ -220,7 +236,7 @@ if (process.platform === 'win32') {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
     const noOrca = path.join(dir, 'no-orca.cmd');
-    const install = (orcaHook = noOrca) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
+    const install = (orcaHook = noOrca, configDir = dir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
     const cmd = path.join(dir, 'hooks', 'statusline.cmd');
     try {
         // Con Orca: el bloque apunta al wrapper que le reenvía el JSON.
@@ -245,6 +261,14 @@ if (process.platform === 'win32') {
         assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
         assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
         assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+
+        // Copia que falla: un directorio con el nombre de statusline.cmd hace de fichero bloqueado por la sesión.
+        const broken = path.join(dir, 'broken');
+        fs.mkdirSync(path.join(broken, 'hooks', 'statusline.cmd'), { recursive: true });
+        const failed = install(noOrca, broken);
+        assert.notStrictEqual(failed.status, 0, 'copia fallida: código de salida distinto de 0');
+        assert.ok(!failed.stdout.includes('Ficheros copiados'), 'copia fallida: no da los ficheros por copiados');
+        assert.ok(failed.stderr.includes('statusline.cmd'), 'copia fallida: el error nombra el fichero');
     } finally {
         fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -330,12 +354,31 @@ if (process.platform === 'win32') {
     assert.strictEqual(where({ workspace: { project_dir: '/a/proj', current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'proj', 'manda project_dir');
     assert.strictEqual(where({ workspace: { current_dir: '/a/cur' }, cwd: '/a/cwd' }), 'cur', 'sin project_dir, current_dir');
     assert.strictEqual(where({ cwd: '/a/cwd' }), 'cwd', 'sin workspace, cwd');
+    // git recibe el mismo directorio, con la misma precedencia.
+    const gitCwd = (data) => { const seen = new Set(); readGit(data, (args, cwd) => { seen.add(cwd); return null; }); return [...seen]; };
+    assert.deepStrictEqual(gitCwd({ workspace: { project_dir: '/a/proj', current_dir: '/a/cur' }, cwd: '/a/cwd' }), ['/a/proj'], 'git en project_dir');
+    assert.deepStrictEqual(gitCwd({ workspace: { current_dir: '/a/cur' }, cwd: '/a/cwd' }), ['/a/cur'], 'git en current_dir sin project_dir');
+    assert.deepStrictEqual(gitCwd({ cwd: '/a/cwd' }), ['/a/cwd'], 'git en cwd sin workspace');
+    // De punta a punta: un project_dir fuera de git manda aunque cwd sea este repo.
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-nogit-'));
+    // El temporal puede colgar de un repo (en esta máquina %TEMP% lo es): git no sube más allá.
+    const gitEnvVars = { ...process.env, GIT_CEILING_DIRECTORIES: path.dirname(outside) };
+    try {
+        const l1 = (data) => cells(spawnSync(process.execPath, [path.join(__dirname, 'statusline.js')], { input: JSON.stringify(data), cwd: __dirname, env: gitEnvVars, encoding: 'utf8', timeout: 5000 }).stdout.split('\n')[0]);
+        const noGit = l1({ workspace: { project_dir: outside }, cwd: __dirname });
+        assert.ok(noGit.includes(`${path.basename(outside)} │`) && !noGit.includes(''), `git corre en project_dir, no en cwd: «${noGit}»`);
+        assert.ok(l1({ workspace: { project_dir: __dirname }, cwd: outside }).includes(''), 'git corre en project_dir del repo');
+    } finally {
+        fs.rmSync(outside, { recursive: true, force: true });
+    }
 }
 
 // Detached HEAD: sin rama, el hash corto; sin hash, ?.
 {
     const PATHS = '/code/proj\n/code/proj/.git\n/code/proj/.git';
-    const detached = (sha) => (args) => (args.includes('--git-dir') ? PATHS : args.includes('--short') && args[0] === 'rev-parse' ? sha : null);
+    const detached = (sha) => (args) => (args.includes('--git-dir') ? PATHS : args[0] === 'status' && sha ? `# branch.oid ${sha}def5678\n# branch.head (detached)\n` : null);
     assert.strictEqual(readGit({ cwd: '/code/proj' }, detached('abc1234')).branch, 'abc1234', 'detached HEAD pinta el hash corto');
     assert.strictEqual(readGit({ cwd: '/code/proj' }, detached(null)).branch, '?', 'sin hash, ?');
     for (const [sha, shown] of [['abc1234', 'abc1234'], [null, '?']]) {
@@ -344,15 +387,61 @@ if (process.platform === 'win32') {
     }
 }
 
+// git status --porcelain=v2 --branch: rama, cambios y ahead/behind frente al upstream.
+{
+    const head = (h, extra = '') => `# branch.oid abc1234def5678\n# branch.head ${h}\n${extra}`;
+    const UP = '# branch.upstream origin/main\n';
+    assert.deepStrictEqual(parseStatus(head('main', `${UP}# branch.ab +2 -1\n1 .M N... 100644 100644 100644 a b x.js\n`)),
+        { branch: 'main', dirty: true, ahead: 2, behind: 1 }, 'parseStatus con cambios, por delante y por detrás');
+    assert.deepStrictEqual(parseStatus(head('main', `${UP}# branch.ab +0 -0\n`)),
+        { branch: 'main', dirty: false, ahead: 0, behind: 0 }, 'parseStatus limpio y al día');
+    assert.strictEqual(parseStatus(head('main', '? u.txt\n')).dirty, true, 'parseStatus: sin seguimiento cuenta como cambio');
+    assert.strictEqual(parseStatus(head('main', 'u UU N... 100644 100644 100644 100644 a b c x.js\n')).dirty, true, 'parseStatus: conflicto cuenta como cambio');
+    assert.deepStrictEqual(parseStatus(head('(detached)')),
+        { branch: 'abc1234', dirty: false, ahead: null, behind: null }, 'parseStatus en detached HEAD');
+    assert.deepStrictEqual(parseStatus(head('nou')),
+        { branch: 'nou', dirty: false, ahead: null, behind: null }, 'parseStatus sin upstream');
+    assert.deepStrictEqual(parseStatus(head('main', UP)),
+        { branch: 'main', dirty: false, ahead: null, behind: null }, 'parseStatus upstream borrado');
+    assert.strictEqual(parseStatus(head('main', '# stash 2\n')).dirty, false, 'parseStatus: # stash (status.showStash) no es un cambio');
+    assert.strictEqual(parseStatus('# branch.oid (initial)\n# branch.head main\n').branch, 'main', 'parseStatus rama sin commits');
+    assert.deepStrictEqual(parseStatus(head('main', `${UP}# branch.ab +3 -4\n`).replace(/\n/g, '\r\n')),
+        { branch: 'main', dirty: false, ahead: 3, behind: 4 }, 'parseStatus con CRLF');
+}
+
+// Estado de git junto a la rama: ● con cambios, ↑↓ frente al upstream, ⚠ con el presupuesto agotado.
+{
+    const B = '';
+    const at = (git, data = { cwd: '/code/proj' }) => render(data, { ...env, git }, NOW).split('\n')[0];
+    const base = { repo: 'proj', branch: 'main', worktree: null, dirty: true, ahead: 2, behind: 1, timedOut: false };
+    const full = at(base);
+    assert.ok(cells(full).startsWith(`proj ${B} main ● ↑2↓1 │`), `marcas junto a la rama: «${cells(full)}»`);
+    assert.ok(full.includes('\x1b[38;2;220;200;0m●'), '● en amarillo');
+    assert.ok(full.includes('\x1b[38;2;130;130;130m↑2↓1'), '↑↓ en gris atenuado');
+    assert.ok(cells(at({ ...base, behind: 0 })).startsWith(`proj ${B} main ● ↑2 │`), 'solo por delante: ↑2');
+    assert.ok(cells(at({ ...base, ahead: 0, behind: 0 })).startsWith(`proj ${B} main ● │`), '↑0↓0 no se pinta');
+    assert.ok(cells(at({ ...base, ahead: null, behind: null })).startsWith(`proj ${B} main ● │`), 'sin upstream no hay ↑↓');
+    assert.ok(cells(at({ ...base, dirty: false, ahead: 0, behind: 3 })).startsWith(`proj ${B} main ↓3 │`), 'limpio y por detrás: ↓3 sin ●');
+    assert.ok(cells(at({ ...base, behind: 0, worktree: 'feat-x' })).startsWith(`proj ${B} main ● ↑2 🌳 feat-x │`), 'marcas antes del worktree');
+    const late = at({ repo: 'proj', branch: '?', worktree: null, dirty: false, ahead: null, behind: null, timedOut: true });
+    assert.ok(cells(late).startsWith(`proj ${B} ? ⚠ │`), `presupuesto agotado tras las rutas: «${cells(late)}»`);
+    assert.ok(late.includes('\x1b[38;2;60;60;60m⚠'), '⚠ en gris');
+    assert.ok(cells(at({ timedOut: true })).startsWith('proj ⚠ │'), `presupuesto agotado en las rutas: «${cells(at({ timedOut: true }))}»`);
+    assert.ok(cells(at(null)).startsWith('proj │'), 'sin git: solo el nombre, sin ⚠');
+    const seg = full.split(/ \x1b\[38;2;60;60;60m│\x1b\[0m /)[0];
+    assert.ok(seg.lastIndexOf('\x1b[0m') > seg.lastIndexOf('\x1b[38;2'), 'la ubicación con marcas cierra su color');
+}
+
 // Color del porcentaje: mismos cortes que el icono, en el contexto y en las dos ventanas.
 for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200;0'], [70, '255;140;0'], [89, '255;140;0'], [90, '220;60;40']]) {
     const out = render({ context_window: { used_percentage: pct }, rate_limits: { five_hour: { used_percentage: pct }, seven_day: { used_percentage: pct } } }, env, NOW);
     assert.strictEqual(out.split(`\x1b[38;2;${color}m${pct}%`).length - 1, 3, `color del ${pct} % en contexto, 5h y 7d`);
 }
 
-// Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, modelo magenta.
+// Color: ningún segmento arrastra su color; repo naranja y negrita, branch verde, perfil y modelo magenta,
+// effort, sufijo, 5h/7d, reset y coste atenuados; velocity verde y rojo.
 {
-    const out = render(fixture, gitEnv, NOW);
+    const out = render(fixture, { ...gitEnv, profile: 'perfil', flags: { ...gitEnv.flags, savings: 'ahorro' } }, NOW);
     for (const seg of out.split('\n').flatMap((line) => line.split(/ \x1b\[38;2;60;60;60m│\x1b\[0m /))) {
         const lastColor = Math.max(seg.lastIndexOf('\x1b[38;2'), seg.lastIndexOf('\x1b[48;2'), seg.lastIndexOf('\x1b[1m'));
         assert.ok(lastColor === -1 || seg.lastIndexOf('\x1b[0m') > lastColor, `segmento sin reset final: «${cells(seg)}»`);
@@ -360,9 +449,16 @@ for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200
     assert.ok(out.includes('\x1b[1m\x1b[38;2;217;119;87mEasyClaw'), 'repo en negrita y naranja');
     assert.ok(out.includes('\x1b[38;2;80;200;120m main'), 'branch en verde');
     assert.ok(out.includes('\x1b[38;2;200;120;220m🤖 Fable 5.1'), 'modelo en magenta');
+    assert.ok(out.includes('\x1b[38;2;200;120;220m🧪 perfil'), 'perfil en magenta');
+    const DIM = '\x1b[38;2;130;130;130m';
+    for (const s of ['(medium)', 'ahorro', '5h', '7d', '💰 $0.47']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
+    assert.strictEqual(out.split(`${DIM}↻`).length - 1, 2, 'reset atenuado en 5h y 7d');
+    assert.ok(out.includes('\x1b[38;2;80;200;120m+156'), 'líneas añadidas en verde');
+    assert.ok(out.includes('\x1b[38;2;220;60;40m-23'), 'líneas eliminadas en rojo');
 }
 
-// Wrapper de Orca: pinta el statusline, reenvía el mismo JSON a Orca y borra su temporal.
+// Wrapper de Orca: pinta el statusline, reenvía el mismo JSON a Orca, descarta lo que Orca escribe
+// y borra su temporal; sin hook, pinta igual.
 if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
     const { spawnSync } = require('child_process');
@@ -371,19 +467,30 @@ if (process.platform === 'win32') {
     try {
         fs.mkdirSync(temp);
         const hooks = path.join(home, '.orca', 'agent-hooks');
+        const hook = path.join(hooks, 'claude-statusline.cmd');
         fs.mkdirSync(hooks, { recursive: true });
-        fs.writeFileSync(path.join(hooks, 'claude-statusline.cmd'), '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\n');
+        fs.writeFileSync(hook, '@echo off\r\nfindstr "^" > "%~dp0got.json"\r\necho ORCA-OUT\r\necho ORCA-ERR 1>&2\r\n');
         const input = '{"model":{"display_name":"Orca test"}}';
         // Sin proto en el USERPROFILE de prueba, statusline.cmd usa el node del PATH: el de este test.
         const pathKey = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
         const pathWithNode = `${path.dirname(process.execPath)};${process.env[pathKey]}`;
-        const run = spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
+        const wrap = () => spawnSync('cmd.exe', ['/d', '/c', path.join(__dirname, 'statusline-orca.cmd')], {
             input, encoding: 'utf8', timeout: 10000, env: { ...process.env, USERPROFILE: home, TEMP: temp, TMP: temp, [pathKey]: pathWithNode },
         });
+        const leftovers = () => fs.readdirSync(temp).filter((f) => f.startsWith('cc-statusline-'));
+        const run = wrap();
         assert.strictEqual(run.status, 0, 'wrapper de Orca sale con 0');
         assert.ok(cells(run.stdout).includes('🤖 Orca test'), 'wrapper de Orca pinta el statusline');
         assert.ok(fs.readFileSync(path.join(hooks, 'got.json'), 'utf8').includes('"Orca test"'), 'Orca recibe el mismo JSON');
-        assert.deepStrictEqual(fs.readdirSync(temp).filter((f) => f.startsWith('cc-statusline-')), [], 'el temporal se borra');
+        assert.ok(!run.stdout.includes('ORCA-OUT') && !run.stderr.includes('ORCA-ERR'), `la salida de Orca se descarta: «${run.stdout}» «${run.stderr}»`);
+        assert.deepStrictEqual(leftovers(), [], 'el temporal se borra');
+
+        fs.rmSync(hook);
+        const bare = wrap();
+        assert.strictEqual(bare.status, 0, 'sin hook de Orca sale con 0');
+        assert.strictEqual(bare.stdout, run.stdout, 'sin hook de Orca pinta lo mismo');
+        assert.strictEqual(bare.stderr, '', 'sin hook de Orca no escribe en stderr');
+        assert.deepStrictEqual(leftovers(), [], 'sin hook el temporal se borra');
     } finally {
         fs.rmSync(home, { recursive: true, force: true });
     }
