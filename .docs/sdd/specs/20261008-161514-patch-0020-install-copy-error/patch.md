@@ -65,3 +65,7 @@ Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: fi
 - AND el perfil por defecto es `~/.claude`
 - AND la carpeta `hooks` se crea si no existe, y los ficheros que ya hubiera se sobrescriben
 - AND si un fichero no se puede copiar (p. ej. `statusline.cmd` bloqueado por la sesión que lo usa), el instalador se para en él con un error que lo nombra y código de salida distinto de 0, sin decir que ha copiado los ficheros ni mostrar el bloque `statusLine`; los copiados antes se quedan
+
+## Adendas
+
+- 2026-10-08 — Validado en el smoke de la release 1.2.0 por el agente, con los casos que fijó el dev-lead: `install.ps1 -ConfigDir <perfil temporal>` con `hooks\statusline.cmd` abierto en exclusiva por otro proceso → error de `Copy-Item` que nombra `statusline.cmd`, sin «Ficheros copiados» y con código de salida 1. Sin bloqueo y sobre un perfil nuevo, sale con código 0.

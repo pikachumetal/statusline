@@ -60,3 +60,7 @@ Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: fi
 - THEN la duración se redondea a minutos y, a partir de 24 h, se muestra en días y horas (`4d12h`), con las horas redondeadas hacia abajo
 - AND por debajo de 24 h se muestra en el formato corto ya existente (`4h16m` o `16m`)
 - AND la duración que redondea a 24 h se pinta `1d00h`, nunca `24h00m`
+
+## Adendas
+
+- 2026-10-08 — Validado en el smoke de la release 1.2.0 por el agente, con los casos que fijó el dev-lead: `resets_at` a 23h59m55s y 23h59m45s → `↻1d00h`; a 23h58m20s → `↻23h58m`. El `statusline.js` de la v1.1.0, con 23h59m55s, pintaba `↻24h00m`.

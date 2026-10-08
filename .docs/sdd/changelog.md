@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-08
+
 ### Changed
 
 - **0019** — Tienen test los detalles que la 0002 dejó sin assert: el perfil en magenta; effort, sufijo de ahorro, `5h`/`7d`, reset y coste atenuados; velocity en verde y rojo; el directorio en el que corre `git` según la precedencia de `project_dir`, `current_dir` y `cwd`; y el wrapper de Orca descartando la salida del hook y funcionando igual sin hook. → [ref](specs/20261008-152437-patch-0019-missing-0002-tests/)

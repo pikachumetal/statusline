@@ -53,3 +53,7 @@ Validación diferida: 2026-10-08 · perfil `unattended` sin `validation.mode: fi
 ## 5. Tiempo (ligero)
 
 - Real: 0,4h
+
+## Adendas
+
+- 2026-10-08 — Validado en el smoke de la release 1.2.0 por el agente, con los casos que fijó el dev-lead: `node statusline.test.js` → `statusline.test.js OK`, con la suite completa sobre la rama `release/1.2.0`.
