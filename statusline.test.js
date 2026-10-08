@@ -236,7 +236,7 @@ if (process.platform === 'win32') {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
     const noOrca = path.join(dir, 'no-orca.cmd');
-    const install = (orcaHook = noOrca) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', dir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
+    const install = (orcaHook = noOrca, configDir = dir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
     const cmd = path.join(dir, 'hooks', 'statusline.cmd');
     try {
         // Con Orca: el bloque apunta al wrapper que le reenvía el JSON.
@@ -261,6 +261,14 @@ if (process.platform === 'win32') {
         assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
         assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
         assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+
+        // Copia que falla: un directorio con el nombre de statusline.cmd hace de fichero bloqueado por la sesión.
+        const broken = path.join(dir, 'broken');
+        fs.mkdirSync(path.join(broken, 'hooks', 'statusline.cmd'), { recursive: true });
+        const failed = install(noOrca, broken);
+        assert.notStrictEqual(failed.status, 0, 'copia fallida: código de salida distinto de 0');
+        assert.ok(!failed.stdout.includes('Ficheros copiados'), 'copia fallida: no da los ficheros por copiados');
+        assert.ok(failed.stderr.includes('statusline.cmd'), 'copia fallida: el error nombra el fichero');
     } finally {
         fs.rmSync(dir, { recursive: true, force: true });
     }

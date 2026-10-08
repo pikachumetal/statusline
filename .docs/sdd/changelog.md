@@ -12,6 +12,7 @@
 
 ### Fixed
 
+- **0020** — `install.ps1` se para si no puede copiar un fichero (p. ej. `statusline.cmd` bloqueado por la sesión que lo usa): sale con código 1, el error nombra el fichero y ya no imprime «Ficheros copiados» ni el bloque `statusLine`. → [ref](specs/20261008-161514-patch-0020-install-copy-error/)
 - **0018** — El `↻` semanal pinta `1d00h` cuando faltan algo menos de 24 h, en vez de `24h00m`: el formato se elige con la duración ya redondeada a minutos. → [ref](specs/20261008-145214-patch-0018-weekly-reset-24h/)
 
 ## [1.1.0] - 2026-10-05
