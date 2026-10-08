@@ -83,3 +83,5 @@ Smoke del agente: `statusline.js` lanzado con `{"cwd": …}` sobre repos tempora
 - Un `core.fsmonitor` lento provoca de verdad el timeout de `git status` para un smoke → este walkthrough.
 
 ## 6. Adendas
+
+- 2026-10-08 — Validado en el smoke de la release 1.2.0 por el agente, con los casos que fijó el dev-lead: repo real con remoto local. Rama por delante y con cambios → `master ● ↑1`; por delante y por detrás → `● ↑1↓1`; rama sin upstream con cambios → `nouser ●`, sin flechas; sin upstream y limpia, y clon al día → solo la rama.
