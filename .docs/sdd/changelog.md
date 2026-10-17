@@ -4,12 +4,17 @@
 
 ### Changed
 
+- **0025** — El coste de la status line se pinta en `#d19a66`, el color que tenía en el mod, en vez de atenuado. → [ref](specs/20261017-215404-patch-0025-cost-to-statusline/)
 - **0022** — Los 11 segmentos tienen nombre (`profile`, `where`, `model`, `caveman`, `ponytail`, `velocity`, `duration`, `context`, `five_hour`, `seven_day`, `cost`) y `render` pinta las líneas de un layout, con el de la v1.2.0 por defecto: la salida no cambia. Base de `statusline.json` (0023). → [ref](specs/20261017-144436-feature-0022-named-segments/)
 
 ### Added
 
 - **0023** — `statusline.json` en el perfil (`CLAUDE_CONFIG_DIR` o `~/.claude`) fija qué segmentos se pintan, en qué orden y en cuántas líneas: `{"lines": [["where", "model"], ["context", "cost"]]}`. Sin fichero, la salida de siempre. Un fichero inválido (JSON roto, forma incorrecta, más de 4096 bytes, symlink) pinta el layout por defecto con un `⚠` gris al final de la L1; un nombre desconocido, un `⚠` en su sitio. Formato en el README. → [ref](specs/20261017-181144-feature-0023-statusline-json/)
 - **0024** — Mod de controles (`mod/`, Claude Code 2.1.302 o superior): bajo la status line, una fila clicable con selectores de modelo, effort, caveman y ponytail, el coste con `$/h` leído en vivo, `[passed]`/`[failed]` del último test de la sesión (Bash o PowerShell) y `Board`, que abre el board de ponytail. `install.ps1` lo instala en el perfil con el CLI `claude`, desde el clon como marketplace de carpeta. → [ref](specs/20261017-124615-feature-0024-controls-mod/)
+
+### Removed
+
+- **0025** — El coste sale de la fila del mod de controles: con `statusline.json` (0023) va en la status line (`cost`). → [ref](specs/20261017-215404-patch-0025-cost-to-statusline/)
 
 ## [1.2.0] - 2026-10-08
 

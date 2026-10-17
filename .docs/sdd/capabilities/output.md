@@ -15,15 +15,12 @@ Qué escribe el statusline en stdout y con qué aspecto. El contenido de cada l�
 
 ### Color
 
-> Cobertura: con test.
-
 - GIVEN un terminal con truecolor
 - WHEN se pinta el statusline
 - THEN los colores se emiten como secuencias ANSI de 24 bits (`38;2;r;g;b`)
 - AND cada fragmento coloreado termina con un reset, de modo que un color no se arrastra al segmento siguiente ni al prompt
-- AND el repo va en naranja y negrita; el branch, en verde; el perfil y el modelo, en magenta; el effort, el sufijo de ahorro, las etiquetas `5h` y `7d`, la hora de reset y el coste, atenuados; velocity, en verde lo añadido y en rojo lo eliminado
-
-El color del porcentaje y el gradiente de las barras están en `usage.md`.
+- AND el repo va en naranja y negrita; el branch, en verde; el perfil y el modelo, en magenta; el coste, en `#d19a66` (`rgb(209, 154, 102)`); el effort, el sufijo de ahorro, las etiquetas `5h` y `7d` y la hora de reset, atenuados; velocity, en verde lo añadido y en rojo lo eliminado
+- AND el color del porcentaje y el gradiente de las barras están en `usage.md`
 
 ### Iconos
 

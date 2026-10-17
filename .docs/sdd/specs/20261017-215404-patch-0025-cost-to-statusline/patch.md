@@ -7,7 +7,7 @@ solution: dev-lead
 status: done
 created: 2026-10-17
 branch: patch/0025-cost-to-statusline
-commit:
+commit: 891a9d1
 ---
 
 # Patch 0025 — el coste sale del mod y toma su color en la status line
@@ -66,11 +66,14 @@ Fijada por el dev-lead, en dos frases:
 | 2 | `node statusline.test.js` tras el fix | ✅ OK |
 | 3 | `claude plugin test mod` tras el fix | ✅ 37 pass, 0 fail |
 | 4 | `claude plugin validate mod` | ✅ con el aviso de `author`, que ya estaba |
+| 5 | `statusline.js` instalado en `~/.claude` y `~/.claude-gco`, lanzado con coste 46.76 USD y 9h40m (ejecución real) | ✅ `[38;2;209;154;102m💰 $46.76 · $4.84/h` |
+
+Validado: 2026-10-18 · «Validado: lo he probado y funciona» · no detalló qué probó
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.25h
-- Real:
+- Real: 0.4h
 
 ## 6. Delta de capacidad
 
@@ -88,8 +91,10 @@ Fijada por el dev-lead, en dos frases:
 
 **MODIFIED — Un fallo no rompe la línea**
 - GIVEN un pintado de la fila que falla entero
-- WHEN se pinta la línea bajo la status line
+- WHEN se pinta la fila
+- REMOVED THEN en el sitio del coste sale un `⚠` gris y el resto de controles se pinta igual
 - THEN la línea muestra la pista normal del motor, sin controles del mod
+- REMOVED AND si falla el pintado de la fila entera, la línea muestra la pista normal del motor, sin controles del mod
 
 **Reglas de la capacidad**
 - **Dónde viven los datos**: el mod no escribe ficheros. Lee el modelo de Claude Code (`$.session`), el effort de cada turno y de la respuesta de `/effort`, el resultado de las llamadas a Bash y PowerShell de la sesión, y los modos de `.caveman-active` y `.ponytail-active` en `CLAUDE_CONFIG_DIR`. Lo que recuerda (selector abierto, effort confirmado, último resultado de tests) vive en el estado de sesión de Claude Code y se pierde al cerrarla. Los valores por defecto que guardan `/model` y `/effort` los escribe Claude Code.
