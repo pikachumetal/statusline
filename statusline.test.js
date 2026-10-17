@@ -539,9 +539,7 @@ if (process.platform === 'win32') {
 
 // Layout: cada segmento tiene nombre y render pinta las líneas de env.layout.
 {
-    const V120 = [['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'], ['duration', 'context', 'five_hour', 'seven_day', 'cost']];
     const withLayout = (layout) => cells(render(fixture, { ...env, layout }, NOW));
-    assert.strictEqual(render(fixture, { ...env, layout: V120 }, NOW), render(fixture, env, NOW), 'layout de la v1.2.0 explícito = sin layout, byte a byte');
 
     const one = withLayout([['cost', 'model']]);
     assert.ok(!one.includes('\n') && /^💰 .* │ 🤖 /.test(one), `una línea, coste y modelo en ese orden: «${one}»`);
@@ -555,6 +553,110 @@ if (process.platform === 'win32') {
 
     const twice = withLayout([['cost', 'cost']]);
     assert.ok(/^💰 .* │ 💰 /.test(twice), `segmento repetido dos veces: «${twice}»`);
+}
+
+// statusline.json del perfil: layout, validación de la forma y ⚠ con un fichero inválido.
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const script = path.join(__dirname, 'statusline.js');
+    const input = JSON.stringify({ cwd: __dirname, model: { display_name: 'Opus' }, cost: { total_cost_usd: 0.42 } });
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-config-'));
+    const profile = path.join(root, 'perfil'), other = path.join(root, 'otro');
+    fs.mkdirSync(profile);
+    fs.mkdirSync(other);
+    const config = path.join(profile, 'statusline.json');
+    const launch = (dir) => {
+        const r = spawnSync(process.execPath, [script], { input, encoding: 'utf8', timeout: 10000, env: { ...process.env, CAVEMAN_STATUSLINE_SAVINGS: '1', CLAUDE_CONFIG_DIR: dir } });
+        assert.ok(r.status === 0 && r.stderr === '', `statusline.js falló: status ${r.status}, ${r.error || r.stderr}`);
+        return r.stdout;
+    };
+    const withConfig = (content) => {
+        fs.rmSync(config, { recursive: true, force: true });
+        if (content !== null) fs.writeFileSync(config, content);
+        return launch(profile);
+    };
+    const GRAY_WARN = '\x1b[38;2;60;60;60m⚠';
+    const small = '{"lines": [["cost"]]}';
+    try {
+        const none = withConfig(null);
+        assert.ok(none.split('\n').length === 2 && !cells(none).includes('⚠'), `sin fichero, dos líneas sin ⚠: «${cells(none)}»`);
+        const v120 = JSON.stringify({ lines: [['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'], ['duration', 'context', 'five_hour', 'seven_day', 'cost']] });
+        assert.strictEqual(withConfig(v120), none, 'layout de la v1.2.0 en statusline.json = sin fichero, byte a byte');
+
+        const one = cells(withConfig('{"lines": [["where","model","context"]]}'));
+        assert.ok(!one.includes('\n') && /^statusline\b.* │ 🤖 Opus │ 🟢 /.test(one), `una línea: «${one}»`);
+
+        const three = cells(withConfig('{"lines": [["model"],["cost"],["duration"]]}')).split('\n');
+        assert.ok(three.length === 3 && three[0] === '🤖 Opus' && three[1].startsWith('💰 $0.42') && three[2].startsWith('⏱️ '), `tres líneas: «${three.join(' / ')}»`);
+
+        // Inválidos: layout por defecto y ⚠ gris al final de la L1.
+        const invalid = (label, out) => {
+            const lines = out.split('\n');
+            assert.ok(lines.length === 2 && cells(lines[0]).endsWith('🤖 Opus │ ⚠') && lines[0].includes(GRAY_WARN), `${label}: L1 acaba en ⚠ gris: «${cells(lines[0])}»`);
+            assert.ok(!cells(lines[1]).includes('⚠'), `${label}: L2 entera, sin ⚠`);
+        };
+        for (const bad of ['{"lines": [', '{"lines": "where"}', '{"lines": []}', '{"lines": [["cost"], []]}', '{"lines": [["cost", 3]]}', '[]', '{}']) invalid(bad, withConfig(bad));
+        invalid('4097 bytes', withConfig(small.padEnd(4097)));
+        fs.rmSync(config, { force: true });
+        fs.mkdirSync(config);
+        invalid('directorio', launch(profile));
+        fs.rmSync(config, { recursive: true, force: true });
+        const target = path.join(root, 'target.json');
+        fs.writeFileSync(target, small);
+        let linked = true;
+        try { fs.symlinkSync(target, config, 'file'); } catch { linked = false; }
+        if (linked) invalid('symlink', launch(profile));
+        else console.log('  (symlink no permitido en este sistema: test del symlink de statusline.json omitido)');
+        fs.rmSync(config, { force: true });
+
+        const edge = cells(withConfig(small.padEnd(4096)));
+        assert.ok(!edge.includes('\n') && edge.startsWith('💰 $0.42') && !edge.includes('⚠'), `4096 bytes justos, válido: «${edge}»`);
+        const bom = cells(withConfig('﻿' + small));
+        assert.ok(!bom.includes('\n') && bom.startsWith('💰 $0.42') && !bom.includes('⚠'), `BOM aceptado: «${bom}»`);
+        const extra = cells(withConfig('{"lines": [["cost"]], "theme": "x"}'));
+        assert.ok(!extra.includes('\n') && extra.startsWith('💰 $0.42') && !extra.includes('⚠'), `claves de más ignoradas: «${extra}»`);
+
+        const unknownRaw = withConfig('{"lines": [["where","modle","cost"]]}');
+        assert.ok(/^statusline\b.* │ ⚠ │ 💰 \$0\.42/.test(cells(unknownRaw)) && unknownRaw.includes(GRAY_WARN), `nombre desconocido: «${cells(unknownRaw)}»`);
+        assert.ok(/^⚠ │ 💰/.test(cells(withConfig('{"lines": [["Where","cost"]]}'))), 'los nombres distinguen mayúsculas');
+
+        // Un perfil por fichero: el de otro perfil no influye.
+        withConfig(small);
+        const otherOut = cells(launch(other));
+        assert.ok(otherOut.split('\n').length === 2 && otherOut.includes('🧪 otro') && otherOut.includes('🤖 Opus') && !otherOut.includes('⚠'), `el statusline.json de otro perfil no influye: «${otherOut}»`);
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+
+    // render recibe la marca ya calculada: con layoutInvalid, ⚠ al final de la primera línea.
+    const marked = render(fixture, { ...env, layoutInvalid: true }, NOW).split('\n');
+    assert.ok(marked.length === 2 && cells(marked[0]).endsWith(' │ ⚠') && !cells(marked[1]).includes('⚠'), 'layoutInvalid: ⚠ al final de la L1');
+}
+
+// El instalador no toca statusline.json: ni en una instalación limpia ni en un update, y no lo crea.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-config-'));
+    const fakeClaude = path.join(dir, 'fake-claude.cmd');
+    fs.writeFileSync(fakeClaude, '@echo off\r\nexit /b 0\r\n');
+    const install = (configDir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', path.join(dir, 'no-orca.cmd'), '-Claude', fakeClaude], { encoding: 'utf8' });
+    try {
+        const withFile = path.join(dir, 'con'), withoutFile = path.join(dir, 'sin');
+        fs.mkdirSync(withFile);
+        fs.mkdirSync(withoutFile);
+        const bytes = Buffer.from('﻿{"lines": [["cost"]]}\r\n', 'utf8');
+        fs.writeFileSync(path.join(withFile, 'statusline.json'), bytes);
+        for (const label of ['instalación limpia', 'update']) {
+            assert.strictEqual(install(withFile).status, 0, `install.ps1 (${label}) termina bien`);
+            assert.ok(fs.readFileSync(path.join(withFile, 'statusline.json')).equals(bytes), `${label}: statusline.json igual byte a byte`);
+        }
+        assert.strictEqual(install(withoutFile).status, 0, 'install.ps1 sin statusline.json termina bien');
+        assert.ok(!fs.existsSync(path.join(withoutFile, 'statusline.json')), 'el instalador no crea statusline.json');
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
 }
 
 console.log('statusline.test.js OK');
