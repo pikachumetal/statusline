@@ -29,7 +29,7 @@ Necesita una terminal con truecolor y una nerd font (el icono de branch es el gl
 .\install.ps1 -ConfigDir "$HOME\.claude-gco"
 ```
 
-Copia `statusline.js`, `statusline.cmd`, `statusline-orca.cmd` y `statusline.test.js` a `hooks\` del perfil y muestra el bloque `statusLine` que hay que pegar en `settings.json`. Nunca modifica `settings.json`.
+Copia `statusline.js`, `statusline.cmd`, `statusline-orca.cmd` y `statusline.test.js` a `hooks\` del perfil y muestra el bloque `statusLine` que hay que pegar en `settings.json`. El instalador nunca edita `settings.json` por su cuenta; el CLI `claude`, al instalar el mod de controles, sí registra el plugin en la configuración del perfil.
 
 `statusline.cmd` lanza el `node.exe` de la versión más alta instalada con proto, por SemVer, y no su shim. Sin proto, usa el `node` del PATH.
 
@@ -41,8 +41,30 @@ Ejecuta el mismo comando sobre el mismo perfil: sobrescribe los ficheros y, si `
 
 Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), el bloque apunta a `statusline-orca.cmd`: pinta este statusline, reenvía el mismo JSON a Orca y descarta su salida.
 
+## Mod de controles
+
+Con Claude Code 2.1.302 o superior, `install.ps1` instala también un mod que sustituye la línea de pista bajo la status line por una fila clicable:
+
+```
+🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  💰 $7.50 · $15.00/h  [passed]  Board  (shift+tab to cycle)
+```
+
+- **Selectores**: clic en el modelo, el effort, caveman o ponytail despliega sus opciones y oculta el resto de la fila; clic en una opción la aplica con el mismo comando que escribirías (`/model`, `/effort`, `/caveman:caveman`, `/ponytail:ponytail`). `✕` cierra sin cambiar nada.
+- **Coste** en vivo, con `$/h` a partir de 5 minutos de sesión.
+- **Tests**: `[passed]` en verde o `[failed]` en rojo según el último comando de test de la sesión.
+- **Board** abre el board de proyectos de ponytail.
+
+Avisos:
+
+- `/model` y `/effort` guardan el valor elegido como defecto de las sesiones nuevas: lo hace Claude Code.
+- Claude Code lee el mod de la carpeta `mod/` del clon. Si mueves o borras el clon, el mod deja de cargar hasta que vuelvas a ejecutar `install.ps1` desde la nueva ruta; si cambias de rama en el clon, cambia el mod de todos los perfiles. Para actualizarlo: `git pull` y `/reload-plugins`.
+- Sin el CLI `claude` en el PATH, el instalador lo dice y da los dos comandos para instalarlo a mano.
+- La banda de ponytail encima del prompt se oculta con `/ponytail band off`.
+- El modelo, el effort, los modos y el coste se ven también en la status line. Para quitarlos de ahí hará falta `statusline.json` (en preparación).
+
 ## Test
 
 ```
 node statusline.test.js
+claude plugin test mod
 ```

@@ -236,7 +236,12 @@ if (process.platform === 'win32') {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
     const noOrca = path.join(dir, 'no-orca.cmd');
-    const install = (orcaHook = noOrca, configDir = dir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
+    // CLI de Claude Code falso: apunta cada llamada con su perfil y sale con FAKE_CLAUDE_EXIT. Ningún test toca un perfil real.
+    const fakeClaude = path.join(dir, 'fake-claude.cmd');
+    const calls = path.join(dir, 'calls.txt');
+    fs.writeFileSync(fakeClaude, `@echo off\r\n>>"${calls}" echo %CLAUDE_CONFIG_DIR%^|%*\r\nexit /b %FAKE_CLAUDE_EXIT%\r\n`);
+    const install = (orcaHook = noOrca, configDir = dir, claude = fakeClaude, exit = '0') => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook, '-Claude', claude], { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_EXIT: exit } });
+    const callLines = () => (fs.existsSync(calls) ? fs.readFileSync(calls, 'utf8').trim().split(/\r?\n/) : []);
     const cmd = path.join(dir, 'hooks', 'statusline.cmd');
     try {
         // Con Orca: el bloque apunta al wrapper que le reenvía el JSON.
@@ -246,21 +251,47 @@ if (process.platform === 'win32') {
         const orcaCmd = path.join(dir, 'hooks', 'statusline-orca.cmd');
         assert.ok(withOrca.stdout.includes(`"\\"${orcaCmd.replace(/\\/g, '\\\\')}\\""`), 'con Orca el bloque apunta a statusline-orca.cmd');
 
+        fs.rmSync(calls, { force: true });
         const fresh = install();
         assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline-orca.cmd')), 'copia statusline-orca.cmd');
         assert.ok(fresh.stdout.includes(`"\\"${cmd.replace(/\\/g, '\\\\')}\\""`), 'bloque statusLine con la ruta escapada');
         assert.ok(!fs.existsSync(path.join(dir, 'settings.json')), 'no crea settings.json');
+        assert.deepStrictEqual(callLines(), [`${dir}|plugin marketplace add ${__dirname}`, `${dir}|plugin install statusline-controls@statusline`], 'install registra el mod en el perfil');
+        assert.ok(fresh.stdout.includes('Mod de controles instalado'), 'install avisa de que el mod está instalado');
 
         const settings = JSON.stringify({ model: 'x', statusLine: { type: 'command', command: `"${cmd}"` } });
         fs.writeFileSync(path.join(dir, 'settings.json'), settings);
         fs.writeFileSync(path.join(dir, 'hooks', 'statusline.js'), '// versión vieja');
+        fs.rmSync(calls, { force: true });
         const update = install();
         assert.strictEqual(update.stderr, '', 'update sin errores');
         assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
         assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
         assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+        assert.ok(update.stdout.includes('Actualizado') && update.stdout.includes('Mod de controles instalado'), 'update también registra el mod');
+        assert.strictEqual(callLines().length, 2, 'update ejecuta los dos comandos claude plugin');
+
+        // Sin CLI de Claude Code: la status line se instala y el mod se explica a mano.
+        const noCli = install(noOrca, dir, path.join(dir, 'no-claude.cmd'));
+        const noCliOut = noCli.stdout + noCli.stderr;
+        assert.strictEqual(noCli.status, 0, 'sin CLI: código 0');
+        assert.ok(noCliOut.includes('no se ha instalado el mod'), 'sin CLI: avisa de que no instala el mod');
+        assert.ok(noCliOut.includes('claude plugin marketplace add') && noCliOut.includes('claude plugin install statusline-controls@statusline'), 'sin CLI: da los dos comandos');
+
+        // Fallo de claude plugin: la status line queda instalada y el error nombra el comando.
+        const cliFails = path.join(dir, 'cli-fails');
+        const failedCli = install(noOrca, cliFails, fakeClaude, '1');
+        assert.notStrictEqual(failedCli.status, 0, 'fallo de claude plugin: código distinto de 0');
+        assert.ok(failedCli.stderr.includes('claude plugin marketplace add'), 'fallo de claude plugin: el error nombra el comando');
+        assert.ok(failedCli.stdout.includes('"statusLine"'), 'fallo de claude plugin: el bloque statusLine se muestra igual');
+
+        // Perfil con espacios: el CLI recibe la ruta entera en CLAUDE_CONFIG_DIR.
+        const spaced = path.join(dir, 'perfil con espacios');
+        fs.rmSync(calls, { force: true });
+        install(noOrca, spaced);
+        assert.ok(callLines()[0].startsWith(`${spaced}|`), 'install con perfil con espacios');
 
         // Copia que falla: un directorio con el nombre de statusline.cmd hace de fichero bloqueado por la sesión.
         const broken = path.join(dir, 'broken');
