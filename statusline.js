@@ -244,26 +244,6 @@ function segment(fn) {
     try { return fn(); } catch { return FAILED; }
 }
 
-function renderLine1(data, env) {
-    const parts = [
-        env.profile ? `${C.magenta}🧪 ${env.profile}${RESET}` : null,
-        segment(() => renderWhere(data, env)),
-        segment(() => {
-            let model = `${C.magenta}🤖 ${data.model?.display_name || '?'}${RESET}`;
-            if (data.effort?.level) model += ` ${C.dim}(${data.effort.level})${RESET}`;
-            return model;
-        }),
-        segment(() => {
-            if (!env.flags.caveman) return null;
-            const savings = env.flags.savings ? ` ${C.dim}${env.flags.savings}${RESET}` : '';
-            return `🗿 ${env.flags.caveman}${savings}`;
-        }),
-        segment(() => (env.flags.ponytail ? `🦥 ${env.flags.ponytail}` : null)),
-        segment(() => renderVelocity(data)),
-    ];
-    return parts.filter(Boolean).join(SEP);
-}
-
 function renderFiveHour(five, now) {
     const pct = clamp(five.used_percentage);
     const reset = resetMs(five.resets_at);
@@ -303,23 +283,51 @@ function renderCost(cost) {
     return `${C.dim}${s}${RESET}`;
 }
 
-function renderLine2(data, now) {
-    const ctx = () => {
+// Cada segmento por su nombre; devuelve el texto o null si no tiene nada que pintar.
+const SEGMENTS = {
+    profile: (data, env) => (env.profile ? `${C.magenta}🧪 ${env.profile}${RESET}` : null),
+    where: (data, env) => renderWhere(data, env),
+    model: (data) => {
+        let model = `${C.magenta}🤖 ${data.model?.display_name || '?'}${RESET}`;
+        if (data.effort?.level) model += ` ${C.dim}(${data.effort.level})${RESET}`;
+        return model;
+    },
+    caveman: (data, env) => {
+        if (!env.flags.caveman) return null;
+        const savings = env.flags.savings ? ` ${C.dim}${env.flags.savings}${RESET}` : '';
+        return `🗿 ${env.flags.caveman}${savings}`;
+    },
+    ponytail: (data, env) => (env.flags.ponytail ? `🦥 ${env.flags.ponytail}` : null),
+    velocity: (data) => renderVelocity(data),
+    duration: (data) => `⏱️ ${fmtDuration(count(data.cost?.total_duration_ms))}`,
+    context: (data) => {
         const pct = clamp(data.context_window?.used_percentage);
         return `${levelEmoji(pct)} ${bar(pct, CONTEXT_WIDTH)} ${pctText(pct)}`;
-    };
-    const parts = [
-        segment(() => `⏱️ ${fmtDuration(count(data.cost?.total_duration_ms))}`),
-        segment(ctx),
-        segment(() => (data.rate_limits?.five_hour ? renderFiveHour(data.rate_limits.five_hour, now) : null)),
-        segment(() => (data.rate_limits?.seven_day ? renderSevenDay(data.rate_limits.seven_day, now) : null)),
-        segment(() => renderCost(data.cost)),
-    ];
-    return parts.filter(Boolean).join(SEP);
+    },
+    five_hour: (data, env, now) => (data.rate_limits?.five_hour ? renderFiveHour(data.rate_limits.five_hour, now) : null),
+    seven_day: (data, env, now) => (data.rate_limits?.seven_day ? renderSevenDay(data.rate_limits.seven_day, now) : null),
+    cost: (data) => renderCost(data.cost),
+};
+
+// El layout de la v1.2.0: sin env.layout la salida es la de siempre.
+const DEFAULT_LAYOUT = [
+    ['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'],
+    ['duration', 'context', 'five_hour', 'seven_day', 'cost'],
+];
+
+// Un nombre que no está en SEGMENTS es un fallo de configuración: ⚠ en su sitio, como un segmento que lanza.
+function renderLine(names, data, env, now) {
+    return names
+        .map(name => (Object.hasOwn(SEGMENTS, name) ? segment(() => SEGMENTS[name](data, env, now)) : FAILED))
+        .filter(Boolean)
+        .join(SEP);
 }
 
 function render(data, env, now = Date.now()) {
-    return `${renderLine1(data, env)}\n${renderLine2(data, now)}`;
+    return (env.layout ?? DEFAULT_LAYOUT)
+        .map(names => renderLine(names, data, env, now))
+        .filter(Boolean)
+        .join('\n');
 }
 
 function main() {

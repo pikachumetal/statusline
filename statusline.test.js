@@ -537,4 +537,24 @@ if (process.platform === 'win32') {
     }
 }
 
+// Layout: cada segmento tiene nombre y render pinta las líneas de env.layout (0022).
+{
+    const V120 = [['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'], ['duration', 'context', 'five_hour', 'seven_day', 'cost']];
+    const withLayout = (layout) => cells(render(fixture, { ...env, layout }, NOW));
+    assert.strictEqual(render(fixture, { ...env, layout: V120 }, NOW), render(fixture, env, NOW), 'layout de la v1.2.0 explícito = sin layout, byte a byte');
+
+    const one = withLayout([['cost', 'model']]);
+    assert.ok(!one.includes('\n') && /^💰 .* │ 🤖 /.test(one), `una línea, coste y modelo en ese orden: «${one}»`);
+
+    const unknown = render(fixture, { ...env, layout: [['where', 'modle', 'cost']] }, NOW);
+    assert.ok(/^\S+ │ ⚠ │ 💰 /.test(cells(unknown)), `nombre desconocido pinta ⚠ en su sitio: «${cells(unknown)}»`);
+    assert.ok(unknown.includes('\x1b[38;2;60;60;60m⚠'), 'el ⚠ del nombre desconocido es gris');
+
+    const noCaveman = cells(render(fixture, { ...env, flags: { ...env.flags, caveman: null }, layout: [['caveman'], ['cost']] }, NOW));
+    assert.ok(!noCaveman.includes('\n') && noCaveman.startsWith('💰 '), `línea vacía omitida: «${noCaveman}»`);
+
+    const twice = withLayout([['cost', 'cost']]);
+    assert.ok(/^💰 .* │ 💰 /.test(twice), `segmento repetido dos veces: «${twice}»`);
+}
+
 console.log('statusline.test.js OK');

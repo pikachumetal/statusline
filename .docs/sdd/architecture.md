@@ -14,7 +14,7 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
    - `readGit`: repo, branch y worktree (de `rev-parse`) y estado del working tree y del upstream (de `git status --porcelain=v2 --branch`, que parsea `parseStatus`).
    - Perfil: el nombre del directorio de `CLAUDE_CONFIG_DIR`, salvo que sea el default.
    - Flags: `.caveman-active`, `.ponytail-active` y `.caveman-statusline-suffix`.
-3. `render(data, env, now)` compone las dos líneas y las escribe en stdout.
+3. `render(data, env, now)` compone las líneas de `env.layout` (por defecto, las dos de la v1.2.0) y las escribe en stdout.
 
 ## Separación que hay que conservar
 
@@ -24,7 +24,7 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **Cada segmento se pinta dentro de `segment()`.** Si lanza, deja `⚠` en su
   sitio; si no tiene datos, devuelve `null` y se omite. Un segmento nuevo que
   no pase por `segment()` puede volver a tirar el statusline entero.
-- **Un segmento, una función `render*`.** Devuelve el texto del segmento, o
+- **Un segmento, una entrada en `SEGMENTS` por su nombre** (`profile`, `where`, `model`, `caveman`, `ponytail`, `velocity`, `duration`, `context`, `five_hour`, `seven_day`, `cost`); el layout es una lista de líneas con esos nombres, y un nombre que no está pinta `⚠`. **Un segmento, una función `render*`.** Devuelve el texto del segmento, o
   `null` si no hay nada que pintar.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente
   degrada su segmento, no rompe el render.
