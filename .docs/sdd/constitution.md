@@ -21,7 +21,7 @@ explícita en su spec y se aprueba antes de implementar.
    por defecto. Un segmento que falla no impide pintar el resto.
 4. **Nunca pinta secretos.** Ningún segmento muestra tokens, claves de API ni
    el contenido de variables de entorno sensibles. El mod lee el texto de los
-   comandos de Bash para saber si son tests, pero nunca lo pinta, y sus avisos
+   comandos de Bash y PowerShell para saber si son tests, pero nunca lo pinta, y sus avisos
    enseñan como mucho la primera línea de la respuesta de un comando de selector,
    recortada a 80 caracteres.
 

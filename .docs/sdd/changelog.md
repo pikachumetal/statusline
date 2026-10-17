@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- **0024** — Mod de controles (`mod/`, Claude Code 2.1.302 o superior): bajo la status line, una fila clicable con selectores de modelo, effort, caveman y ponytail, el coste con `$/h` leído en vivo, `[passed]`/`[failed]` del último test de la sesión (Bash o PowerShell) y `Board`, que abre el board de ponytail. `install.ps1` lo instala en el perfil con el CLI `claude`, desde el clon como marketplace de carpeta. → [ref](specs/20261017-124615-feature-0024-controls-mod/)
+
 ## [1.2.0] - 2026-10-08
 
 ### Changed

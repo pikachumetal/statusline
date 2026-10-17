@@ -81,3 +81,12 @@ Un mod de Claude Code en `mod/` que pinta una fila clicable bajo la status line
   sigue en su plugin.
 - **El repo es un marketplace de carpeta** (`.claude-plugin/marketplace.json`):
   Claude Code lee el mod del clon, no de una copia.
+- **El harness de tests del motor** (`claude-code/testing`) tiene sus reglas: un
+  hook por evento en cada test; `turn.step` es un stream que hay que leer entero y
+  su respuesta lleva `{ turnId, index, answer, toolUses }`; `tool.call` responde
+  `{ result }`; un `Text` no conserva su `key` (se envuelve en un `Box`) y un
+  `Button` exige `onPress`.
+- **`$.env.get` exige un nombre literal** (el motor lista las variables que lee el
+  mod) y **`$.command.run` rechaza un comando que no existe**.
+- **El instalador no pasa `CLAUDE_CONFIG_DIR` para `~/.claude`**: con la variable,
+  el CLI `claude` crea un `.claude.json` propio dentro de esa carpeta.

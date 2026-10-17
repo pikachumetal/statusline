@@ -14,8 +14,14 @@ async function readFlag($: EngineInterface, dir: string, name: string, allowed: 
   return flagValue(await $.fs.read(`${dir}/${name}`).catch(() => undefined), allowed)
 }
 
+// Al abrir, las opciones caen en las columnas de la fila plegada: el segundo clic de un doble clic
+// aterrizaría en una de ellas. Durante esta pausa una opción no hace nada.
+const OPEN_GUARD_MS = 400
+let openedAt = 0
+
 // El mismo comando que teclearía la persona: la lógica de cada modo sigue en su plugin.
 async function pick($: EngineInterface, key: SelectorKey, value: string) {
+  if ((await $.clock.now()) - openedAt < OPEN_GUARD_MS) return
   await update($, row, r => ({ ...r, open: null }))
   const { command } = CHOICES[key]
   const text = await $.command.run({ command, args: value }).then(
@@ -48,13 +54,16 @@ async function openBoard($: EngineInterface) {
 }
 
 export const register: Register = on => {
-  // Solo cuenta un test cuyo resultado llega con la llamada; uno en segundo plano aún no ha acabado.
-  on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
-    const ran = await next(e)
-    if (ran.deny === undefined && !e.run_in_background && isTestCommand(e.command))
-      await update($, row, r => ({ ...r, tests: ran.isError ? 'failed' : 'passed' }))
-    return ran
-  })
+  // Los dos shells que usa Claude Code: en Windows el principal suele ser PowerShell.
+  for (const tool of ['Bash', 'PowerShell'] as const) {
+    on('tool.call', { tool }, async ($, e, next) => {
+      const ran = await next(e)
+      // Solo cuenta un test cuyo resultado llega con la llamada; uno en segundo plano aún no ha acabado.
+      if (ran.deny === undefined && !e.run_in_background && isTestCommand(e.command))
+        await update($, row, r => ({ ...r, tests: ran.isError ? 'failed' : 'passed' }))
+      return ran
+    })
+  }
 
   // turn.step va en streaming: solo admite un generador asíncrono que reenvía el stream.
   on('turn.step', async function* ($, e, next) {
@@ -66,7 +75,10 @@ export const register: Register = on => {
     const r = await read($, row)
     const { Box, Text, Button } = $.ui.resolve(e)
     const hint = <Text dimColor>{e.props.hint}</Text>
-    const toggle = (key: SelectorKey) => update($, row, x => ({ ...x, open: x.open === key ? null : key }))
+    const toggle = async (key: SelectorKey) => {
+      openedAt = await $.clock.now()
+      await update($, row, x => ({ ...x, open: x.open === key ? null : key }))
+    }
 
     const dir = await claudeDir($)
     const modelId = await $.session.model().catch(() => '?')

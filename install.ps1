@@ -43,13 +43,16 @@ $steps = @(
     @('plugin', 'marketplace', 'add', $PSScriptRoot),
     @('plugin', 'install', 'statusline-controls@statusline')
 )
+# El perfil por defecto va sin la variable: con ella, el CLI crea un .claude.json propio dentro de ~/.claude.
+$isDefault = [IO.Path]::GetFullPath($ConfigDir).TrimEnd('\').Equals([IO.Path]::GetFullPath((Join-Path $HOME '.claude')), [StringComparison]::OrdinalIgnoreCase)
 if (-not $Claude -or -not (Test-Path $Claude)) {
-    Write-Warning "Sin CLI claude en el PATH: no se ha instalado el mod de controles. Instálalo a mano con CLAUDE_CONFIG_DIR=$ConfigDir :"
+    $how = if ($isDefault) { 'Instálalo a mano con:' } else { "Instálalo a mano con CLAUDE_CONFIG_DIR=$ConfigDir :" }
+    Write-Warning "Sin CLI claude en el PATH: no se ha instalado el mod de controles. $how"
     foreach ($step in $steps) { Write-Warning "  claude $($step -join ' ')" }
     exit 0
 }
 $previous = $env:CLAUDE_CONFIG_DIR
-$env:CLAUDE_CONFIG_DIR = $ConfigDir
+$env:CLAUDE_CONFIG_DIR = if ($isDefault) { $null } else { $ConfigDir }
 try {
     foreach ($step in $steps) {
         & $Claude @step

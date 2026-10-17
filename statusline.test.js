@@ -293,6 +293,16 @@ if (process.platform === 'win32') {
         install(noOrca, spaced);
         assert.ok(callLines()[0].startsWith(`${spaced}|`), 'install con perfil con espacios');
 
+        // Perfil por defecto (~/.claude): el CLI va sin CLAUDE_CONFIG_DIR; con la variable dejaría un .claude.json suelto en ~/.claude.
+        const fakeHome = path.join(dir, 'home');
+        fs.rmSync(calls, { force: true });
+        const { CLAUDE_CONFIG_DIR: _profile, ...noProfileEnv } = process.env;
+        spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', path.join(fakeHome, '.claude') + '\\', '-OrcaHook', noOrca, '-Claude', fakeClaude], { encoding: 'utf8', env: { ...noProfileEnv, USERPROFILE: fakeHome, HOME: fakeHome, FAKE_CLAUDE_EXIT: '0' } });
+        assert.ok(callLines().length === 2 && callLines().every(l => l.startsWith('|')), `perfil por defecto sin CLAUDE_CONFIG_DIR: ${callLines()}`);
+        const noCliDefault = spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', path.join(fakeHome, '.claude'), '-OrcaHook', noOrca, '-Claude', path.join(dir, 'no-claude.cmd')], { encoding: 'utf8', env: { ...noProfileEnv, USERPROFILE: fakeHome, HOME: fakeHome } });
+        const noCliDefaultOut = noCliDefault.stdout + noCliDefault.stderr;
+        assert.ok(noCliDefaultOut.includes('claude plugin install') && !noCliDefaultOut.includes('CLAUDE_CONFIG_DIR='), 'sin CLI en el perfil por defecto: el aviso no pide CLAUDE_CONFIG_DIR');
+
         // Copia que falla: un directorio con el nombre de statusline.cmd hace de fichero bloqueado por la sesión.
         const broken = path.join(dir, 'broken');
         fs.mkdirSync(path.join(broken, 'hooks', 'statusline.cmd'), { recursive: true });

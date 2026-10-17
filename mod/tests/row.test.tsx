@@ -26,7 +26,7 @@ type Session = {
 
 function session(on: On, opts: Session = {}) {
   const usd = opts.usd ?? (() => 7.5)
-  mock.clock(on, { now: MINUTES_30 })
+  clock = mock.clock(on, { now: MINUTES_30 })
   mock.store(on)
   if (opts.envThrows) {
     on('env.get', () => {
@@ -75,6 +75,10 @@ function session(on: On, opts: Session = {}) {
   })
   return { sent, toasts, opened }
 }
+
+// Deja pasar la pausa que protege un selector recién abierto de un doble clic.
+let clock: ReturnType<typeof mock.clock> | undefined
+const settle = (_$: EngineInterface) => clock!.advance(500)
 
 // turn.step es un stream: hay que leerlo entero para que corran los hooks.
 async function step($: EngineInterface, effort: string) {
@@ -157,6 +161,7 @@ test('picking an option runs the command and folds', async ($, on) => {
   await step($, 'medium')
   const ui = await $.ui.mount(ROW)
   await ui.press({ key: 'effort' })
+  await settle($)
   await ui.press({ key: 'effort-high' })
   expect(sent).toEqual(['/effort high'])
   expect(await ui.find({ key: 'model' })).toBeDefined()
@@ -170,6 +175,7 @@ test('a change Claude Code keeps out leaves the confirmed effort', async ($, on)
   await step($, 'medium')
   const ui = await $.ui.mount(ROW)
   await ui.press({ key: 'effort' })
+  await settle($)
   await ui.press({ key: 'effort-low' })
   expect(await ui.find({ text: /\(medium\)/ })).toBeDefined()
   expect(toasts).toContain('Kept effort level as medium')
@@ -181,7 +187,8 @@ test('every selector runs its own command', async ($, on) => {
   const ui = await $.ui.mount(ROW)
   for (const [pill, option] of [['model', 'model-sonnet'], ['caveman', 'caveman-ultracave'], ['ponytail', 'ponytail-lite']]) {
     await ui.press({ key: pill! })
-    await ui.press({ key: option! })
+    await settle($)
+  await ui.press({ key: option! })
   }
   expect(sent).toEqual(['/model sonnet', '/caveman:caveman ultracave', '/ponytail:ponytail lite'])
   await ui.unmount()
@@ -191,6 +198,7 @@ test('a missing command folds and says so', async ($, on) => {
   const { toasts } = session(on, { missing: ['ponytail:ponytail'] })
   const ui = await $.ui.mount(ROW)
   await ui.press({ key: 'ponytail' })
+  await settle($)
   await ui.press({ key: 'ponytail-full' })
   expect(await ui.find({ key: 'model' })).toBeDefined()
   expect(await ui.find({ text: /🦥 off/ })).toBeDefined()
@@ -233,6 +241,7 @@ test('toast shows the first line of the response', async ($, on) => {
   const { toasts } = session(on, { responses: { model: '\nline one\nline two' } })
   const ui = await $.ui.mount(ROW)
   await ui.press({ key: 'model' })
+  await settle($)
   await ui.press({ key: 'model-sonnet' })
   expect(toasts).toContain('line one')
   await ui.unmount()
@@ -294,5 +303,23 @@ test('missing board says so', async ($, on) => {
   await ui.press({ key: 'board' })
   expect(opened).toEqual([])
   expect(toasts).toContain('ponytail has not generated the board yet')
+  await ui.unmount()
+})
+
+test('a double click on a pill runs no command', async ($, on) => {
+  const { sent } = session(on)
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'caveman' })
+  await ui.press({ key: 'caveman-ultracave' })
+  expect(sent).toEqual([])
+  expect(await ui.find({ key: 'caveman-ultracave' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a test run through PowerShell counts too', async ($, on) => {
+  session(on)
+  await $.tool.call({ tool: 'PowerShell', command: 'node statusline.test.js' } as never)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests', text: /\[passed\]/ })).toBeDefined()
   await ui.unmount()
 })
