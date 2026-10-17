@@ -13,6 +13,7 @@ en preparación
 | --- | --- | --- | --- | --- |
 | 0022 | Segmentos con nombre y render guiado por un layout, con el de la v1.2.0 por defecto y sin cambio visible · `proposal: 0021` | B1 del backlog | `statusline.js` (`renderLine1`, `renderLine2`, `render`), `statusline.test.js` | ⏳ |
 | 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | ⏳ |
+| 0024 | Mod de controles bajo la status line: selectores de modelo, effort, caveman y ponytail, coste en vivo, estado de tests y Board; `install.ps1` lo instala | Petición del usuario el 2026-10-17 | `mod/`, `.claude-plugin/marketplace.json`, `install.ps1`, `statusline.test.js`, `README.md`, `README.en.md`, `.docs/sdd/` | 🔄 |
 
 ## Backlog
 
