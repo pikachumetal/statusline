@@ -87,11 +87,10 @@ With Orca installed (`~\.orca\agent-hooks\claude-statusline.cmd`), the block poi
 With Claude Code 2.1.302 or later, `install.ps1` also installs a mod that replaces the hint line under the status line with a clickable row:
 
 ```
-🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  💰 $7.50 · $15.00/h  [passed]  Board  (shift+tab to cycle)
+🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  [passed]  Board  (shift+tab to cycle)
 ```
 
 - **Selectors**: clicking the model, the effort, caveman or ponytail opens its options and hides the rest of the row; clicking an option applies it with the same command you would type (`/model`, `/effort`, `/caveman:caveman`, `/ponytail:ponytail`). `✕` closes without changing anything.
-- **Cost**, live, with `$/h` from 5 minutes into the session.
 - **Tests**: `[passed]` in green or `[failed]` in red, from the session's last test command.
 - **Board** opens ponytail's project board.
 
@@ -101,7 +100,7 @@ Notes:
 - Claude Code reads the mod from the clone's `mod/` folder. If you move or delete the clone, the mod stops loading until you run `install.ps1` again from the new path; switching branches in the clone changes the mod for every profile. To update it: `git pull` and `/reload-plugins`.
 - Without the `claude` CLI on the PATH, the installer says so and gives the two commands to install it by hand.
 - Hide ponytail's band above the prompt with `/ponytail band off`.
-- The model, effort, modes and cost still show in the status line. Removing them from there will take `statusline.json` (in progress).
+- The model, effort and modes also show in the status line; to remove them from there, leave `model`, `caveman` and `ponytail` out of `statusline.json`. The cost is only in the status line (`cost`).
 
 ## Test
 

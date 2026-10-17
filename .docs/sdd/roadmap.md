@@ -37,6 +37,7 @@ en preparación
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
+| 2026-10-18 | 0025 | El coste sale de la fila del mod y la status line lo pinta en `#d19a66` ([patch](specs/20261017-215404-patch-0025-cost-to-statusline/patch.md)) |
 
 ## Releases cerradas
 

@@ -10,10 +10,8 @@ const ROW = {
 
 const MINUTES_30 = 30 * 60000
 
-// Una sesión de 30 minutos en Opus 5.5 con 7.50 USD, caveman activo y sin flag de ponytail; cada opción cambia una pieza.
+// Una sesión de 30 minutos en Opus 5.5, caveman activo y sin flag de ponytail; cada opción cambia una pieza.
 type Session = {
-  usd?: () => number | null
-  usageFails?: boolean
   modelFails?: boolean
   envThrows?: boolean
   // Respuesta de cada comando, por nombre; un nombre en missing no existe.
@@ -25,7 +23,6 @@ type Session = {
 }
 
 function session(on: On, opts: Session = {}) {
-  const usd = opts.usd ?? (() => 7.5)
   clock = mock.clock(on, { now: MINUTES_30 })
   mock.store(on)
   if (opts.envThrows) {
@@ -34,11 +31,6 @@ function session(on: On, opts: Session = {}) {
     })
   } else mock.env(on, { HOME: '/home/u', ...opts.env })
   on('session.model', () => (opts.modelFails ? { deny: 'no model yet' } : { value: 'claude-opus-5-5' }) as never)
-  on('session.usage', () => {
-    if (opts.usageFails) return { deny: 'unavailable' } as never
-    const v = usd()
-    return { value: v === null ? { startedAt: 0 } : { startedAt: 0, cost: { usd: v } } } as never
-  })
   on('fs.read', ($, e) => {
     const path = e.path.replaceAll('\\', '/')
     if (path.endsWith('/.claude/.caveman-active')) return { value: 'caveman' } as never
@@ -85,7 +77,7 @@ async function step($: EngineInterface, effort: string) {
   for await (const _ of $.turn.step({ model: 'claude-opus-5-5', effort, turnId: 't1', index: 0, messageCount: 1 } as never));
 }
 
-test('collapsed row shows the six controls in order', async ($, on) => {
+test('collapsed row shows the five controls in order', async ($, on) => {
   session(on)
   await step($, 'medium')
   const ui = await $.ui.mount(ROW)
@@ -94,35 +86,10 @@ test('collapsed row shows the six controls in order', async ($, on) => {
   expect(await ui.find({ text: /\(medium\)/ })).toBeDefined()
   expect(await ui.find({ text: /🗿 caveman/ })).toBeDefined()
   expect(await ui.find({ text: /🦥 off/ })).toBeDefined()
-  expect(await ui.find({ text: /💰 \$7\.50 · \$15\.00\/h/ })).toBeDefined()
+  // El coste vive en la status line, no en la fila.
+  expect(await ui.find({ key: 'cost' })).toBeUndefined()
+  expect(await ui.find({ text: /💰/ })).toBeUndefined()
   expect(await ui.find({ text: /\? for shortcuts/ })).toBeDefined()
-  await ui.unmount()
-})
-
-test('cost is read on every render', async ($, on) => {
-  let usd = 7.5
-  session(on, { usd: () => usd })
-  const ui = await $.ui.mount(ROW)
-  expect(await ui.find({ text: /💰 \$7\.50/ })).toBeDefined()
-  usd = 7.55
-  await ui.redraw()
-  expect(await ui.find({ text: /💰 \$7\.55/ })).toBeDefined()
-  await ui.unmount()
-})
-
-test('usage that fails leaves a warning in place of the cost', async ($, on) => {
-  session(on, { usageFails: true })
-  const ui = await $.ui.mount(ROW)
-  expect(await ui.find({ key: 'cost', text: /⚠/ })).toBeDefined()
-  expect(await ui.find({ key: 'model' })).toBeDefined()
-  await ui.unmount()
-})
-
-test('usage without cost shows zero', async ($, on) => {
-  session(on, { usd: () => null })
-  const ui = await $.ui.mount(ROW)
-  expect(await ui.find({ text: /💰 \$0\.00/ })).toBeDefined()
-  expect(await ui.find({ text: /\/h/ })).toBeUndefined()
   await ui.unmount()
 })
 
