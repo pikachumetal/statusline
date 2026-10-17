@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { CAVEMAN_FLAGS, PONYTAIL_FLAGS, costText, flagValue, modelName } from '../hooks/logic'
+import { CAVEMAN_FLAGS, PONYTAIL_FLAGS, confirmedEffort, costText, firstLine, flagValue, modelName } from '../hooks/logic'
 
 describe('modelName', () => {
   test('turns a model id into its short name', () => {
@@ -43,5 +43,29 @@ describe('flagValue', () => {
 
   test('a flag over 64 bytes is off', () => {
     expect(flagValue('full'.padEnd(65, ' '), PONYTAIL_FLAGS)).toBe('off')
+  })
+})
+
+describe('confirmedEffort', () => {
+  test('reads the level Claude Code set', () => {
+    expect(confirmedEffort('Set effort level to high (saved as your default for new sessions): x')).toBe('high')
+  })
+
+  test('is undefined when Claude Code kept the old level', () => {
+    expect(confirmedEffort('Kept effort level as medium')).toBeUndefined()
+  })
+})
+
+describe('firstLine', () => {
+  test('takes the first non-empty line', () => {
+    expect(firstLine('\nSet model to `Sonnet 5.5`\nmore')).toBe('Set model to `Sonnet 5.5`')
+  })
+
+  test('says ok for an empty response', () => {
+    expect(firstLine('')).toBe('ok')
+  })
+
+  test('cuts at 80 characters', () => {
+    expect(firstLine('x'.repeat(100)).length).toBe(80)
   })
 })

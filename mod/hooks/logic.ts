@@ -35,3 +35,12 @@ export function flagValue(raw: string | undefined, allowed: readonly string[]): 
   const value = raw.trim()
   return allowed.includes(value) ? value : 'off'
 }
+
+// La única forma de saber si /effort aplicó el nivel es su respuesta; si el texto cambia, la fila se queda con el anterior.
+export function confirmedEffort(response: string): string | undefined {
+  return /^Set effort level to (\w+)/.exec(response)?.[1]
+}
+
+export function firstLine(text: string, max = 80): string {
+  return (text.split('\n').find(line => line.trim() !== '') ?? 'ok').trim().slice(0, max)
+}
