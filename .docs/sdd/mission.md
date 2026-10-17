@@ -25,7 +25,9 @@ Un único tipo de usuario: quien instala el statusline en su Claude Code. No hay
   para que en macOS o Linux se pueda configurar a mano.
 - **Terminal:** truecolor y nerd font son requisito duro, documentado en el
   README. Sin modo alternativo ni autodetección.
-- **Producto:** se queda como está. Los segmentos nuevos y la configurabilidad
+- **Producto:** la status line más un mod de controles opcional (`mod/`) con una
+  fila clicable bajo ella (modelo, effort, modos, coste, tests y Board).
+  Por lo demás se queda como está. Los segmentos nuevos y la configurabilidad
   son módulos futuros sin compromiso (ver `roadmap.md`).
 
 ## Glosario
