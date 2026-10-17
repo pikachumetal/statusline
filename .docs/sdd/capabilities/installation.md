@@ -21,17 +21,17 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 - WHEN `install.ps1` termina
 - THEN muestra por pantalla el bloque `statusLine` que hay que pegar en `<perfil>\settings.json`, con la ruta del `.cmd` ya escapada, `padding: 0` y `refreshInterval: 10`
 - AND el `.cmd` es `statusline-orca.cmd` si existe el hook de Orca (`-OrcaHook`, por defecto `~\.orca\agent-hooks\claude-statusline.cmd`), y `statusline.cmd` si no
-- AND no crea ni modifica `settings.json`
+- AND `install.ps1` no crea ni modifica `settings.json` por su cuenta
+- AND el CLI `claude` que invoca para el mod sí registra el plugin y su marketplace en la configuración del perfil, `settings.json` incluido
 
 ### Update sobre una instalación existente
-
-> Cobertura: con test (solo en Windows).
 
 - GIVEN un perfil donde el statusline ya está instalado y `settings.json` tiene un `statusLine.command` que apunta al `statusline.cmd` de ese perfil
 - WHEN se ejecuta otra vez `.\install.ps1` sobre ese perfil
 - THEN los ficheros de `hooks` se sobrescriben con los del repo
 - AND el instalador informa de que el perfil está actualizado y no muestra el bloque para pegar
-- AND `settings.json` se lee pero no se modifica
+- AND `install.ps1` lee `settings.json` pero no lo modifica por su cuenta
+- AND ejecuta igual los dos comandos `claude plugin` de «Instalación del mod de controles»; con un perfil que ya tiene el mod, los dos salen con 0 y el instalador avisa de que el mod está instalado
 - AND si `settings.json` no existe, no se puede leer o apunta a otro comando, se muestra el bloque como en una instalación limpia
 
 ### Lanzador
@@ -53,10 +53,33 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 - AND si existe `%USERPROFILE%\.orca\agent-hooks\claude-statusline.cmd`, le pasa el mismo JSON y descarta su salida
 - AND borra el temporal y sale con 0
 
+### Instalación del mod de controles
+
+- GIVEN el repo clonado y el CLI `claude` en el PATH
+- WHEN se ejecuta `.\install.ps1`, con o sin `-ConfigDir <perfil>`, después de copiar la status line
+- THEN ejecuta, con `CLAUDE_CONFIG_DIR` apuntando al perfil, `claude plugin marketplace add <raíz del repo>` y `claude plugin install statusline-controls@statusline`
+- AND avisa de que el mod está instalado en el perfil
+- AND el mod se lee de la carpeta `mod/` del clon: un `git pull` y `/reload-plugins` lo actualizan sin reinstalar
+
+### Sin CLI de Claude Code
+
+- GIVEN un equipo sin `claude` en el PATH (o `-Claude` apuntando a un fichero que no existe)
+- WHEN se ejecuta `.\install.ps1`
+- THEN la status line se instala como siempre
+- AND el instalador avisa de que no ha instalado el mod y de cómo hacerlo a mano
+- AND el código de salida es 0
+
+### Fallo al instalar el mod
+
+- GIVEN un `claude` que sale con 1 al ejecutar `plugin marketplace add` o `plugin install`
+- WHEN se ejecuta `.\install.ps1`
+- THEN la status line queda instalada y su bloque `statusLine`, o el aviso de perfil actualizado, se muestra como siempre
+- AND el instalador termina con un error que nombra el comando que falló y código de salida distinto de 0
+
 ## Reglas de la capacidad
 
-- **Dónde viven los datos**: en `<perfil>\hooks`. El instalador no escribe en ningún otro sitio.
+- **Dónde viven los datos**: la status line, en `<perfil>\hooks`. El mod no se copia: Claude Code lo lee de `mod/` del clon, así que mover o borrar el clon lo deja sin cargar hasta reinstalar, y cambiar de rama en el clon cambia el mod de todos los perfiles. El registro del mod lo escribe el CLI `claude` en la configuración de plugins del perfil. El instalador no escribe en ningún otro sitio.
 - **Idioma de los nombres**: los mensajes de `install.ps1` están hoy en castellano. La regla 2 de `constitution.md` pide inglés para el texto que pinta el producto; pendiente de decidir si aplica al instalador.
 - **Límites**: no aplica.
-- **Avisos**: el instalador avisa de dónde ha copiado y de qué hay que pegar en `settings.json`.
-- **Regla ante conflicto**: la copia del repo manda: sobrescribe lo que haya en `hooks`.
+- **Avisos**: el instalador avisa de dónde ha copiado, de qué hay que pegar en `settings.json` y de si ha instalado el mod o por qué no.
+- **Regla ante conflicto**: la copia del repo manda: sobrescribe lo que haya en `hooks`. Para el mod, manda el clon.

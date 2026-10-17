@@ -2,7 +2,8 @@
 
 ## Forma
 
-Un único fichero, `statusline.js`. Claude Code lo ejecuta en cada refresco: le
+Dos piezas: `statusline.js`, la status line, y el mod de controles en `mod/`
+(al final). `statusline.js`: Claude Code lo ejecuta en cada refresco: le
 pasa el JSON de la sesión por stdin y pinta lo que el script escribe en stdout.
 El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 
@@ -63,3 +64,29 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 [ccstatusline](https://github.com/sirmalloc/ccstatusline) se puede consultar
 para ver cómo resuelve un segmento. No se copia su arquitectura de widgets
 configurables mientras la configurabilidad no entre en el roadmap.
+
+## Mod de controles
+
+Un mod de Claude Code en `mod/` que pinta una fila clicable bajo la status line
+(`ui.render` sobre `PromptHint`). Comportamiento en `capabilities/controls.md`.
+
+- **`mod/hooks/logic.ts` es puro**: nombre del modelo, texto del coste, lectura
+  de flags y las opciones de cada selector. Se prueba sin simular el motor.
+- **`mod/hooks/register.tsx` tiene todo el acceso al motor**: `$.session`,
+  `$.fs`, `$.command.run` y el estado de sesión (`$.state`, atom `row`).
+- **El render acaba en `.catch(($, e, next) => next(e))`**: si la fila falla,
+  Claude Code pinta su línea de pista normal.
+- **Cada control llama al comando que escribiría la persona** (`/model`,
+  `/effort`, `/caveman:caveman`, `/ponytail:ponytail`): la lógica de cada modo
+  sigue en su plugin.
+- **El repo es un marketplace de carpeta** (`.claude-plugin/marketplace.json`):
+  Claude Code lee el mod del clon, no de una copia.
+- **El harness de tests del motor** (`claude-code/testing`) tiene sus reglas: un
+  hook por evento en cada test; `turn.step` es un stream que hay que leer entero y
+  su respuesta lleva `{ turnId, index, answer, toolUses }`; `tool.call` responde
+  `{ result }`; un `Text` no conserva su `key` (se envuelve en un `Box`) y un
+  `Button` exige `onPress`.
+- **`$.env.get` exige un nombre literal** (el motor lista las variables que lee el
+  mod) y **`$.command.run` rechaza un comando que no existe**.
+- **El instalador no pasa `CLAUDE_CONFIG_DIR` para `~/.claude`**: con la variable,
+  el CLI `claude` crea un `.claude.json` propio dentro de esa carpeta.

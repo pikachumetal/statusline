@@ -25,20 +25,21 @@
 | 2026-10-08 | 0018 | patch | — | 0.1 | — | — | — | — | — | 20261008-145214-patch-0018-weekly-reset-24h |
 | 2026-10-08 | 0019 | patch | — | 0.4 | — | — | — | — | — | 20261008-152437-patch-0019-missing-0002-tests |
 | 2026-10-08 | 0020 | patch | — | 0.2 | — | — | — | — | — | 20261008-161514-patch-0020-install-copy-error |
+| 2026-10-17 | 0024 | frontend | 2.5 | 1.4 | 0.56 | 65573k | 2520k | no aplica | sin precio | 20261017-124615-feature-0024-controls-mod |
 
-**Factor de calibración** (ratio mediano real/estimado, 10 artefactos): **0.92** · media 0.82
+**Factor de calibración** (ratio mediano real/estimado, 11 artefactos): **0.83** · media 0.79
 
-- p25–p75: 0.57–1
-- p80: 1.03 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
-- Dentro de ±25 %: 70 % · sobreestimadas: 30 % · infraestimadas: 0 %
-- Error absoluto (h): media 0.15 · mediana 0.07
+- p25–p75: 0.53–1
+- p80: 1 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
+- Dentro de ±25 %: 64 % · sobreestimadas: 36 % · infraestimadas: 0 %
+- Error absoluto (h): media 0.24 · mediana 0.1
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tramo del ratio | n | % |
 | --- | --- | --- |
-| <0.5 | 1 | 10 % |
-| 0.5–0.8 | 2 | 20 % |
-| 0.8–1.25 | 7 | 70 % |
+| <0.5 | 1 | 9 % |
+| 0.5–0.8 | 3 | 27 % |
+| 0.8–1.25 | 7 | 64 % |
 | 1.25–2 | 0 | 0 % |
 | ≥2 | 0 | 0 % |
 
@@ -47,13 +48,14 @@
 | backend | 3 | 1 | — |
 | chore | 1 | 1.2 | — |
 | docs | 1 | 0.5 | — |
-| frontend | 4 | 0.92 | — |
+| frontend | 5 | 0.83 | 0.56–1 |
 | infra/tooling | 1 | 0.8 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
 | 1.1.0 | 16 | 4.75 | 1 | — | — |
-| sin publicar | 4 | 0.85 | 0.15 | — | — |
+| 1.2.0 | 4 | 0.85 | 0.15 | — | — |
+| sin publicar | 1 | 1.4 | 0.56 | — | — |
 
 > Ver `estimation.md`.
