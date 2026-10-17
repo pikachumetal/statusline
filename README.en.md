@@ -58,7 +58,8 @@ Each inner list is a line, and its names are drawn in that order. Names are case
   - it is not JSON;
   - `lines` is not a list of lines with at least one name each;
   - it is larger than 4096 bytes;
-  - it is a symlink.
+  - it is a symlink;
+  - it is not a file (a directory) or cannot be read.
 - Keys other than `lines` are ignored. A UTF-8 BOM at the start is accepted.
 - The installer never creates or touches `statusline.json`.
 

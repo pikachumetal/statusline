@@ -24,7 +24,8 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **Cada segmento se pinta dentro de `segment()`.** Si lanza, deja `⚠` en su
   sitio; si no tiene datos, devuelve `null` y se omite. Un segmento nuevo que
   no pase por `segment()` puede volver a tirar el statusline entero.
-- **Un segmento, una entrada en `SEGMENTS` por su nombre** (`profile`, `where`, `model`, `caveman`, `ponytail`, `velocity`, `duration`, `context`, `five_hour`, `seven_day`, `cost`): devuelve el texto del segmento, o `null` si no hay nada que pintar; las que crecen salen a una función `render*`. El layout es una lista de líneas con esos nombres, y un nombre que no está pinta `⚠`. `render` no valida la forma del layout: quien lo construye lo valida antes.
+- **Un segmento, una entrada en `SEGMENTS` por su nombre** (`profile`, `where`, `model`, `caveman`, `ponytail`, `velocity`, `duration`, `context`, `five_hour`, `seven_day`, `cost`): devuelve el texto del segmento, o `null` si no hay nada que pintar; las que crecen salen a una función `render*`. El layout es una lista de líneas con esos nombres, y un nombre que no está pinta `⚠`. `render` no valida la forma del layout: quien lo construye lo valida antes (`readLayout`, al leer `statusline.json`).
+- **Ficheros del perfil: los de otros plugins se ignoran si fallan, `statusline.json` avisa.** Los flags (64 bytes) los escriben otros plugins y un fallo es un dato ausente; `statusline.json` (4096 bytes) lo escribe la persona, y un fallo pinta el layout por defecto con `⚠` para que lo vea.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente
   degrada su segmento, no rompe el render.
 - **Un campo numérico del JSON se valida con `Number.isFinite` antes de operar

@@ -165,7 +165,7 @@ function readGit(data, run = git) {
     return { ...gitNames(...paths.split(/\r?\n/)), ...state, timedOut };
 }
 
-// Mismo hardening que caveman-badge.js: sin symlinks, máx 64 bytes, whitelist.
+// Mismo hardening que caveman-badge.js: sin symlinks, máx maxBytes (64 por defecto), whitelist.
 function readSmallFile(file, maxBytes = 64) {
     const st = fs.lstatSync(file);
     if (!st.isFile() || st.isSymbolicLink() || st.size > maxBytes) return null;

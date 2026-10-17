@@ -58,7 +58,8 @@ Cada lista interior es una línea, y sus nombres se pintan en ese orden. Los nom
   - no es JSON;
   - `lines` no es una lista de líneas con al menos un nombre cada una;
   - pasa de 4096 bytes;
-  - es un symlink.
+  - es un symlink;
+  - no es un fichero (un directorio) o no se puede leer.
 - Las claves que no son `lines` se ignoran. Un BOM UTF-8 al principio se acepta.
 - El instalador nunca crea ni toca `statusline.json`.
 

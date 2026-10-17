@@ -2,7 +2,7 @@
 
 ## Propósito
 
-La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo y con qué modos activos. Los segmentos van separados por `│`, en este orden: perfil, ubicación, modelo, caveman, ponytail, velocity.
+La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué modelo y con qué modos activos. Los segmentos van separados por `│`, por defecto en este orden (`statusline.json` lo cambia, ver `output.md`): perfil, ubicación, modelo, caveman, ponytail, velocity.
 
 ## Requisitos
 
