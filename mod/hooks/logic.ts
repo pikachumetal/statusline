@@ -44,3 +44,14 @@ export function confirmedEffort(response: string): string | undefined {
 export function firstLine(text: string, max = 80): string {
   return (text.split('\n').find(line => line.trim() !== '') ?? 'ok').trim().slice(0, max)
 }
+
+// La expresión de ponytail más los runners de este repo: node con un *.test.* e Invoke-Pester.
+const TEST_COMMAND =
+  /\b(npm (run )?test|pnpm (run )?test|yarn test|bun test|npx (jest|vitest)|jest|vitest|pytest|python3? -m pytest|go test|cargo test|mvn test|gradle test|rspec|phpunit|dotnet test|node --test|deno test|make test|node \S+\.test\.(js|mjs|cjs|ts)|Invoke-Pester)\b/
+
+export const isTestCommand = (command: string) => TEST_COMMAND.test(command)
+
+// La misma ruta en la que ponytail regenera su board.
+export function boardPath(env: { XDG_CONFIG_HOME?: string; HOME?: string; USERPROFILE?: string }): string {
+  return `${env.XDG_CONFIG_HOME ?? `${env.HOME ?? env.USERPROFILE}/.config`}/ponytail/band/board.html`
+}

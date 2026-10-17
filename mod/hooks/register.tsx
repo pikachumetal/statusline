@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Row, SelectorKey } from '../types'
-import { CAVEMAN_FLAGS, CHOICES, PONYTAIL_FLAGS, confirmedEffort, costText, firstLine, flagValue, modelName } from './logic'
+import { CAVEMAN_FLAGS, CHOICES, PONYTAIL_FLAGS, boardPath, confirmedEffort, costText, firstLine, flagValue, isTestCommand, modelName } from './logic'
 
 const row = atom({ plugin: 'statusline-controls', key: 'row' } as const, { open: null, effort: '?', tests: null } as Row)
 
@@ -31,7 +31,31 @@ async function pick($: EngineInterface, key: SelectorKey, value: string) {
   $.ui.toast(firstLine(text))
 }
 
+// Abre el board que regenera ponytail; el mod no lo genera.
+async function openBoard($: EngineInterface) {
+  const file = boardPath({
+    XDG_CONFIG_HOME: (await $.env.get('XDG_CONFIG_HOME')) ?? undefined,
+    HOME: (await $.env.get('HOME')) ?? undefined,
+    USERPROFILE: (await $.env.get('USERPROFILE')) ?? undefined,
+  })
+  if ((await $.fs.read(file).catch(() => undefined)) === undefined) {
+    $.ui.toast('ponytail has not generated the board yet')
+    return
+  }
+  const windows = (await $.env.get('OS')) === 'Windows_NT'
+  const mac = !windows && (await $.process.run(['uname']).catch(() => undefined))?.stdout.trim() === 'Darwin'
+  await $.process.run(windows ? ['cmd', '/c', 'start', '', file] : [mac ? 'open' : 'xdg-open', file])
+}
+
 export const register: Register = on => {
+  // Solo cuenta un test cuyo resultado llega con la llamada; uno en segundo plano aún no ha acabado.
+  on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
+    const ran = await next(e)
+    if (ran.deny === undefined && !e.run_in_background && isTestCommand(e.command))
+      await update($, row, r => ({ ...r, tests: ran.isError ? 'failed' : 'passed' }))
+    return ran
+  })
+
   // turn.step va en streaming: solo admite un generador asíncrono que reenvía el stream.
   on('turn.step', async function* ($, e, next) {
     if (e.agentId === undefined && e.effort !== undefined) await update($, row, r => ({ ...r, effort: String(e.effort) }))
@@ -74,8 +98,6 @@ export const register: Register = on => {
 
     const usage = await $.session.usage().catch(() => undefined)
     const now = await $.clock.now()
-    // Board llega en la siguiente task.
-    const idle = () => undefined
 
     return (
       <Box flexDirection="row" gap={2}>
@@ -100,7 +122,12 @@ export const register: Register = on => {
             <Text color="#d19a66">💰 {costText(usage.cost?.usd ?? 0, usage.startedAt, now)}</Text>
           )}
         </Box>
-        <Button key="board" plain label="Board" onPress={idle} />
+        {r.tests !== null && (
+          <Box key="tests">
+            <Text color={r.tests === 'passed' ? 'green' : 'red'}>[{r.tests}]</Text>
+          </Box>
+        )}
+        <Button key="board" plain label="Board" onPress={() => openBoard($).catch(() => $.ui.toast('could not open the board'))} />
         {hint}
       </Box>
     )

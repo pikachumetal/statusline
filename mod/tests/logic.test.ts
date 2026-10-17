@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { CAVEMAN_FLAGS, PONYTAIL_FLAGS, confirmedEffort, costText, firstLine, flagValue, modelName } from '../hooks/logic'
+import { CAVEMAN_FLAGS, PONYTAIL_FLAGS, boardPath, confirmedEffort, costText, firstLine, flagValue, isTestCommand, modelName } from '../hooks/logic'
 
 describe('modelName', () => {
   test('turns a model id into its short name', () => {
@@ -67,5 +67,31 @@ describe('firstLine', () => {
 
   test('cuts at 80 characters', () => {
     expect(firstLine('x'.repeat(100)).length).toBe(80)
+  })
+})
+
+describe('isTestCommand', () => {
+  test('recognises test runs, also inside a compound command', () => {
+    for (const command of ['node statusline.test.js', 'npm test', 'git add . && node statusline.test.js', 'Invoke-Pester -CI', 'cd api && python -m pytest -q'])
+      expect(isTestCommand(command)).toBe(true)
+  })
+
+  test('ignores commands that are not tests', () => {
+    for (const command of ['git status', 'npm install', 'node statusline.js']) expect(isTestCommand(command)).toBe(false)
+  })
+})
+
+describe('boardPath', () => {
+  test('uses ~/.config under HOME', () => {
+    expect(boardPath({ HOME: '/home/u' })).toBe('/home/u/.config/ponytail/band/board.html')
+  })
+
+  test('uses USERPROFILE on Windows', () => {
+    expect(boardPath({ USERPROFILE: 'C:\\Users\\u' }).replaceAll('\\', '/')).toBe('C:/Users/u/.config/ponytail/band/board.html')
+  })
+
+  test('XDG_CONFIG_HOME wins', () => {
+    const path = boardPath({ XDG_CONFIG_HOME: 'D:\\cfg', HOME: '/home/u' }).replaceAll('\\', '/')
+    expect(path).toBe('D:/cfg/ponytail/band/board.html')
   })
 })

@@ -19,6 +19,9 @@ type Session = {
   // Respuesta de cada comando, por nombre; un nombre en missing no existe.
   responses?: Record<string, string>
   missing?: string[]
+  // Variables de entorno además de HOME, y si existe el board de ponytail.
+  env?: Record<string, string>
+  board?: boolean
 }
 
 function session(on: On, opts: Session = {}) {
@@ -29,14 +32,19 @@ function session(on: On, opts: Session = {}) {
     on('env.get', () => {
       throw new Error('boom')
     })
-  } else mock.env(on, { HOME: '/home/u' })
+  } else mock.env(on, { HOME: '/home/u', ...opts.env })
   on('session.model', () => (opts.modelFails ? { deny: 'no model yet' } : { value: 'claude-opus-5-5' }) as never)
   on('session.usage', () => {
     if (opts.usageFails) return { deny: 'unavailable' } as never
     const v = usd()
     return { value: v === null ? { startedAt: 0 } : { startedAt: 0, cost: { usd: v } } } as never
   })
-  on('fs.read', ($, e) => (e.path.replaceAll('\\', '/').endsWith('/.claude/.caveman-active') ? { value: 'caveman' } : { deny: 'missing' }) as never)
+  on('fs.read', ($, e) => {
+    const path = e.path.replaceAll('\\', '/')
+    if (path.endsWith('/.claude/.caveman-active')) return { value: 'caveman' } as never
+    if (opts.board && path.endsWith('/ponytail/band/board.html')) return { value: '<html></html>' } as never
+    return { deny: 'missing' } as never
+  })
   // Lo que pinta Claude Code sin el mod.
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
@@ -48,6 +56,13 @@ function session(on: On, opts: Session = {}) {
   })
   const sent: string[] = []
   const toasts: string[] = []
+  const opened: string[][] = []
+  on('process.run', ($, e) => {
+    opened.push([...e.argv])
+    return { value: { exitCode: 0, stdout: '', stderr: '' } } as never
+  })
+  // Bash bajo los plugins: sale con error si el comando lleva FAIL.
+  on('tool.call', ($, e) => ({ result: { stdout: '', stderr: '', interrupted: false }, text: '', isError: String((e as { command?: string }).command).includes('FAIL') }) as never)
   on('command.run', ($, e) => {
     // Claude Code rechaza un comando que no existe.
     if (opts.missing?.includes(e.command)) throw new Error(`unknown command ${e.command}`)
@@ -58,7 +73,7 @@ function session(on: On, opts: Session = {}) {
     toasts.push(e.text)
     return { value: undefined }
   })
-  return { sent, toasts }
+  return { sent, toasts, opened }
 }
 
 // turn.step es un stream: hay que leerlo entero para que corran los hooks.
@@ -220,5 +235,64 @@ test('toast shows the first line of the response', async ($, on) => {
   await ui.press({ key: 'model' })
   await ui.press({ key: 'model-sonnet' })
   expect(toasts).toContain('line one')
+  await ui.unmount()
+})
+
+test('no tests yet, no indicator', async ($, on) => {
+  session(on)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('a passing test run shows passed', async ($, on) => {
+  session(on)
+  await $.tool.call({ tool: 'Bash', command: 'node statusline.test.js' } as never)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests', text: /\[passed\]/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a failing test run shows failed', async ($, on) => {
+  session(on)
+  await $.tool.call({ tool: 'Bash', command: 'npm test FAIL' } as never)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests', text: /\[failed\]/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('other commands leave the indicator alone', async ($, on) => {
+  session(on)
+  await $.tool.call({ tool: 'Bash', command: 'node statusline.test.js' } as never)
+  await $.tool.call({ tool: 'Bash', command: 'git status FAIL' } as never)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests', text: /\[passed\]/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('background runs do not count', async ($, on) => {
+  session(on)
+  await $.tool.call({ tool: 'Bash', command: 'npm test', run_in_background: true } as never)
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'tests' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('board opens the file when it exists', async ($, on) => {
+  const { opened } = session(on, { board: true, env: { OS: 'Windows_NT' } })
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'board' })
+  expect(opened.length).toBe(1)
+  expect(opened[0]!.slice(0, 4)).toEqual(['cmd', '/c', 'start', ''])
+  expect(opened[0]![4]!.replaceAll('\\', '/')).toBe('/home/u/.config/ponytail/band/board.html')
+  await ui.unmount()
+})
+
+test('missing board says so', async ($, on) => {
+  const { opened, toasts } = session(on, { env: { OS: 'Windows_NT' } })
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'board' })
+  expect(opened).toEqual([])
+  expect(toasts).toContain('ponytail has not generated the board yet')
   await ui.unmount()
 })
