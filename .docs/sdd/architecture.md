@@ -70,7 +70,7 @@ configurables mientras la configurabilidad no entre en el roadmap.
 Un mod de Claude Code en `mod/` que pinta una fila clicable bajo la status line
 (`ui.render` sobre `PromptHint`). Comportamiento en `capabilities/controls.md`.
 
-- **`mod/hooks/logic.ts` es puro**: nombre del modelo, texto del coste, lectura
+- **`mod/hooks/logic.ts` es puro**: nombre del modelo, lectura
   de flags y las opciones de cada selector. Se prueba sin simular el motor.
 - **`mod/hooks/register.tsx` tiene todo el acceso al motor**: `$.session`,
   `$.fs`, `$.command.run` y el estado de sesión (`$.state`, atom `row`).

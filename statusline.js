@@ -19,6 +19,8 @@ const C = {
     magenta: rgb(200, 120, 220),
     gray: rgb(60, 60, 60),
     dim: rgb(130, 130, 130),
+    // El color que tenía el coste en el mod de controles.
+    cost: rgb(209, 154, 102),
 };
 const SEP = ` ${C.gray}│${RESET} `;
 const BRANCH_ICON = '';
@@ -297,7 +299,7 @@ function renderCost(cost) {
     const ms = cost?.total_duration_ms;
     let s = `💰 $${usd.toFixed(2)}`;
     if (Number.isFinite(ms) && ms >= MIN_RATE_MS && usd > 0) s += ` · $${(usd / (ms / 3600000)).toFixed(2)}/h`;
-    return `${C.dim}${s}${RESET}`;
+    return `${C.cost}${s}${RESET}`;
 }
 
 // Las claves son los nombres que admite statusline.json. Un pintor devuelve null sin datos, y su línea no deja hueco.

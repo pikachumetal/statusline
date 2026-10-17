@@ -2,7 +2,7 @@
 
 ## Propósito
 
-La fila clicable que pinta el mod bajo la status line: selectores de modelo, effort, caveman y ponytail, coste, estado de los tests y Board.
+La fila clicable que pinta el mod bajo la status line: selectores de modelo, effort, caveman y ponytail, estado de los tests y Board. El coste está en la status line (`usage.md`).
 
 ## Requisitos
 

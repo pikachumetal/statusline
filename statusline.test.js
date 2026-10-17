@@ -3,6 +3,14 @@
 const assert = require('assert');
 const { render, bar, gitNames, readGit, parseStatus, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
 
+// Los procesos que lanza el test heredan un perfil vacío: el statusline.json y los flags del perfil real no cuentan.
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const emptyProfile = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-test-profile-'));
+    process.env.CLAUDE_CONFIG_DIR = emptyProfile;
+    process.on('exit', () => fs.rmSync(emptyProfile, { recursive: true, force: true }));
+}
+
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
     model: { display_name: 'Fable 5.1' },
@@ -172,6 +180,8 @@ assert.ok(!costL2({ total_cost_usd: 0.2, total_duration_ms: 4 * 60000 }).include
 assert.ok(!costL2({ total_cost_usd: 0, total_duration_ms: 60 * 60000 }).includes('/h'), 'sin coste por hora con coste 0');
 assert.ok(!costL2({ total_cost_usd: 0.47, total_duration_ms: 'x' }).includes('/h'), 'sin duración numérica');
 assert.ok(costL2({ total_cost_usd: 'abc', total_duration_ms: 12 * 60000 }).includes('💰 $0.00'), 'coste no numérico');
+// El coste va en el color que tenía en el mod de controles (#d19a66).
+assert.ok(render(fixture, env, NOW).includes('\x1b[38;2;209;154;102m💰 $0.47 · $2.35/h\x1b[0m'), 'coste en #d19a66');
 
 // Icono de nivel en las ventanas, con los mismos cortes que el contexto.
 const windows = (five, week) => cells(render({ rate_limits: { five_hour: { used_percentage: five }, seven_day: { used_percentage: week } } }, env, NOW).split('\n')[1]);
@@ -492,7 +502,7 @@ for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200
     assert.ok(out.includes('\x1b[38;2;200;120;220m🤖 Fable 5.1'), 'modelo en magenta');
     assert.ok(out.includes('\x1b[38;2;200;120;220m🧪 perfil'), 'perfil en magenta');
     const DIM = '\x1b[38;2;130;130;130m';
-    for (const s of ['(medium)', 'ahorro', '5h', '7d', '💰 $0.47']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
+    for (const s of ['(medium)', 'ahorro', '5h', '7d']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
     assert.strictEqual(out.split(`${DIM}↻`).length - 1, 2, 'reset atenuado en 5h y 7d');
     assert.ok(out.includes('\x1b[38;2;80;200;120m+156'), 'líneas añadidas en verde');
     assert.ok(out.includes('\x1b[38;2;220;60;40m-23'), 'líneas eliminadas en rojo');

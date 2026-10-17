@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Row, SelectorKey } from '../types'
-import { CAVEMAN_FLAGS, CHOICES, PONYTAIL_FLAGS, boardPath, confirmedEffort, costText, firstLine, flagValue, isTestCommand, modelName } from './logic'
+import { CAVEMAN_FLAGS, CHOICES, PONYTAIL_FLAGS, boardPath, confirmedEffort, firstLine, flagValue, isTestCommand, modelName } from './logic'
 
 const row = atom({ plugin: 'statusline-controls', key: 'row' } as const, { open: null, effort: '?', tests: null } as Row)
 
@@ -108,9 +108,6 @@ export const register: Register = on => {
       )
     }
 
-    const usage = await $.session.usage().catch(() => undefined)
-    const now = await $.clock.now()
-
     return (
       <Box flexDirection="row" gap={2}>
         <Box flexDirection="row" gap={1}>
@@ -127,13 +124,6 @@ export const register: Register = on => {
         <Button key="ponytail" plain onPress={() => toggle('ponytail')}>
           <Text>🦥 {current.ponytail}</Text>
         </Button>
-        <Box key="cost">
-          {usage === undefined ? (
-            <Text color="gray">⚠</Text>
-          ) : (
-            <Text color="#d19a66">💰 {costText(usage.cost?.usd ?? 0, usage.startedAt, now)}</Text>
-          )}
-        </Box>
         {r.tests !== null && (
           <Box key="tests">
             <Text color={r.tests === 'passed' ? 'green' : 'red'}>[{r.tests}]</Text>
