@@ -1,5 +1,5 @@
 'use strict';
-// Statusline de Claude Code: dos líneas, emojis + nerd font, barras con gradiente truecolor.
+// Statusline de Claude Code: líneas configurables con statusline.json, emojis + nerd font, barras con gradiente truecolor.
 // Lee el JSON de stdin, escribe ANSI en stdout. Sin dependencias.
 const fs = require('fs');
 const os = require('os');
@@ -165,10 +165,10 @@ function readGit(data, run = git) {
     return { ...gitNames(...paths.split(/\r?\n/)), ...state, timedOut };
 }
 
-// Mismo hardening que caveman-badge.js: sin symlinks, máx 64 bytes, whitelist.
-function readSmallFile(file) {
+// Mismo hardening que caveman-badge.js: sin symlinks, máx maxBytes (64 por defecto), whitelist.
+function readSmallFile(file, maxBytes = 64) {
     const st = fs.lstatSync(file);
-    if (!st.isFile() || st.isSymbolicLink() || st.size > 64) return null;
+    if (!st.isFile() || st.isSymbolicLink() || st.size > maxBytes) return null;
     return fs.readFileSync(file, 'utf8');
 }
 
@@ -192,6 +192,22 @@ function readSavingsSuffix(claudeDir) {
     } catch { return null; }
 }
 
+const LAYOUT_MAX_BYTES = 4096;
+const isLayout = (lines) => Array.isArray(lines) && lines.length > 0
+    && lines.every(line => Array.isArray(line) && line.length > 0 && line.every(name => typeof name === 'string'));
+
+// statusline.json lo escribe el usuario: roto no se ignora como un flag, se avisa con ⚠. Sin fichero, layout por defecto.
+// El BOM se quita porque el Bloc de notas y PowerShell 5 lo escriben y JSON.parse lo rechaza.
+function readLayout(claudeDir) {
+    try {
+        const raw = readSmallFile(path.join(claudeDir, 'statusline.json'), LAYOUT_MAX_BYTES);
+        const lines = raw === null ? null : JSON.parse(raw.replace(/^\uFEFF/, ''))?.lines;
+        return isLayout(lines) ? { layout: lines } : { layoutInvalid: true };
+    } catch (e) {
+        return e.code === 'ENOENT' ? {} : { layoutInvalid: true };
+    }
+}
+
 function readEnv(data) {
     const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
     const profile = process.env.CLAUDE_CONFIG_DIR ? path.basename(process.env.CLAUDE_CONFIG_DIR) : null;
@@ -206,6 +222,7 @@ function readEnv(data) {
             ponytail: readFlag(path.join(claudeDir, '.ponytail-active'), ['lite', 'full', 'ultra', 'review']),
             savings: readSavingsSuffix(claudeDir),
         },
+        ...readLayout(claudeDir),
     };
 }
 
@@ -283,7 +300,7 @@ function renderCost(cost) {
     return `${C.dim}${s}${RESET}`;
 }
 
-// Cada segmento por su nombre; devuelve el texto o null si no tiene nada que pintar.
+// Las claves son los nombres que admite statusline.json. Un pintor devuelve null sin datos, y su línea no deja hueco.
 const SEGMENTS = {
     profile: (data, env) => (env.profile ? `${C.magenta}🧪 ${env.profile}${RESET}` : null),
     where: (data, env) => renderWhere(data, env),
@@ -324,10 +341,12 @@ function renderLine(names, data, env, now) {
 }
 
 function render(data, env, now = Date.now()) {
-    return (env.layout ?? DEFAULT_LAYOUT)
+    const lines = (env.layout ?? DEFAULT_LAYOUT)
         .map(names => renderLine(names, data, env, now))
-        .filter(Boolean)
-        .join('\n');
+        .filter(Boolean);
+    // Con statusline.json inválido el layout es el por defecto, cuya L1 siempre pinta el modelo: el ⚠ siempre tiene sitio.
+    if (env.layoutInvalid) lines[0] += SEP + FAILED;
+    return lines.join('\n');
 }
 
 function main() {

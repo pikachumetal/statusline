@@ -70,9 +70,11 @@ valores por defecto que guardan `/model` y `/effort` los escribe Claude Code.
 - Todas las llamadas a `git` de un refresco comparten un presupuesto de tiempo,
   y el statusline completo tiene un tope comprobado con un test. Las cifras viven
   en `capabilities/input.md` («Consulta a git»).
-- Todo fichero externo que se lea tiene un tope de 64 bytes.
-- Número de líneas: 2 por defecto. No es un tope fijo: pasa a ser configurable
-  cuando llegue el módulo de configurabilidad (ver `roadmap.md`).
+- Todo fichero externo que se lea tiene un tope de 64 bytes, salvo
+  `statusline.json`, que lo escribe la persona y tiene un tope de 4096 bytes
+  (feature 0023).
+- Número de líneas: 2 por defecto; `statusline.json` las fija por perfil
+  (`capabilities/output.md`).
 
 ### 4. Avisos — respondida
 
@@ -88,6 +90,9 @@ Vigentes:
   o usa su valor por defecto, sin avisar.
 - Si un segmento falla al pintarse (lanza un error), se pinta un `⚠` discreto en
   su sitio y el resto de segmentos se pinta igual.
+- Un `statusline.json` inválido pinta el layout por defecto con un `⚠` discreto
+  al final de la L1 (feature 0023), y un nombre de segmento desconocido, un `⚠`
+  en su sitio (feature 0022).
 - No hay texto de aviso ni nada que interrumpa.
 - Excepción (feature 0024): el mod de controles da un aviso solo como respuesta
   a un clic de la persona.

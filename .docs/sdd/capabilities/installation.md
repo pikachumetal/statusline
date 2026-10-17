@@ -76,6 +76,13 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 - THEN la status line queda instalada y su bloque `statusLine`, o el aviso de perfil actualizado, se muestra como siempre
 - AND el instalador termina con un error que nombra el comando que falló y código de salida distinto de 0
 
+### El instalador no toca statusline.json
+
+- GIVEN un perfil con un `statusline.json`
+- WHEN se ejecuta `install.ps1` sobre ese perfil, como instalación limpia o como update
+- THEN el `statusline.json` queda igual byte a byte
+- AND sin `statusline.json`, el instalador no lo crea
+
 ## Reglas de la capacidad
 
 - **Dónde viven los datos**: la status line, en `<perfil>\hooks`. El mod no se copia: Claude Code lo lee de `mod/` del clon, así que mover o borrar el clon lo deja sin cargar hasta reinstalar, y cambiar de rama en el clon cambia el mod de todos los perfiles. El registro del mod lo escribe el CLI `claude` en la configuración de plugins del perfil. El instalador no escribe en ningún otro sitio.

@@ -12,14 +12,14 @@ en preparación
 | id | Feature | Origen | Ficheros que toca | Estado |
 | --- | --- | --- | --- | --- |
 | 0022 | Segmentos con nombre y render guiado por un layout, con el de la v1.2.0 por defecto y sin cambio visible · `proposal: 0021` | B1 del backlog | `statusline.js` (`renderLine1`, `renderLine2`, `render`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
-| 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | ⏳ |
+| 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | 🧪 validación diferida a smoke de la release 2.0.0 |
 | 0024 | Mod de controles bajo la status line: selectores de modelo, effort, caveman y ponytail, coste en vivo, estado de tests y Board; `install.ps1` lo instala | Petición del usuario el 2026-10-17 | `mod/`, `.claude-plugin/marketplace.json`, `install.ps1`, `statusline.test.js`, `README.md`, `README.en.md`, `.docs/sdd/` | 🧪 validación diferida a smoke de la release 2.0.0 |
 
 ## Backlog
 
 | # | Ítem | Origen |
 | --- | --- | --- |
-| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. Planificada en la Release 2.0.0 como 0022 y 0023 (`proposal: 0021`). | Módulo identificado |
+| B1 | **[Feature 0023, 2026-10-17: saldada — [walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)]** Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. Planificada en la Release 2.0.0 como 0022 y 0023 (`proposal: 0021`). | Módulo identificado |
 | B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado |
 | B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado |
 | B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
@@ -29,7 +29,8 @@ en preparación
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
-| Minors aplazados de la 0022: el comentario de `SEGMENTS` roza repetir el código; el test «layout explícito = sin layout» pasa por construcción; la cabecera de `statusline.js` dice «dos líneas» ([walkthrough](specs/20261017-144436-feature-0022-named-segments/walkthrough.md)) | Bajo: legibilidad | **Actuar**: con la 0023 |
+| **[Feature 0023, 2026-10-17: saldada — [walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)]** Minors aplazados de la 0022: el comentario de `SEGMENTS` roza repetir el código; el test «layout explícito = sin layout» pasa por construcción; la cabecera de `statusline.js` dice «dos líneas» ([walkthrough](specs/20261017-144436-feature-0022-named-segments/walkthrough.md)) | Bajo: legibilidad | **Actuar**: con la 0023 |
+| Minors aplazados de la 0023: el test «un perfil por fichero» es más débil que su THEN; `^statusline\b` en dos tests depende de cómo se llame la carpeta del clon; falta un test del fallback a `~/.claude` sin `CLAUDE_CONFIG_DIR` ([walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)) | Bajo: solo de test | **Actuar**: patch |
 | Minors aplazados de la 0024: `isTestCommand` detecta el runner en cualquier posición (`cat jest.config.js` cuenta); `modelName` lee una fecha como versión menor; un fallo pasajero de un comando se avisa como «not available»; el recorte a 80 caracteres puede partir un emoji; falta test de la fila tras `/model` y `/caveman`; faltan dos asserts del plan en los tests del instalador; `-ConfigDir ~\.claude` y rutas relativas no se resuelven antes de comparar ([walkthrough](specs/20261017-124615-feature-0024-controls-mod/walkthrough.md)) | Bajo: casos raros o solo de test | **Actuar**: patch |
 
 ## Patches
