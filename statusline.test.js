@@ -242,7 +242,7 @@ if (process.platform === 'win32') {
 // Instalador: solo Windows (install.ps1 necesita pwsh). Instalación limpia y update sobre una ya hecha.
 if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
-    const { spawnSync } = require('child_process');
+    const { spawn, spawnSync } = require('child_process');
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
     const noOrca = path.join(dir, 'no-orca.cmd');
@@ -320,6 +320,27 @@ if (process.platform === 'win32') {
         assert.notStrictEqual(failed.status, 0, 'copia fallida: código de salida distinto de 0');
         assert.ok(!failed.stdout.includes('Ficheros copiados'), 'copia fallida: no da los ficheros por copiados');
         assert.ok(failed.stderr.includes('statusline.cmd'), 'copia fallida: el error nombra el fichero');
+
+        // Fichero en uso: una sesión abierta tiene statusline.cmd abierto mientras pinta, como cmd.exe (solo lectura compartida).
+        const busy = path.join(dir, 'busy');
+        assert.strictEqual(install(noOrca, busy).status, 0, 'instalación previa del perfil en uso');
+        const busyCmd = path.join(busy, 'hooks', 'statusline.cmd');
+        const holding = (fn) => {
+            const ready = path.join(dir, 'lock-ready');
+            fs.rmSync(ready, { force: true });
+            const lock = spawn('pwsh', ['-NoProfile', '-Command', `$f = [IO.File]::Open('${busyCmd}', 'Open', 'Read', 'Read'); New-Item '${ready}' | Out-Null; Start-Sleep 30; $f.Close()`]);
+            const until = Date.now() + 15000;
+            while (!fs.existsSync(ready) && Date.now() < until) spawnSync(process.execPath, ['-e', 'setTimeout(() => {}, 100)']);
+            // Por su PID y esperando a que termine: kill() es asíncrono y el handle seguiría abierto al borrar el perfil.
+            try { return fn(); } finally { spawnSync('taskkill', ['/pid', String(lock.pid), '/t', '/f']); }
+        };
+        const same = holding(() => install(noOrca, busy));
+        assert.ok(same.status === 0 && same.stderr === '', `update con statusline.cmd en uso e idéntico: sin error («${same.stderr}»)`);
+        assert.ok(same.stdout.includes('Ficheros copiados'), 'update con statusline.cmd en uso e idéntico: da los ficheros por copiados');
+        fs.appendFileSync(busyCmd, 'rem cambiado\r\n');
+        const changed = holding(() => install(noOrca, busy));
+        assert.notStrictEqual(changed.status, 0, 'update con statusline.cmd en uso y distinto: sigue fallando');
+        assert.ok(changed.stderr.includes('statusline.cmd'), 'update con statusline.cmd en uso y distinto: el error nombra el fichero');
     } finally {
         fs.rmSync(dir, { recursive: true, force: true });
     }

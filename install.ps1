@@ -10,8 +10,12 @@ param(
 $hooks = Join-Path $ConfigDir 'hooks'
 New-Item -ItemType Directory -Force $hooks | Out-Null
 foreach ($f in 'statusline.js', 'statusline.cmd', 'statusline-orca.cmd', 'statusline.test.js') {
+    $src = Join-Path $PSScriptRoot $f
+    $dst = Join-Path $hooks $f
+    # Idéntico no se copia: una sesión abierta tiene statusline.cmd abierto y sobrescribirlo fallaría sin nada que cambiar.
+    if ((Test-Path $dst -PathType Leaf) -and (Get-FileHash $src).Hash -eq (Get-FileHash $dst).Hash) { continue }
     # Stop: un fichero bloqueado corta el script; sin él, se daría por bueno un update a medias.
-    Copy-Item (Join-Path $PSScriptRoot $f) $hooks -Force -ErrorAction Stop
+    Copy-Item $src $hooks -Force -ErrorAction Stop
 }
 # Con Orca instalado, el wrapper pinta el statusline y además le reenvía el JSON (rate_limits).
 $cmd = Join-Path $hooks $(if (Test-Path $OrcaHook) { 'statusline-orca.cmd' } else { 'statusline.cmd' })
