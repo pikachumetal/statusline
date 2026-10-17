@@ -27,9 +27,7 @@ De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variab
 - GIVEN un JSON con varios directorios informados
 - WHEN el statusline decide sobre qué directorio consultar `git` y qué nombre mostrar
 - THEN usa `workspace.project_dir`; si falta, `workspace.current_dir`; si falta, `cwd`
-
-`project_dir` es donde arrancó Claude Code. `current_dir` sigue al cwd de la
-shell y cambia durante la sesión.
+- AND `project_dir` es donde arrancó Claude Code; `current_dir` sigue al cwd de la shell y cambia durante la sesión
 
 ### Consulta a git
 
