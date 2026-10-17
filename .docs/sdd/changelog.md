@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **0026** — `install.ps1` no copia los ficheros idénticos a los del perfil: un update con una sesión abierta ya no falla al sobrescribir `statusline.cmd` en uso sin cambios. → [ref](specs/20261017-220851-patch-0026-install-skip-identical/)
+
 ### Changed
 
 - **0025** — El coste de la status line se pinta en `#d19a66`, el color que tenía en el mod, en vez de atenuado. → [ref](specs/20261017-215404-patch-0025-cost-to-statusline/)

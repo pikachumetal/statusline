@@ -13,7 +13,8 @@ Cómo llega el statusline a un perfil de Claude Code y cómo se lanza. Solo Wind
 - THEN `statusline.js`, `statusline.cmd`, `statusline-orca.cmd` y `statusline.test.js` se copian a `<perfil>\hooks`
 - AND el perfil por defecto es `~/.claude`
 - AND la carpeta `hooks` se crea si no existe, y los ficheros que ya hubiera se sobrescriben
-- AND si un fichero no se puede copiar (p. ej. `statusline.cmd` bloqueado por la sesión que lo usa), el instalador se para en él con un error que lo nombra y código de salida distinto de 0, sin decir que ha copiado los ficheros ni mostrar el bloque `statusLine`; los copiados antes se quedan
+- AND un fichero idéntico byte a byte al del repo no se copia: un update con una sesión abierta, que tiene `statusline.cmd` en uso, termina bien si ese fichero no ha cambiado
+- AND si un fichero no se puede copiar (p. ej. `statusline.cmd` distinto del del repo y bloqueado por la sesión que lo usa), el instalador se para en él con un error que lo nombra y código de salida distinto de 0, sin decir que ha copiado los ficheros ni mostrar el bloque `statusLine`; los copiados antes se quedan
 
 ### El instalador no toca settings.json
 

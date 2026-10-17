@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-18
 branch: patch/0026-install-skip-identical
-commit:
+commit: 079cb89
 ---
 
 # Patch 0026 — el instalador no copia los ficheros idénticos
@@ -50,11 +50,14 @@ El fichero del perfil era idéntico al del repo (`cmp` sin diferencias).
 | 3 | `statusline.cmd` distinto y en uso (suite) | ✅ sigue fallando: código distinto de 0 y el error nombra `statusline.cmd` |
 | 4 | `node statusline.test.js` | ✅ OK |
 | 5 | `claude plugin test mod` | ✅ 37 pass, 0 fail |
+| 6 | `install.ps1` sobre `~/.claude` y `~/.claude-gco` con la sesión abierta, 3 veces cada uno (ejecución real) | ✅ 6 de 6 con código 0 y «Ficheros copiados» |
+
+Validación diferida: 2026-10-18 · «Diferir: lo pruebo en el próximo update de la status line, a cargo del dev-lead» · disparador: próximo update de la status line, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.5h
-- Real:
+- Real: 0.4h
 
 ## 6. Delta de capacidad
 
