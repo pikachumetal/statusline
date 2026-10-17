@@ -537,7 +537,7 @@ if (process.platform === 'win32') {
     }
 }
 
-// Layout: cada segmento tiene nombre y render pinta las líneas de env.layout (0022).
+// Layout: cada segmento tiene nombre y render pinta las líneas de env.layout.
 {
     const V120 = [['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'], ['duration', 'context', 'five_hour', 'seven_day', 'cost']];
     const withLayout = (layout) => cells(render(fixture, { ...env, layout }, NOW));
