@@ -9,7 +9,6 @@
 
 | # | Ítem | Origen |
 | --- | --- | --- |
-| B1 | Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. | Módulo identificado |
 | B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado |
 | B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado |
 | B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
@@ -18,6 +17,8 @@
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
+| Minors aplazados de la 0023: el test «un perfil por fichero» es más débil que su THEN; `^statusline\b` en dos tests depende de cómo se llame la carpeta del clon; falta un test del fallback a `~/.claude` sin `CLAUDE_CONFIG_DIR` ([walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)) | Bajo: solo de test | **Actuar**: patch |
+| Minors aplazados de la 0024: `isTestCommand` detecta el runner en cualquier posición (`cat jest.config.js` cuenta); `modelName` lee una fecha como versión menor; un fallo pasajero de un comando se avisa como «not available»; el recorte a 80 caracteres puede partir un emoji; falta test de la fila tras `/model` y `/caveman`; faltan dos asserts del plan en los tests del instalador; `-ConfigDir ~\.claude` y rutas relativas no se resuelven antes de comparar ([walkthrough](specs/20261017-124615-feature-0024-controls-mod/walkthrough.md)) | Bajo: casos raros o solo de test | **Actuar**: patch |
 
 ## Patches
 
@@ -25,6 +26,14 @@
 | --- | --- | --- |
 
 ## Releases cerradas
+
+### v2.0.0 — 2026-10-18
+
+Configurabilidad (B1): segmentos con nombre y `render` guiado por un layout (0022) y `statusline.json` por perfil, con validación y `⚠` (0023). Mod de controles bajo la status line, con selectores de modelo, effort, caveman y ponytail, estado de los tests y Board (0024). Patches: el coste sale del mod y la status line lo pinta en `#d19a66` (0025), `install.ps1` no copia los ficheros idénticos (0026, B5) y el test del fichero en uso suelta el bloqueo por señal (0027). Sale como 2.0.0 por decisión del dev-lead: sin `statusline.json` la salida es la de la 1.2.0. Antes, la migración del kit SDD a la 2.3.4.
+
+[changelog](changelog.md)
+
+smoke: 2026-10-18 · 0 hallazgos (suite completa y `claude plugin test mod` sobre `develop`; uso diario del dev-lead en `~/.claude` y `~/.claude-gco` con su `statusline.json` y el mod; `install.ps1` con la sesión abierta; 0 corregidos)
 
 ### v1.2.0 — 2026-10-08
 

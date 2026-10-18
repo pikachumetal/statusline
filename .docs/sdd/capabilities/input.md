@@ -27,9 +27,7 @@ De dónde salen los datos de cada refresco: el JSON del stdin, `git`, las variab
 - GIVEN un JSON con varios directorios informados
 - WHEN el statusline decide sobre qué directorio consultar `git` y qué nombre mostrar
 - THEN usa `workspace.project_dir`; si falta, `workspace.current_dir`; si falta, `cwd`
-
-`project_dir` es donde arrancó Claude Code. `current_dir` sigue al cwd de la
-shell y cambia durante la sesión.
+- AND `project_dir` es donde arrancó Claude Code; `current_dir` sigue al cwd de la shell y cambia durante la sesión
 
 ### Consulta a git
 
@@ -61,10 +59,28 @@ shell y cambia durante la sesión.
 - THEN elimina los caracteres de control antes de pintarlo, de modo que un fichero externo no puede inyectar secuencias ANSI
 - AND son caracteres de control los C0 (`U+0000`–`U+001F`, `ESC` incluido), `DEL` (`U+007F`) y los C1 (`U+0080`–`U+009F`, `U+009B` incluido): `A␡B<CSI>31mC` se pinta `AB31mC`
 
+### Lectura de statusline.json
+
+- GIVEN el fichero `statusline.json` en el perfil (`CLAUDE_CONFIG_DIR`, o `~/.claude` si no está definida)
+- WHEN el statusline lo lee
+- THEN, si no existe, usa el layout por defecto sin marca
+- AND lo da por inválido si no es un fichero regular, si es un symlink, si pesa más de 4096 bytes o si no se puede leer
+- AND acepta un BOM UTF-8 al principio
+- AND solo lee el `statusline.json` de su perfil: con `CLAUDE_CONFIG_DIR=C:\Users\u\.claude-gco`, el de `~/.claude` no influye
+
+### Forma de statusline.json
+
+- GIVEN un `statusline.json` que se ha podido leer
+- WHEN el statusline lo valida
+- THEN es válido solo si es JSON, si la raíz es un objeto, si `lines` es un array con al menos una línea y si cada línea es un array con al menos un string
+- AND las claves que no son `lines` se ignoran: `{"lines": [["cost"]], "theme": "x"}` es válido
+- AND son inválidos `{"lines": "where"}`, `{"lines": []}`, `{"lines": [["cost"], []]}`, `{"lines": [["cost", 3]]}`, `[]` y `{}`
+- AND un nombre que no es de un segmento no invalida el fichero: lo resuelve `output`
+
 ## Reglas de la capacidad
 
 - **Dónde viven los datos**: en ningún sitio propio. Todo se lee en cada ejecución y nada se escribe.
 - **Idioma de los nombres**: no aplica.
-- **Límites**: 64 bytes por fichero flag; 2000 ms por llamada a `git`.
-- **Avisos**: ninguno. Una fuente que falla se trata como dato ausente.
+- **Límites**: 64 bytes por fichero flag; 4096 bytes para `statusline.json`; 2000 ms por llamada a `git`.
+- **Avisos**: un `statusline.json` inválido pinta `⚠` (ver `output.md`). Cualquier otra fuente que falla se trata como dato ausente.
 - **Regla ante conflicto**: el stdin manda; `git`, el entorno y los ficheros solo rellenan lo que el JSON no trae. Excepción: el nombre del worktree sale de `git` (ver `session-state.md`).

@@ -25,35 +25,43 @@
 | 2026-10-08 | 0018 | patch | — | 0.1 | — | — | — | — | — | 20261008-145214-patch-0018-weekly-reset-24h |
 | 2026-10-08 | 0019 | patch | — | 0.4 | — | — | — | — | — | 20261008-152437-patch-0019-missing-0002-tests |
 | 2026-10-08 | 0020 | patch | — | 0.2 | — | — | — | — | — | 20261008-161514-patch-0020-install-copy-error |
+| 2026-10-17 | 0024 | frontend | 2.5 | 1.4 | 0.56 | 65573k | 2520k | no aplica | sin precio | 20261017-124615-feature-0024-controls-mod |
+| 2026-10-17 | 0022 | backend | 1 | 0.5 | 0.5 | 18421k | 652k | no aplica | sin precio | 20261017-144436-feature-0022-named-segments |
+| 2026-10-17 | 0023 | backend | 2 | 0.75 | 0.38 | 5601k | 536k | no aplica | sin precio | 20261017-181144-feature-0023-statusline-json |
+| 2026-10-17 | 0025 | patch | 0.25 | 0.4 | 1.6 | — | — | — | — | 20261017-215404-patch-0025-cost-to-statusline |
+| 2026-10-18 | 0026 | patch | 0.5 | 0.4 | 0.8 | — | — | — | — | 20261017-220851-patch-0026-install-skip-identical |
+| 2026-10-18 | 0027 | patch | 0.25 | 0.4 | 1.6 | — | — | — | — | 20261017-222335-patch-0027-lock-test-race |
 
-**Factor de calibración** (ratio mediano real/estimado, 10 artefactos): **0.92** · media 0.82
+**Factor de calibración** (ratio mediano real/estimado, 16 artefactos): **0.82** · media 0.85
 
-- p25–p75: 0.57–1
-- p80: 1.03 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
-- Dentro de ±25 %: 70 % · sobreestimadas: 30 % · infraestimadas: 0 %
-- Error absoluto (h): media 0.15 · mediana 0.07
+- p25–p75: 0.5–1.04
+- p80: 1.17 — para comprometer una fecha, multiplica la estimación por el p80: así cubre 4 de cada 5 artefactos.
+- Dentro de ±25 %: 50 % · sobreestimadas: 38 % · infraestimadas: 13 %
+- Error absoluto (h): media 0.3 · mediana 0.15
 - Tendencia: n insuficiente (hacen falta 20)
 
 | Tramo del ratio | n | % |
 | --- | --- | --- |
-| <0.5 | 1 | 10 % |
-| 0.5–0.8 | 2 | 20 % |
-| 0.8–1.25 | 7 | 70 % |
-| 1.25–2 | 0 | 0 % |
+| <0.5 | 2 | 13 % |
+| 0.5–0.8 | 4 | 25 % |
+| 0.8–1.25 | 8 | 50 % |
+| 1.25–2 | 2 | 13 % |
 | ≥2 | 0 | 0 % |
 
 | Tipo | n | Mediana | p25–p75 |
 | --- | --- | --- | --- |
-| backend | 3 | 1 | — |
+| backend | 5 | 0.5 | 0.38–1 |
 | chore | 1 | 1.2 | — |
 | docs | 1 | 0.5 | — |
-| frontend | 4 | 0.92 | — |
+| frontend | 5 | 0.83 | 0.56–1 |
 | infra/tooling | 1 | 0.8 | — |
+| patch | 3 | 1.6 | — |
 
 | Release | Artefactos | Horas reales | Mediana | Sujetos ($) | Sesión ($) |
 | --- | --- | --- | --- | --- | --- |
 | 1.0.0 | 2 | 0.8 | — | — | — |
 | 1.1.0 | 16 | 4.75 | 1 | — | — |
-| sin publicar | 4 | 0.85 | 0.15 | — | — |
+| 1.2.0 | 4 | 0.85 | 0.15 | — | — |
+| sin publicar | 6 | 3.85 | 0.68 | — | — |
 
 > Ver `estimation.md`.

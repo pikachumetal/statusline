@@ -1,0 +1,11 @@
+{
+  "name": "statusline",
+  "owner": { "name": "pikachumetal" },
+  "plugins": [
+    {
+      "name": "statusline-controls",
+      "source": "./mod",
+      "description": "Clickable row under the status line: model, effort, caveman, ponytail, cost, tests and Board."
+    }
+  ]
+}

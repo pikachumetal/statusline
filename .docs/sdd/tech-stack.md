@@ -11,6 +11,8 @@
 | Instalador | PowerShell 7+ (`install.ps1`) | Solo Windows. |
 | Lanzador | `statusline.cmd` | Solo Windows. |
 | Salida | ANSI truecolor + iconos nerd font | Requisito duro del terminal (ver `mission.md`). |
+| Mod de controles | TypeScript/TSX en `mod/`, compilado y ejecutado por Claude Code | Claude Code 2.1.302 o superior. Sin `package.json` ni `tsc`. Tests con `claude plugin test mod` (`claude-code/testing`). Comportamiento en `capabilities/controls.md`. |
+| Marketplace | `.claude-plugin/marketplace.json` en la raíz | Marketplace de carpeta `statusline`: Claude Code lee el mod del clon. |
 
 ## Abierto
 

@@ -2,7 +2,7 @@
 
 ## Propósito
 
-La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por `│`, en este orden: reloj, contexto, ventana de 5h, ventana semanal, coste.
+La segunda línea (L2): cuánto se ha consumido. Los segmentos van separados por `│`, por defecto en este orden (`statusline.json` lo cambia, ver `output.md`): reloj, contexto, ventana de 5h, ventana semanal, coste.
 
 ## Requisitos
 

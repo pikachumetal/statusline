@@ -11,11 +11,19 @@ explícita en su spec y se aprueba antes de implementar.
      principal. Un subagente recibe los tests ya en RED y su trabajo es
      ponerlos en GREEN. Un subagente nunca escribe los tests de su propia
      implementación ni modifica los que recibe para que pasen.
-2. **Sin dependencias npm.** Solo Node y `git` como binario externo.
+   - **El mod:** sus tests viven en `mod/tests/` y `claude plugin test mod`
+     también pasa antes de cada commit.
+2. **Sin dependencias npm.** `statusline.js` usa solo Node y `git` como binario
+   externo. El mod tampoco tiene dependencias npm: lo compila y lo ejecuta
+   Claude Code (2.1.302 o superior). El instalador usa el CLI `claude` si está en
+   el PATH.
 3. **El statusline nunca rompe.** Con stdin vacío o inválido pinta con valores
    por defecto. Un segmento que falla no impide pintar el resto.
 4. **Nunca pinta secretos.** Ningún segmento muestra tokens, claves de API ni
-   el contenido de variables de entorno sensibles.
+   el contenido de variables de entorno sensibles. El mod lee el texto de los
+   comandos de Bash y PowerShell para saber si son tests, pero nunca lo pinta, y sus avisos
+   enseñan como mucho la primera línea de la respuesta de un comando de selector,
+   recortada a 80 caracteres.
 
 ## Reglas de producto
 
@@ -38,6 +46,13 @@ stdin en un temporal de `%TEMP%` para pasárselo a `statusline.cmd` y a Orca, y
 lo borra al acabar. Si Claude Code mata el proceso antes, el temporal queda
 huérfano. `statusline.js` sigue sin escribir ficheros.
 
+Excepción (feature 0024): el mod de controles tampoco escribe ficheros, pero sus
+fuentes son otras: Claude Code (`$.session` y los eventos de la sesión) y los
+mismos ficheros flag, con whitelist y 64 bytes como máximo, sin comprobar
+symlinks (el motor no lo permite; la whitelist limita lo que se puede colar).
+Lo que recuerda vive en el estado de sesión de Claude Code, en memoria. Los
+valores por defecto que guardan `/model` y `/effort` los escribe Claude Code.
+
 ### 2. Idioma de los nombres — respondida
 
 - **En inglés:** código, variables de entorno propias, claves de configuración
@@ -55,9 +70,11 @@ huérfano. `statusline.js` sigue sin escribir ficheros.
 - Todas las llamadas a `git` de un refresco comparten un presupuesto de tiempo,
   y el statusline completo tiene un tope comprobado con un test. Las cifras viven
   en `capabilities/input.md` («Consulta a git»).
-- Todo fichero externo que se lea tiene un tope de 64 bytes.
-- Número de líneas: 2 por defecto. No es un tope fijo: pasa a ser configurable
-  cuando llegue el módulo de configurabilidad (ver `roadmap.md`).
+- Todo fichero externo que se lea tiene un tope de 64 bytes, salvo
+  `statusline.json`, que lo escribe la persona y tiene un tope de 4096 bytes
+  (feature 0023).
+- Número de líneas: 2 por defecto; `statusline.json` las fija por perfil
+  (`capabilities/output.md`).
 
 ### 4. Avisos — respondida
 
@@ -73,7 +90,12 @@ Vigentes:
   o usa su valor por defecto, sin avisar.
 - Si un segmento falla al pintarse (lanza un error), se pinta un `⚠` discreto en
   su sitio y el resto de segmentos se pinta igual.
+- Un `statusline.json` inválido pinta el layout por defecto con un `⚠` discreto
+  al final de la L1 (feature 0023), y un nombre de segmento desconocido, un `⚠`
+  en su sitio (feature 0022).
 - No hay texto de aviso ni nada que interrumpa.
+- Excepción (feature 0024): el mod de controles da un aviso solo como respuesta
+  a un clic de la persona.
 
 ### 5. Regla ante conflicto — respondida
 

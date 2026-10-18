@@ -3,6 +3,14 @@
 const assert = require('assert');
 const { render, bar, gitNames, readGit, parseStatus, gradientAt, GRAY_BG, RESET } = require('./statusline.js');
 
+// Los procesos que lanza el test heredan un perfil vacío: el statusline.json y los flags del perfil real no cuentan.
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const emptyProfile = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-test-profile-'));
+    process.env.CLAUDE_CONFIG_DIR = emptyProfile;
+    process.on('exit', () => fs.rmSync(emptyProfile, { recursive: true, force: true }));
+}
+
 const NOW = Date.UTC(2026, 8, 17, 12, 0, 0);
 const fixture = {
     model: { display_name: 'Fable 5.1' },
@@ -172,6 +180,8 @@ assert.ok(!costL2({ total_cost_usd: 0.2, total_duration_ms: 4 * 60000 }).include
 assert.ok(!costL2({ total_cost_usd: 0, total_duration_ms: 60 * 60000 }).includes('/h'), 'sin coste por hora con coste 0');
 assert.ok(!costL2({ total_cost_usd: 0.47, total_duration_ms: 'x' }).includes('/h'), 'sin duración numérica');
 assert.ok(costL2({ total_cost_usd: 'abc', total_duration_ms: 12 * 60000 }).includes('💰 $0.00'), 'coste no numérico');
+// El coste va en el color que tenía en el mod de controles (#d19a66).
+assert.ok(render(fixture, env, NOW).includes('\x1b[38;2;209;154;102m💰 $0.47 · $2.35/h\x1b[0m'), 'coste en #d19a66');
 
 // Icono de nivel en las ventanas, con los mismos cortes que el contexto.
 const windows = (five, week) => cells(render({ rate_limits: { five_hour: { used_percentage: five }, seven_day: { used_percentage: week } } }, env, NOW).split('\n')[1]);
@@ -232,11 +242,16 @@ if (process.platform === 'win32') {
 // Instalador: solo Windows (install.ps1 necesita pwsh). Instalación limpia y update sobre una ya hecha.
 if (process.platform === 'win32') {
     const fs = require('fs'), os = require('os'), path = require('path');
-    const { spawnSync } = require('child_process');
+    const { spawn, spawnSync } = require('child_process');
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-'));
     // -OrcaHook apunta a un hook que no existe: el resultado no depende de si Orca está instalado en esta máquina.
     const noOrca = path.join(dir, 'no-orca.cmd');
-    const install = (orcaHook = noOrca, configDir = dir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook], { encoding: 'utf8' });
+    // CLI de Claude Code falso: apunta cada llamada con su perfil y sale con FAKE_CLAUDE_EXIT. Ningún test toca un perfil real.
+    const fakeClaude = path.join(dir, 'fake-claude.cmd');
+    const calls = path.join(dir, 'calls.txt');
+    fs.writeFileSync(fakeClaude, `@echo off\r\n>>"${calls}" echo %CLAUDE_CONFIG_DIR%^|%*\r\nexit /b %FAKE_CLAUDE_EXIT%\r\n`);
+    const install = (orcaHook = noOrca, configDir = dir, claude = fakeClaude, exit = '0') => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', orcaHook, '-Claude', claude], { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_EXIT: exit } });
+    const callLines = () => (fs.existsSync(calls) ? fs.readFileSync(calls, 'utf8').trim().split(/\r?\n/) : []);
     const cmd = path.join(dir, 'hooks', 'statusline.cmd');
     try {
         // Con Orca: el bloque apunta al wrapper que le reenvía el JSON.
@@ -246,21 +261,57 @@ if (process.platform === 'win32') {
         const orcaCmd = path.join(dir, 'hooks', 'statusline-orca.cmd');
         assert.ok(withOrca.stdout.includes(`"\\"${orcaCmd.replace(/\\/g, '\\\\')}\\""`), 'con Orca el bloque apunta a statusline-orca.cmd');
 
+        fs.rmSync(calls, { force: true });
         const fresh = install();
         assert.strictEqual(fresh.stderr, '', 'instalación limpia sin errores');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline.js')), 'copia statusline.js');
         assert.ok(fs.existsSync(path.join(dir, 'hooks', 'statusline-orca.cmd')), 'copia statusline-orca.cmd');
         assert.ok(fresh.stdout.includes(`"\\"${cmd.replace(/\\/g, '\\\\')}\\""`), 'bloque statusLine con la ruta escapada');
         assert.ok(!fs.existsSync(path.join(dir, 'settings.json')), 'no crea settings.json');
+        assert.deepStrictEqual(callLines(), [`${dir}|plugin marketplace add ${__dirname}`, `${dir}|plugin install statusline-controls@statusline`], 'install registra el mod en el perfil');
+        assert.ok(fresh.stdout.includes('Mod de controles instalado'), 'install avisa de que el mod está instalado');
 
         const settings = JSON.stringify({ model: 'x', statusLine: { type: 'command', command: `"${cmd}"` } });
         fs.writeFileSync(path.join(dir, 'settings.json'), settings);
         fs.writeFileSync(path.join(dir, 'hooks', 'statusline.js'), '// versión vieja');
+        fs.rmSync(calls, { force: true });
         const update = install();
         assert.strictEqual(update.stderr, '', 'update sin errores');
         assert.notStrictEqual(fs.readFileSync(path.join(dir, 'hooks', 'statusline.js'), 'utf8'), '// versión vieja', 'update sobrescribe');
         assert.ok(!update.stdout.includes('"statusLine"'), 'update: no pide pegar el bloque si ya está configurado');
         assert.strictEqual(fs.readFileSync(path.join(dir, 'settings.json'), 'utf8'), settings, 'update no toca settings.json');
+        assert.ok(update.stdout.includes('Actualizado') && update.stdout.includes('Mod de controles instalado'), 'update también registra el mod');
+        assert.strictEqual(callLines().length, 2, 'update ejecuta los dos comandos claude plugin');
+
+        // Sin CLI de Claude Code: la status line se instala y el mod se explica a mano.
+        const noCli = install(noOrca, dir, path.join(dir, 'no-claude.cmd'));
+        const noCliOut = noCli.stdout + noCli.stderr;
+        assert.strictEqual(noCli.status, 0, 'sin CLI: código 0');
+        assert.ok(noCliOut.includes('no se ha instalado el mod'), 'sin CLI: avisa de que no instala el mod');
+        assert.ok(noCliOut.includes('claude plugin marketplace add') && noCliOut.includes('claude plugin install statusline-controls@statusline'), 'sin CLI: da los dos comandos');
+
+        // Fallo de claude plugin: la status line queda instalada y el error nombra el comando.
+        const cliFails = path.join(dir, 'cli-fails');
+        const failedCli = install(noOrca, cliFails, fakeClaude, '1');
+        assert.notStrictEqual(failedCli.status, 0, 'fallo de claude plugin: código distinto de 0');
+        assert.ok(failedCli.stderr.includes('claude plugin marketplace add'), 'fallo de claude plugin: el error nombra el comando');
+        assert.ok(failedCli.stdout.includes('"statusLine"'), 'fallo de claude plugin: el bloque statusLine se muestra igual');
+
+        // Perfil con espacios: el CLI recibe la ruta entera en CLAUDE_CONFIG_DIR.
+        const spaced = path.join(dir, 'perfil con espacios');
+        fs.rmSync(calls, { force: true });
+        install(noOrca, spaced);
+        assert.ok(callLines()[0].startsWith(`${spaced}|`), 'install con perfil con espacios');
+
+        // Perfil por defecto (~/.claude): el CLI va sin CLAUDE_CONFIG_DIR; con la variable dejaría un .claude.json suelto en ~/.claude.
+        const fakeHome = path.join(dir, 'home');
+        fs.rmSync(calls, { force: true });
+        const { CLAUDE_CONFIG_DIR: _profile, ...noProfileEnv } = process.env;
+        spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', path.join(fakeHome, '.claude') + '\\', '-OrcaHook', noOrca, '-Claude', fakeClaude], { encoding: 'utf8', env: { ...noProfileEnv, USERPROFILE: fakeHome, HOME: fakeHome, FAKE_CLAUDE_EXIT: '0' } });
+        assert.ok(callLines().length === 2 && callLines().every(l => l.startsWith('|')), `perfil por defecto sin CLAUDE_CONFIG_DIR: ${callLines()}`);
+        const noCliDefault = spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', path.join(fakeHome, '.claude'), '-OrcaHook', noOrca, '-Claude', path.join(dir, 'no-claude.cmd')], { encoding: 'utf8', env: { ...noProfileEnv, USERPROFILE: fakeHome, HOME: fakeHome } });
+        const noCliDefaultOut = noCliDefault.stdout + noCliDefault.stderr;
+        assert.ok(noCliDefaultOut.includes('claude plugin install') && !noCliDefaultOut.includes('CLAUDE_CONFIG_DIR='), 'sin CLI en el perfil por defecto: el aviso no pide CLAUDE_CONFIG_DIR');
 
         // Copia que falla: un directorio con el nombre de statusline.cmd hace de fichero bloqueado por la sesión.
         const broken = path.join(dir, 'broken');
@@ -269,6 +320,36 @@ if (process.platform === 'win32') {
         assert.notStrictEqual(failed.status, 0, 'copia fallida: código de salida distinto de 0');
         assert.ok(!failed.stdout.includes('Ficheros copiados'), 'copia fallida: no da los ficheros por copiados');
         assert.ok(failed.stderr.includes('statusline.cmd'), 'copia fallida: el error nombra el fichero');
+
+        // Fichero en uso: una sesión abierta tiene statusline.cmd abierto mientras pinta, como cmd.exe (solo lectura compartida).
+        const busy = path.join(dir, 'busy');
+        assert.strictEqual(install(noOrca, busy).status, 0, 'instalación previa del perfil en uso');
+        const busyCmd = path.join(busy, 'hooks', 'statusline.cmd');
+        // El proceso que bloquea suelta el fichero él mismo cuando aparece release y borra ready al cerrarlo: matarlo
+        // (kill o taskkill) devuelve antes de que Windows libere el handle, y la escritura siguiente daba EBUSY.
+        const holding = (fn) => {
+            const ready = path.join(dir, 'lock-ready'), release = path.join(dir, 'lock-release');
+            fs.rmSync(ready, { force: true });
+            fs.rmSync(release, { force: true });
+            spawn('pwsh', ['-NoProfile', '-Command', `$f = [IO.File]::Open('${busyCmd}', 'Open', 'Read', 'Read'); New-Item '${ready}' | Out-Null; while (-not (Test-Path '${release}')) { Start-Sleep -Milliseconds 50 }; $f.Close(); Remove-Item '${ready}'`]);
+            const waitFor = (done) => {
+                const until = Date.now() + 15000;
+                while (!done() && Date.now() < until) spawnSync(process.execPath, ['-e', 'setTimeout(() => {}, 100)']);
+                return done();
+            };
+            assert.ok(waitFor(() => fs.existsSync(ready)), 'el proceso de prueba tiene statusline.cmd abierto');
+            try { return fn(); } finally {
+                fs.writeFileSync(release, '');
+                assert.ok(waitFor(() => !fs.existsSync(ready)), 'el proceso de prueba ha soltado statusline.cmd');
+            }
+        };
+        const same = holding(() => install(noOrca, busy));
+        assert.ok(same.status === 0 && same.stderr === '', `update con statusline.cmd en uso e idéntico: sin error («${same.stderr}»)`);
+        assert.ok(same.stdout.includes('Ficheros copiados'), 'update con statusline.cmd en uso e idéntico: da los ficheros por copiados');
+        fs.appendFileSync(busyCmd, 'rem cambiado\r\n');
+        const changed = holding(() => install(noOrca, busy));
+        assert.notStrictEqual(changed.status, 0, 'update con statusline.cmd en uso y distinto: sigue fallando');
+        assert.ok(changed.stderr.includes('statusline.cmd'), 'update con statusline.cmd en uso y distinto: el error nombra el fichero');
     } finally {
         fs.rmSync(dir, { recursive: true, force: true });
     }
@@ -451,7 +532,7 @@ for (const [pct, color] of [[19, '80;200;120'], [20, '220;200;0'], [69, '220;200
     assert.ok(out.includes('\x1b[38;2;200;120;220m🤖 Fable 5.1'), 'modelo en magenta');
     assert.ok(out.includes('\x1b[38;2;200;120;220m🧪 perfil'), 'perfil en magenta');
     const DIM = '\x1b[38;2;130;130;130m';
-    for (const s of ['(medium)', 'ahorro', '5h', '7d', '💰 $0.47']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
+    for (const s of ['(medium)', 'ahorro', '5h', '7d']) assert.ok(out.includes(`${DIM}${s}`), `${s} atenuado`);
     assert.strictEqual(out.split(`${DIM}↻`).length - 1, 2, 'reset atenuado en 5h y 7d');
     assert.ok(out.includes('\x1b[38;2;80;200;120m+156'), 'líneas añadidas en verde');
     assert.ok(out.includes('\x1b[38;2;220;60;40m-23'), 'líneas eliminadas en rojo');
@@ -493,6 +574,128 @@ if (process.platform === 'win32') {
         assert.deepStrictEqual(leftovers(), [], 'sin hook el temporal se borra');
     } finally {
         fs.rmSync(home, { recursive: true, force: true });
+    }
+}
+
+// Layout: cada segmento tiene nombre y render pinta las líneas de env.layout.
+{
+    const withLayout = (layout) => cells(render(fixture, { ...env, layout }, NOW));
+
+    const one = withLayout([['cost', 'model']]);
+    assert.ok(!one.includes('\n') && /^💰 .* │ 🤖 /.test(one), `una línea, coste y modelo en ese orden: «${one}»`);
+
+    const unknown = render(fixture, { ...env, layout: [['where', 'modle', 'cost']] }, NOW);
+    assert.ok(/^\S+ │ ⚠ │ 💰 /.test(cells(unknown)), `nombre desconocido pinta ⚠ en su sitio: «${cells(unknown)}»`);
+    assert.ok(unknown.includes('\x1b[38;2;60;60;60m⚠'), 'el ⚠ del nombre desconocido es gris');
+
+    const noCaveman = cells(render(fixture, { ...env, flags: { ...env.flags, caveman: null }, layout: [['caveman'], ['cost']] }, NOW));
+    assert.ok(!noCaveman.includes('\n') && noCaveman.startsWith('💰 '), `línea vacía omitida: «${noCaveman}»`);
+
+    const twice = withLayout([['cost', 'cost']]);
+    assert.ok(/^💰 .* │ 💰 /.test(twice), `segmento repetido dos veces: «${twice}»`);
+}
+
+// statusline.json del perfil: layout, validación de la forma y ⚠ con un fichero inválido.
+{
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const script = path.join(__dirname, 'statusline.js');
+    const input = JSON.stringify({ cwd: __dirname, model: { display_name: 'Opus' }, cost: { total_cost_usd: 0.42 } });
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-config-'));
+    const profile = path.join(root, 'perfil'), other = path.join(root, 'otro');
+    fs.mkdirSync(profile);
+    fs.mkdirSync(other);
+    const config = path.join(profile, 'statusline.json');
+    const launch = (dir) => {
+        const r = spawnSync(process.execPath, [script], { input, encoding: 'utf8', timeout: 10000, env: { ...process.env, CAVEMAN_STATUSLINE_SAVINGS: '1', CLAUDE_CONFIG_DIR: dir } });
+        assert.ok(r.status === 0 && r.stderr === '', `statusline.js falló: status ${r.status}, ${r.error || r.stderr}`);
+        return r.stdout;
+    };
+    const withConfig = (content) => {
+        fs.rmSync(config, { recursive: true, force: true });
+        if (content !== null) fs.writeFileSync(config, content);
+        return launch(profile);
+    };
+    const GRAY_WARN = '\x1b[38;2;60;60;60m⚠';
+    const small = '{"lines": [["cost"]]}';
+    try {
+        const none = withConfig(null);
+        assert.ok(none.split('\n').length === 2 && !cells(none).includes('⚠'), `sin fichero, dos líneas sin ⚠: «${cells(none)}»`);
+        const v120 = JSON.stringify({ lines: [['profile', 'where', 'model', 'caveman', 'ponytail', 'velocity'], ['duration', 'context', 'five_hour', 'seven_day', 'cost']] });
+        assert.strictEqual(withConfig(v120), none, 'layout de la v1.2.0 en statusline.json = sin fichero, byte a byte');
+
+        const one = cells(withConfig('{"lines": [["where","model","context"]]}'));
+        assert.ok(!one.includes('\n') && /^statusline\b.* │ 🤖 Opus │ 🟢 /.test(one), `una línea: «${one}»`);
+
+        const three = cells(withConfig('{"lines": [["model"],["cost"],["duration"]]}')).split('\n');
+        assert.ok(three.length === 3 && three[0] === '🤖 Opus' && three[1].startsWith('💰 $0.42') && three[2].startsWith('⏱️ '), `tres líneas: «${three.join(' / ')}»`);
+
+        // Inválidos: layout por defecto y ⚠ gris al final de la L1.
+        const invalid = (label, out) => {
+            const lines = out.split('\n');
+            assert.ok(lines.length === 2 && cells(lines[0]).endsWith('🤖 Opus │ ⚠') && lines[0].includes(GRAY_WARN), `${label}: L1 acaba en ⚠ gris: «${cells(lines[0])}»`);
+            assert.ok(!cells(lines[1]).includes('⚠'), `${label}: L2 entera, sin ⚠`);
+        };
+        for (const bad of ['{"lines": [', '{"lines": "where"}', '{"lines": []}', '{"lines": [["cost"], []]}', '{"lines": [["cost", 3]]}', '[]', '{}']) invalid(bad, withConfig(bad));
+        invalid('4097 bytes', withConfig(small.padEnd(4097)));
+        fs.rmSync(config, { force: true });
+        fs.mkdirSync(config);
+        invalid('directorio', launch(profile));
+        fs.rmSync(config, { recursive: true, force: true });
+        const target = path.join(root, 'target.json');
+        fs.writeFileSync(target, small);
+        let linked = true;
+        try { fs.symlinkSync(target, config, 'file'); } catch { linked = false; }
+        if (linked) invalid('symlink', launch(profile));
+        else console.log('  (symlink no permitido en este sistema: test del symlink de statusline.json omitido)');
+        fs.rmSync(config, { force: true });
+
+        const edge = cells(withConfig(small.padEnd(4096)));
+        assert.ok(!edge.includes('\n') && edge.startsWith('💰 $0.42') && !edge.includes('⚠'), `4096 bytes justos, válido: «${edge}»`);
+        const bom = cells(withConfig('﻿' + small));
+        assert.ok(!bom.includes('\n') && bom.startsWith('💰 $0.42') && !bom.includes('⚠'), `BOM aceptado: «${bom}»`);
+        const extra = cells(withConfig('{"lines": [["cost"]], "theme": "x"}'));
+        assert.ok(!extra.includes('\n') && extra.startsWith('💰 $0.42') && !extra.includes('⚠'), `claves de más ignoradas: «${extra}»`);
+
+        const unknownRaw = withConfig('{"lines": [["where","modle","cost"]]}');
+        assert.ok(/^statusline\b.* │ ⚠ │ 💰 \$0\.42/.test(cells(unknownRaw)) && unknownRaw.includes(GRAY_WARN), `nombre desconocido: «${cells(unknownRaw)}»`);
+        assert.ok(/^⚠ │ 💰/.test(cells(withConfig('{"lines": [["Where","cost"]]}'))), 'los nombres distinguen mayúsculas');
+
+        // Un perfil por fichero: el de otro perfil no influye.
+        withConfig(small);
+        const otherOut = cells(launch(other));
+        assert.ok(otherOut.split('\n').length === 2 && otherOut.includes('🧪 otro') && otherOut.includes('🤖 Opus') && !otherOut.includes('⚠'), `el statusline.json de otro perfil no influye: «${otherOut}»`);
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+
+    // render recibe la marca ya calculada: con layoutInvalid, ⚠ al final de la primera línea.
+    const marked = render(fixture, { ...env, layoutInvalid: true }, NOW).split('\n');
+    assert.ok(marked.length === 2 && cells(marked[0]).endsWith(' │ ⚠') && !cells(marked[1]).includes('⚠'), 'layoutInvalid: ⚠ al final de la L1');
+}
+
+// El instalador no toca statusline.json: ni en una instalación limpia ni en un update, y no lo crea.
+if (process.platform === 'win32') {
+    const fs = require('fs'), os = require('os'), path = require('path');
+    const { spawnSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'statusline-install-config-'));
+    const fakeClaude = path.join(dir, 'fake-claude.cmd');
+    fs.writeFileSync(fakeClaude, '@echo off\r\nexit /b 0\r\n');
+    const install = (configDir) => spawnSync('pwsh', ['-NoProfile', '-File', path.join(__dirname, 'install.ps1'), '-ConfigDir', configDir, '-OrcaHook', path.join(dir, 'no-orca.cmd'), '-Claude', fakeClaude], { encoding: 'utf8' });
+    try {
+        const withFile = path.join(dir, 'con'), withoutFile = path.join(dir, 'sin');
+        fs.mkdirSync(withFile);
+        fs.mkdirSync(withoutFile);
+        const bytes = Buffer.from('﻿{"lines": [["cost"]]}\r\n', 'utf8');
+        fs.writeFileSync(path.join(withFile, 'statusline.json'), bytes);
+        for (const label of ['instalación limpia', 'update']) {
+            assert.strictEqual(install(withFile).status, 0, `install.ps1 (${label}) termina bien`);
+            assert.ok(fs.readFileSync(path.join(withFile, 'statusline.json')).equals(bytes), `${label}: statusline.json igual byte a byte`);
+        }
+        assert.strictEqual(install(withoutFile).status, 0, 'install.ps1 sin statusline.json termina bien');
+        assert.ok(!fs.existsSync(path.join(withoutFile, 'statusline.json')), 'el instalador no crea statusline.json');
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
     }
 }
 

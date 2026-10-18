@@ -2,7 +2,8 @@
 
 ## Forma
 
-Un único fichero, `statusline.js`. Claude Code lo ejecuta en cada refresco: le
+Dos piezas: `statusline.js`, la status line, y el mod de controles en `mod/`
+(al final). `statusline.js`: Claude Code lo ejecuta en cada refresco: le
 pasa el JSON de la sesión por stdin y pinta lo que el script escribe en stdout.
 El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 
@@ -13,7 +14,7 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
    - `readGit`: repo, branch y worktree (de `rev-parse`) y estado del working tree y del upstream (de `git status --porcelain=v2 --branch`, que parsea `parseStatus`).
    - Perfil: el nombre del directorio de `CLAUDE_CONFIG_DIR`, salvo que sea el default.
    - Flags: `.caveman-active`, `.ponytail-active` y `.caveman-statusline-suffix`.
-3. `render(data, env, now)` compone las dos líneas y las escribe en stdout.
+3. `render(data, env, now)` compone las líneas de `env.layout` (por defecto, las dos de la v1.2.0) y las escribe en stdout.
 
 ## Separación que hay que conservar
 
@@ -23,8 +24,8 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 - **Cada segmento se pinta dentro de `segment()`.** Si lanza, deja `⚠` en su
   sitio; si no tiene datos, devuelve `null` y se omite. Un segmento nuevo que
   no pase por `segment()` puede volver a tirar el statusline entero.
-- **Un segmento, una función `render*`.** Devuelve el texto del segmento, o
-  `null` si no hay nada que pintar.
+- **Un segmento, una entrada en `SEGMENTS` por su nombre** (`profile`, `where`, `model`, `caveman`, `ponytail`, `velocity`, `duration`, `context`, `five_hour`, `seven_day`, `cost`): devuelve el texto del segmento, o `null` si no hay nada que pintar; las que crecen salen a una función `render*`. El layout es una lista de líneas con esos nombres, y un nombre que no está pinta `⚠`. `render` no valida la forma del layout: quien lo construye lo valida antes (`readLayout`, al leer `statusline.json`).
+- **Ficheros del perfil: los de otros plugins se ignoran si fallan, `statusline.json` avisa.** Los flags (64 bytes) los escriben otros plugins y un fallo es un dato ausente; `statusline.json` (4096 bytes) lo escribe la persona, y un fallo pinta el layout por defecto con `⚠` para que lo vea.
 - **Todo acceso al JSON va con `?.` y valor por defecto.** Un campo ausente
   degrada su segmento, no rompe el render.
 - **Un campo numérico del JSON se valida con `Number.isFinite` antes de operar
@@ -63,3 +64,29 @@ El proceso nace y muere en cada refresco. No hay estado entre ejecuciones.
 [ccstatusline](https://github.com/sirmalloc/ccstatusline) se puede consultar
 para ver cómo resuelve un segmento. No se copia su arquitectura de widgets
 configurables mientras la configurabilidad no entre en el roadmap.
+
+## Mod de controles
+
+Un mod de Claude Code en `mod/` que pinta una fila clicable bajo la status line
+(`ui.render` sobre `PromptHint`). Comportamiento en `capabilities/controls.md`.
+
+- **`mod/hooks/logic.ts` es puro**: nombre del modelo, lectura
+  de flags y las opciones de cada selector. Se prueba sin simular el motor.
+- **`mod/hooks/register.tsx` tiene todo el acceso al motor**: `$.session`,
+  `$.fs`, `$.command.run` y el estado de sesión (`$.state`, atom `row`).
+- **El render acaba en `.catch(($, e, next) => next(e))`**: si la fila falla,
+  Claude Code pinta su línea de pista normal.
+- **Cada control llama al comando que escribiría la persona** (`/model`,
+  `/effort`, `/caveman:caveman`, `/ponytail:ponytail`): la lógica de cada modo
+  sigue en su plugin.
+- **El repo es un marketplace de carpeta** (`.claude-plugin/marketplace.json`):
+  Claude Code lee el mod del clon, no de una copia.
+- **El harness de tests del motor** (`claude-code/testing`) tiene sus reglas: un
+  hook por evento en cada test; `turn.step` es un stream que hay que leer entero y
+  su respuesta lleva `{ turnId, index, answer, toolUses }`; `tool.call` responde
+  `{ result }`; un `Text` no conserva su `key` (se envuelve en un `Box`) y un
+  `Button` exige `onPress`.
+- **`$.env.get` exige un nombre literal** (el motor lista las variables que lee el
+  mod) y **`$.command.run` rechaza un comando que no existe**.
+- **El instalador no pasa `CLAUDE_CONFIG_DIR` para `~/.claude`**: con la variable,
+  el CLI `claude` crea un `.claude.json` propio dentro de esa carpeta.
