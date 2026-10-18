@@ -325,14 +325,23 @@ if (process.platform === 'win32') {
         const busy = path.join(dir, 'busy');
         assert.strictEqual(install(noOrca, busy).status, 0, 'instalación previa del perfil en uso');
         const busyCmd = path.join(busy, 'hooks', 'statusline.cmd');
+        // El proceso que bloquea suelta el fichero él mismo cuando aparece release y borra ready al cerrarlo: matarlo
+        // (kill o taskkill) devuelve antes de que Windows libere el handle, y la escritura siguiente daba EBUSY.
         const holding = (fn) => {
-            const ready = path.join(dir, 'lock-ready');
+            const ready = path.join(dir, 'lock-ready'), release = path.join(dir, 'lock-release');
             fs.rmSync(ready, { force: true });
-            const lock = spawn('pwsh', ['-NoProfile', '-Command', `$f = [IO.File]::Open('${busyCmd}', 'Open', 'Read', 'Read'); New-Item '${ready}' | Out-Null; Start-Sleep 30; $f.Close()`]);
-            const until = Date.now() + 15000;
-            while (!fs.existsSync(ready) && Date.now() < until) spawnSync(process.execPath, ['-e', 'setTimeout(() => {}, 100)']);
-            // Por su PID y esperando a que termine: kill() es asíncrono y el handle seguiría abierto al borrar el perfil.
-            try { return fn(); } finally { spawnSync('taskkill', ['/pid', String(lock.pid), '/t', '/f']); }
+            fs.rmSync(release, { force: true });
+            spawn('pwsh', ['-NoProfile', '-Command', `$f = [IO.File]::Open('${busyCmd}', 'Open', 'Read', 'Read'); New-Item '${ready}' | Out-Null; while (-not (Test-Path '${release}')) { Start-Sleep -Milliseconds 50 }; $f.Close(); Remove-Item '${ready}'`]);
+            const waitFor = (done) => {
+                const until = Date.now() + 15000;
+                while (!done() && Date.now() < until) spawnSync(process.execPath, ['-e', 'setTimeout(() => {}, 100)']);
+                return done();
+            };
+            assert.ok(waitFor(() => fs.existsSync(ready)), 'el proceso de prueba tiene statusline.cmd abierto');
+            try { return fn(); } finally {
+                fs.writeFileSync(release, '');
+                assert.ok(waitFor(() => !fs.existsSync(ready)), 'el proceso de prueba ha soltado statusline.cmd');
+            }
         };
         const same = holding(() => install(noOrca, busy));
         assert.ok(same.status === 0 && same.stderr === '', `update con statusline.cmd en uso e idéntico: sin error («${same.stderr}»)`);
