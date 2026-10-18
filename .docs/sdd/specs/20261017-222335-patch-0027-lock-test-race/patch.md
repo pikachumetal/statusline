@@ -7,7 +7,7 @@ solution: causa raíz
 status: done
 created: 2026-10-18
 branch: patch/0027-lock-test-race
-commit:
+commit: d0d5b52
 ---
 
 # Patch 0027 — carrera del test del fichero en uso del instalador
@@ -50,9 +50,11 @@ Evidencia: el `EBUSY` sale en el `open` de `appendFileSync`, justo después de `
 | --- | --- | --- |
 | 1 | Reproducir: suite en la verificación de `Invoke-SddMerge.ps1` antes del fix | ❌ `EBUSY` en `appendFileSync` (log citado en §1) |
 | 2 | Suite completa tras el fix, 5 veces seguidas | ✅ 5 de 5 OK |
-| 3 | La misma suite en la verificación del merge del patch (`Invoke-SddMerge.ps1`) | pendiente: va en el cierre |
+| 3 | La misma suite en la verificación del merge del patch (`Invoke-SddMerge.ps1`) | la ejecuta el merge del cierre |
+
+Validación diferida: 2026-10-18 · «Diferir: lo pruebo en los próximos merges con Invoke-SddMerge, a cargo del dev-lead» · disparador: próximos merges con Invoke-SddMerge, a cargo del dev-lead
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.25h
-- Real:
+- Real: 0.4h
