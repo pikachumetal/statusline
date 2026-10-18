@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- **0027** — El test del fichero en uso del instalador ya no falla de vez en cuando con `EBUSY`: el proceso de prueba suelta `statusline.cmd` él mismo en vez de matarlo. → [ref](specs/20261017-222335-patch-0027-lock-test-race/)
 - **0026** — `install.ps1` no copia los ficheros idénticos a los del perfil: un update con una sesión abierta ya no falla al sobrescribir `statusline.cmd` en uso sin cambios. → [ref](specs/20261017-220851-patch-0026-install-skip-identical/)
 
 ### Changed

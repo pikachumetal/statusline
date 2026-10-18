@@ -15,6 +15,7 @@ en preparación
 | 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | 🧪 validación diferida a smoke de la release 2.0.0 |
 | 0024 | Mod de controles bajo la status line: selectores de modelo, effort, caveman y ponytail, coste en vivo, estado de tests y Board; `install.ps1` lo instala | Petición del usuario el 2026-10-17 | `mod/`, `.claude-plugin/marketplace.json`, `install.ps1`, `statusline.test.js`, `README.md`, `README.en.md`, `.docs/sdd/` | 🧪 validación diferida a smoke de la release 2.0.0 |
 | 0026 | Patch: `install.ps1` no copia los ficheros idénticos ([patch](specs/20261017-220851-patch-0026-install-skip-identical/patch.md)) | B5 del backlog | `install.ps1`, `statusline.test.js` | 🧪 validación diferida a próximo update de la status line, a cargo del dev-lead |
+| 0027 | Patch: el test del fichero en uso del instalador suelta `statusline.cmd` por señal ([patch](specs/20261017-222335-patch-0027-lock-test-race/patch.md)) | Fallo de la verificación del merge | `statusline.test.js` | 🧪 validación diferida a próximos merges con Invoke-SddMerge, a cargo del dev-lead |
 
 ## Backlog
 
@@ -38,6 +39,7 @@ en preparación
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
+| 2026-10-18 | 0027 | 🧪 validación diferida a próximos merges con Invoke-SddMerge, a cargo del dev-lead — el test del fichero en uso suelta `statusline.cmd` por señal ([patch](specs/20261017-222335-patch-0027-lock-test-race/patch.md)) |
 | 2026-10-18 | 0026 | 🧪 validación diferida a próximo update de la status line, a cargo del dev-lead — `install.ps1` no copia los ficheros idénticos ([patch](specs/20261017-220851-patch-0026-install-skip-identical/patch.md)) |
 | 2026-10-18 | 0025 | El coste sale de la fila del mod y la status line lo pinta en `#d19a66` ([patch](specs/20261017-215404-patch-0025-cost-to-statusline/patch.md)) |
 
