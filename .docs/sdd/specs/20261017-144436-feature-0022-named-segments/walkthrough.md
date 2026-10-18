@@ -68,3 +68,5 @@ created: 2026-10-17
 - `render` no valida la forma del layout; quien lo construya (la 0023) lo valida antes → `architecture.md`.
 
 ## 6. Adendas
+
+- 2026-10-18 — Validado en el smoke de la release 2.0.0: «Todo, lo uso a diario y funciona». Cierra la validación diferida.

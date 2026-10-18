@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-18
+
 ### Fixed
 
 - **0027** — El test del fichero en uso del instalador ya no falla de vez en cuando con `EBUSY`: el proceso de prueba suelta `statusline.cmd` él mismo en vez de matarlo. → [ref](specs/20261017-222335-patch-0027-lock-test-race/)

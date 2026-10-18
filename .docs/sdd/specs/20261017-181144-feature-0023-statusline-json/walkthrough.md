@@ -93,3 +93,5 @@ created: 2026-10-17
 - Una regla de la constitution con una cifra (el tope de 64 bytes) se contrasta con la spec antes del gate. Aquí se vio después de aprobarla → es de proceso, no de arquitectura: va al ticket del kit (`sdd-feedback`), si se genera.
 
 ## 6. Adendas
+
+- 2026-10-18 — Validado en el smoke de la release 2.0.0: «Todo, lo uso a diario y funciona». Cierra la validación diferida.

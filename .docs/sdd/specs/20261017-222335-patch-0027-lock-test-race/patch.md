@@ -58,3 +58,7 @@ Validación diferida: 2026-10-18 · «Diferir: lo pruebo en los próximos merges
 
 - Estimación: 0.25h
 - Real: 0.4h
+
+## Adendas
+
+- 2026-10-18 — Validado en el smoke de la release 2.0.0: «Todo, lo uso a diario y funciona». Cierra la validación diferida.

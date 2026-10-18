@@ -5,33 +5,18 @@
 | # | Ítem | Estado |
 | --- | --- | --- |
 
-## Release 2.0.0
-
-en preparación
-
-| id | Feature | Origen | Ficheros que toca | Estado |
-| --- | --- | --- | --- | --- |
-| 0022 | Segmentos con nombre y render guiado por un layout, con el de la v1.2.0 por defecto y sin cambio visible · `proposal: 0021` | B1 del backlog | `statusline.js` (`renderLine1`, `renderLine2`, `render`), `statusline.test.js` | 🧪 validación diferida a smoke de la release 2.0.0 |
-| 0023 | `statusline.json` en el perfil: lectura endurecida, validación, `⚠`, N líneas y formato en el README · `proposal: 0021` · tras 0022 | B1 del backlog | `statusline.js` (`readEnv`), `statusline.test.js`, `README.md`, `README.en.md` | 🧪 validación diferida a smoke de la release 2.0.0 |
-| 0024 | Mod de controles bajo la status line: selectores de modelo, effort, caveman y ponytail, coste en vivo, estado de tests y Board; `install.ps1` lo instala | Petición del usuario el 2026-10-17 | `mod/`, `.claude-plugin/marketplace.json`, `install.ps1`, `statusline.test.js`, `README.md`, `README.en.md`, `.docs/sdd/` | 🧪 validación diferida a smoke de la release 2.0.0 |
-| 0026 | Patch: `install.ps1` no copia los ficheros idénticos ([patch](specs/20261017-220851-patch-0026-install-skip-identical/patch.md)) | B5 del backlog | `install.ps1`, `statusline.test.js` | 🧪 validación diferida a próximo update de la status line, a cargo del dev-lead |
-| 0027 | Patch: el test del fichero en uso del instalador suelta `statusline.cmd` por señal ([patch](specs/20261017-222335-patch-0027-lock-test-race/patch.md)) | Fallo de la verificación del merge | `statusline.test.js` | 🧪 validación diferida a próximos merges con Invoke-SddMerge, a cargo del dev-lead |
-
 ## Backlog
 
 | # | Ítem | Origen |
 | --- | --- | --- |
-| B1 | **[Feature 0023, 2026-10-17: saldada — [walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)]** Configurabilidad: elegir qué segmentos se ven, en qué orden y en cuántas líneas. Planificada en la Release 2.0.0 como 0022 y 0023 (`proposal: 0021`). | Módulo identificado |
 | B2 | Segmentos nuevos. Sin lista concreta todavía. | Módulo identificado |
 | B3 | Lanzador para macOS y Linux. Hoy se configura a mano. | Módulo identificado |
 | B4 | % de uso de Fable en la ventana semanal: porcentaje del bucket semanal de Fable en la L2. **Bloqueado:** el stdin del statusline solo trae `five_hour`, `seven_day` y `spend_limit`; los buckets por modelo (`model_scoped`) no se proyectan y el store vive en memoria de Claude Code. Revisar si una versión futura proyecta `model_scoped`. | Módulo identificado |
-| B5 | **[Patch 0026, 2026-10-18: saldada — [patch](specs/20261017-220851-patch-0026-install-skip-identical/patch.md)]** Instalador que se salta los ficheros idénticos: hoy un update con una sesión abierta falla al copiar `statusline.cmd` en uso aunque no haya cambiado (la 0020 lo hace fallar con error en vez de darlo por copiado). | Visto al instalar la v1.2.0 en local |
 
 ## Deuda técnica
 
 | Ítem | Impacto | Destino |
 | --- | --- | --- |
-| **[Feature 0023, 2026-10-17: saldada — [walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)]** Minors aplazados de la 0022: el comentario de `SEGMENTS` roza repetir el código; el test «layout explícito = sin layout» pasa por construcción; la cabecera de `statusline.js` dice «dos líneas» ([walkthrough](specs/20261017-144436-feature-0022-named-segments/walkthrough.md)) | Bajo: legibilidad | **Actuar**: con la 0023 |
 | Minors aplazados de la 0023: el test «un perfil por fichero» es más débil que su THEN; `^statusline\b` en dos tests depende de cómo se llame la carpeta del clon; falta un test del fallback a `~/.claude` sin `CLAUDE_CONFIG_DIR` ([walkthrough](specs/20261017-181144-feature-0023-statusline-json/walkthrough.md)) | Bajo: solo de test | **Actuar**: patch |
 | Minors aplazados de la 0024: `isTestCommand` detecta el runner en cualquier posición (`cat jest.config.js` cuenta); `modelName` lee una fecha como versión menor; un fallo pasajero de un comando se avisa como «not available»; el recorte a 80 caracteres puede partir un emoji; falta test de la fila tras `/model` y `/caveman`; faltan dos asserts del plan en los tests del instalador; `-ConfigDir ~\.claude` y rutas relativas no se resuelven antes de comparar ([walkthrough](specs/20261017-124615-feature-0024-controls-mod/walkthrough.md)) | Bajo: casos raros o solo de test | **Actuar**: patch |
 
@@ -39,11 +24,16 @@ en preparación
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
-| 2026-10-18 | 0027 | 🧪 validación diferida a próximos merges con Invoke-SddMerge, a cargo del dev-lead — el test del fichero en uso suelta `statusline.cmd` por señal ([patch](specs/20261017-222335-patch-0027-lock-test-race/patch.md)) |
-| 2026-10-18 | 0026 | 🧪 validación diferida a próximo update de la status line, a cargo del dev-lead — `install.ps1` no copia los ficheros idénticos ([patch](specs/20261017-220851-patch-0026-install-skip-identical/patch.md)) |
-| 2026-10-18 | 0025 | El coste sale de la fila del mod y la status line lo pinta en `#d19a66` ([patch](specs/20261017-215404-patch-0025-cost-to-statusline/patch.md)) |
 
 ## Releases cerradas
+
+### v2.0.0 — 2026-10-18
+
+Configurabilidad (B1): segmentos con nombre y `render` guiado por un layout (0022) y `statusline.json` por perfil, con validación y `⚠` (0023). Mod de controles bajo la status line, con selectores de modelo, effort, caveman y ponytail, estado de los tests y Board (0024). Patches: el coste sale del mod y la status line lo pinta en `#d19a66` (0025), `install.ps1` no copia los ficheros idénticos (0026, B5) y el test del fichero en uso suelta el bloqueo por señal (0027). Sale como 2.0.0 por decisión del dev-lead: sin `statusline.json` la salida es la de la 1.2.0. Antes, la migración del kit SDD a la 2.3.4.
+
+[changelog](changelog.md)
+
+smoke: 2026-10-18 · 0 hallazgos (suite completa y `claude plugin test mod` sobre `develop`; uso diario del dev-lead en `~/.claude` y `~/.claude-gco` con su `statusline.json` y el mod; `install.ps1` con la sesión abierta; 0 corregidos)
 
 ### v1.2.0 — 2026-10-08
 

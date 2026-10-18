@@ -97,3 +97,5 @@ created: 2026-10-17
 - Con `CLAUDE_CONFIG_DIR` apuntando a `~/.claude`, el CLI `claude` crea un `.claude.json` propio dentro de esa carpeta → capacidad `installation` (ya en la regla «Dónde viven los datos» vía el delta) y `architecture.md`.
 
 ## 6. Adendas
+
+- 2026-10-18 — Validado en el smoke de la release 2.0.0: «Todo, lo uso a diario y funciona». Cierra la validación diferida.

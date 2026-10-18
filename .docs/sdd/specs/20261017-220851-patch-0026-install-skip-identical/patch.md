@@ -71,3 +71,7 @@ Validación diferida: 2026-10-18 · «Diferir: lo pruebo en el próximo update d
 - AND la carpeta `hooks` se crea si no existe, y los ficheros que ya hubiera se sobrescriben
 - AND un fichero idéntico byte a byte al del repo no se copia: un update con una sesión abierta, que tiene `statusline.cmd` en uso, termina bien si ese fichero no ha cambiado
 - AND si un fichero no se puede copiar (p. ej. `statusline.cmd` distinto del del repo y bloqueado por la sesión que lo usa), el instalador se para en él con un error que lo nombra y código de salida distinto de 0, sin decir que ha copiado los ficheros ni mostrar el bloque `statusLine`; los copiados antes se quedan
+
+## Adendas
+
+- 2026-10-18 — Validado en el smoke de la release 2.0.0: «Todo, lo uso a diario y funciona». Cierra la validación diferida.
