@@ -75,8 +75,7 @@ La primera línea (L1): en qué perfil, repo y rama está la sesión, con qué m
 - GIVEN el flag `.ponytail-active` con un modo válido
 - WHEN se pinta la L1
 - THEN se muestra `🦥 <modo>`
-
-Modos válidos: `lite`, `full`, `ultra`, `review`.
+- AND los modos válidos son `lite`, `full`, `ultra` y `review`
 
 ### Valor de un flag
 
