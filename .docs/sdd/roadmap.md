@@ -24,11 +24,16 @@
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
-| 2026-10-19 | 0030 | Botones `[folder]` y `[code]` en la fila del mod; iconos fuera de los botones → [patch](specs/20261019-084004-patch-0030-folder-code-buttons/patch.md) |
-| 2026-10-19 | 0029 | Modos, tests y Board del mod a la derecha, entre corchetes y separados por barras → [patch](specs/20261019-083021-patch-0029-controls-right-brackets/patch.md) |
-| 2026-10-19 | 0028 | Controles del mod en la banda sobre el prompt: «N shells» vuelve a ser clicable → [patch](specs/20261019-075407-patch-0028-controls-above-prompt/patch.md) |
 
 ## Releases cerradas
+
+### v2.1.0 — 2026-10-19
+
+Mod de controles: la fila pasa a la banda sobre el prompt y la pastilla «N shells» de Claude Code vuelve a ser clicable (0028); modelo a la izquierda y `🧪 [passed] | 🗿 [caveman] | 🦥 [full] [Board]` a la derecha, con corchetes en lo que se pulsa (0029); `[folder]` y `[code]` abren la carpeta de la sesión en el explorador y en VS Code, con iconos de Nerd Font en el terminal y emoji en el escritorio, y la fila ocupa el ancho de la banda (0030).
+
+[changelog](changelog.md)
+
+smoke: 2026-10-19 · 0 hallazgos (suite completa y `claude plugin test mod` sobre `develop`; uso del dev-lead en el terminal y en el addon de VS Code tras `/reload-plugins`: «chulo»; 0 corregidos)
 
 ### v2.0.0 — 2026-10-18
 
