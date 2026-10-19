@@ -84,15 +84,16 @@ Con Orca instalado (`~\.orca\agent-hooks\claude-statusline.cmd`), el bloque apun
 
 ## Mod de controles
 
-Con Claude Code 2.1.302 o superior, `install.ps1` instala también un mod que sustituye la línea de pista bajo la status line por una fila clicable:
+Con Claude Code 2.1.302 o superior, `install.ps1` instala también un mod que pinta una fila clicable sobre el prompt. La línea de pista de Claude Code sigue igual, con sus pastillas (`2 shells`) clicables. Mientras una encuesta ocupa ese sitio, la fila no se pinta:
 
 ```
-🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  [passed]  Board  (shift+tab to cycle)
+🤖 Opus 5.5 (medium) |  [folder] | 󰨞 [code]          🧪 [passed] | 🗿 [caveman] | 🦥 [full] [Board]
 ```
 
 - **Selectores**: clic en el modelo, el effort, caveman o ponytail despliega sus opciones y oculta el resto de la fila; clic en una opción la aplica con el mismo comando que escribirías (`/model`, `/effort`, `/caveman:caveman`, `/ponytail:ponytail`). `✕` cierra sin cambiar nada.
 - **Tests**: `[passed]` en verde o `[failed]` en rojo según el último comando de test de la sesión.
 - **Board** abre el board de proyectos de ponytail.
+- **folder** abre la carpeta de la sesión en el explorador y **code**, en VS Code (`code` en el PATH). Los iconos son de Nerd Font.
 
 Avisos:
 

@@ -27,6 +27,14 @@
 
 ## Releases cerradas
 
+### v2.1.0 — 2026-10-19
+
+Mod de controles: la fila pasa a la banda sobre el prompt y la pastilla «N shells» de Claude Code vuelve a ser clicable (0028); modelo a la izquierda y `🧪 [passed] | 🗿 [caveman] | 🦥 [full] [Board]` a la derecha, con corchetes en lo que se pulsa (0029); `[folder]` y `[code]` abren la carpeta de la sesión en el explorador y en VS Code, con iconos de Nerd Font en el terminal y emoji en el escritorio, y la fila ocupa el ancho de la banda (0030).
+
+[changelog](changelog.md)
+
+smoke: 2026-10-19 · 0 hallazgos (suite completa y `claude plugin test mod` sobre `develop`; uso del dev-lead en el terminal y en el addon de VS Code tras `/reload-plugins`: «chulo»; 0 corregidos)
+
 ### v2.0.0 — 2026-10-18
 
 Configurabilidad (B1): segmentos con nombre y `render` guiado por un layout (0022) y `statusline.json` por perfil, con validación y `⚠` (0023). Mod de controles bajo la status line, con selectores de modelo, effort, caveman y ponytail, estado de los tests y Board (0024). Patches: el coste sale del mod y la status line lo pinta en `#d19a66` (0025), `install.ps1` no copia los ficheros idénticos (0026, B5) y el test del fichero en uso suelta el bloqueo por señal (0027). Sale como 2.0.0 por decisión del dev-lead: sin `statusline.json` la salida es la de la 1.2.0. Antes, la migración del kit SDD a la 2.3.4.
