@@ -95,6 +95,15 @@ With Claude Code 2.1.302 or later, `install.ps1` also installs a mod that draws 
 - **Board** opens ponytail's project board.
 - **folder** opens the session folder in the file manager and **code** opens it in VS Code (`code` on the PATH). The icons come from Nerd Font.
 
+The mod alone, without cloning the repo, from GitHub with the CLI:
+
+```
+claude plugin marketplace add pikachumetal/statusline
+claude plugin install statusline-controls@statusline
+```
+
+Update it with `claude plugin marketplace update statusline` and `/reload-plugins`. The marketplace installs only the mod: the status line is installed with `install.ps1`, because a plugin cannot set the `statusLine` in `settings.json`.
+
 Notes:
 
 - `/model` and `/effort` save the chosen value as the default for new sessions: Claude Code does that.

@@ -95,6 +95,15 @@ Con Claude Code 2.1.302 o superior, `install.ps1` instala también un mod que pi
 - **Board** abre el board de proyectos de ponytail.
 - **folder** abre la carpeta de la sesión en el explorador y **code**, en VS Code (`code` en el PATH). Los iconos son de Nerd Font.
 
+Solo el mod, sin clonar el repo, desde GitHub con el CLI:
+
+```
+claude plugin marketplace add pikachumetal/statusline
+claude plugin install statusline-controls@statusline
+```
+
+Se actualiza con `claude plugin marketplace update statusline` y `/reload-plugins`. El marketplace solo instala el mod: la status line se instala con `install.ps1`, porque un plugin no puede fijar la `statusLine` de `settings.json`.
+
 Avisos:
 
 - `/model` y `/effort` guardan el valor elegido como defecto de las sesiones nuevas: lo hace Claude Code.
