@@ -27,6 +27,14 @@
 
 ## Releases cerradas
 
+### v2.1.1 — 2026-10-19
+
+El mod de controles declara la versión del repo en su `plugin.json` (estaba en `0.1.0`). Sin cambios de comportamiento.
+
+[changelog](changelog.md)
+
+smoke: 2026-10-19 · 0 hallazgos (`claude plugin validate mod`, suite completa y `claude plugin test mod` sobre `develop`; 0 corregidos)
+
 ### v2.1.0 — 2026-10-19
 
 Mod de controles: la fila pasa a la banda sobre el prompt y la pastilla «N shells» de Claude Code vuelve a ser clicable (0028); modelo a la izquierda y `🧪 [passed] | 🗿 [caveman] | 🦥 [full] [Board]` a la derecha, con corchetes en lo que se pulsa (0029); `[folder]` y `[code]` abren la carpeta de la sesión en el explorador y en VS Code, con iconos de Nerd Font en el terminal y emoji en el escritorio, y la fila ocupa el ancho de la banda (0030).
