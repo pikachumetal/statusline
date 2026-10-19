@@ -1,6 +1,6 @@
 {
   "name": "statusline-controls",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Clickable row above the prompt: model, effort, caveman, ponytail, tests and Board.",
   "types": "./types/index.d.ts"
 }
