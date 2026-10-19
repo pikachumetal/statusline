@@ -1,6 +1,6 @@
 {
   "name": "statusline-controls",
   "version": "0.1.0",
-  "description": "Clickable row under the status line: model, effort, caveman, ponytail, tests and Board.",
+  "description": "Clickable row above the prompt: model, effort, caveman, ponytail, tests and Board.",
   "types": "./types/index.d.ts"
 }

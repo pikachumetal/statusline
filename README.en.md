@@ -84,10 +84,10 @@ With Orca installed (`~\.orca\agent-hooks\claude-statusline.cmd`), the block poi
 
 ## Controls mod
 
-With Claude Code 2.1.302 or later, `install.ps1` also installs a mod that replaces the hint line under the status line with a clickable row:
+With Claude Code 2.1.302 or later, `install.ps1` also installs a mod that draws a clickable row above the prompt. Claude Code's hint line stays as it is, with its pills (`2 shells`) clickable. While a survey takes that spot, the row is not drawn:
 
 ```
-🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  [passed]  Board  (shift+tab to cycle)
+🤖 Opus 5.5 (medium)  🗿 caveman  🦥 full  [passed]  Board
 ```
 
 - **Selectors**: clicking the model, the effort, caveman or ponytail opens its options and hides the rest of the row; clicking an option applies it with the same command you would type (`/model`, `/effort`, `/caveman:caveman`, `/ponytail:ponytail`). `✕` closes without changing anything.

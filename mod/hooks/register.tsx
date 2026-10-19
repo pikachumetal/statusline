@@ -53,6 +53,9 @@ async function openBoard($: EngineInterface) {
   await $.process.run(windows ? ['cmd', '/c', 'start', '', file] : [mac ? 'open' : 'xdg-open', file])
 }
 
+// Columnas que sangra Claude Code en la status line y la línea de pista: la fila se alinea con ellas.
+const INDENT = 2
+
 export const register: Register = on => {
   // Los dos shells que usa Claude Code: en Windows el principal suele ser PowerShell.
   for (const tool of ['Bash', 'PowerShell'] as const) {
@@ -71,10 +74,11 @@ export const register: Register = on => {
     return yield* next(e)
   })
 
-  on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
+  // Banda sobre el prompt, no la línea de pista: pintar esa línea apaga sus pastillas («2 shells»).
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.props.hasSurvey) return next(e)
     const r = await read($, row)
     const { Box, Text, Button } = $.ui.resolve(e)
-    const hint = <Text dimColor>{e.props.hint}</Text>
     const toggle = async (key: SelectorKey) => {
       openedAt = await $.clock.now()
       await update($, row, x => ({ ...x, open: x.open === key ? null : key }))
@@ -92,7 +96,7 @@ export const register: Register = on => {
     if (r.open !== null) {
       const key = r.open
       return (
-        <Box flexDirection="row" gap={1}>
+        <Box flexDirection="row" gap={1} paddingLeft={INDENT}>
           <Button key={key} plain label={key} onPress={() => toggle(key)} />
           {CHOICES[key].values.map(v => (
             <Button
@@ -103,13 +107,12 @@ export const register: Register = on => {
             />
           ))}
           <Button key="close" plain dimColor label="✕" onPress={() => toggle(key)} />
-          {hint}
         </Box>
       )
     }
 
     return (
-      <Box flexDirection="row" gap={2}>
+      <Box flexDirection="row" gap={2} paddingLeft={INDENT}>
         <Box flexDirection="row" gap={1}>
           <Button key="model" plain onPress={() => toggle('model')}>
             <Text color="#c678dd">🤖 {modelId === '?' ? '?' : modelName(modelId)}</Text>
@@ -130,7 +133,6 @@ export const register: Register = on => {
           </Box>
         )}
         <Button key="board" plain label="Board" onPress={() => openBoard($).catch(() => $.ui.toast('could not open the board'))} />
-        {hint}
       </Box>
     )
   }).catch(($, e, next) => next(e))
