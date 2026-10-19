@@ -94,6 +94,11 @@ test('collapsed row shows the five controls in order', async ($, on) => {
   expect(await ui.find({ text: /\(medium\)/ })).toBeDefined()
   expect(await ui.find({ text: /🗿 caveman/ })).toBeDefined()
   expect(await ui.find({ text: /🦥 off/ })).toBeDefined()
+  // Los modos y Board van entre corchetes para que se vea que se pulsan; una barra separa caveman de ponytail.
+  expect(await ui.find({ key: 'caveman', text: /^\[🗿 caveman\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'ponytail', text: /^\[🦥 off\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'board', text: /^\[Board\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'modes-sep', text: /^\|$/ })).toBeDefined()
   // El coste vive en la status line, no en la fila.
   expect(await ui.find({ key: 'cost' })).toBeUndefined()
   expect(await ui.find({ text: /💰/ })).toBeUndefined()
@@ -240,6 +245,7 @@ test('no tests yet, no indicator', async ($, on) => {
   session(on)
   const ui = await $.ui.mount(ROW)
   expect(await ui.find({ key: 'tests' })).toBeUndefined()
+  expect(await ui.find({ key: 'tests-sep' })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -248,6 +254,10 @@ test('a passing test run shows passed', async ($, on) => {
   await $.tool.call({ tool: 'Bash', command: 'node statusline.test.js' } as never)
   const ui = await $.ui.mount(ROW)
   expect(await ui.find({ key: 'tests', text: /\[passed\]/ })).toBeDefined()
+  // Los tests abren el grupo derecho, separados de caveman por una barra.
+  expect(await ui.find({ key: 'tests-sep', text: /^\|$/ })).toBeDefined()
+  const drawn = JSON.stringify(await ui.drawn())
+  expect(drawn.indexOf('[passed]')).toBeLessThan(drawn.indexOf('caveman'))
   await ui.unmount()
 })
 

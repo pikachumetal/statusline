@@ -112,7 +112,8 @@ export const register: Register = on => {
     }
 
     return (
-      <Box flexDirection="row" gap={2} paddingLeft={INDENT}>
+      // El modelo a la izquierda; los tests, los modos y Board pegados a la derecha, junto al [-] del motor.
+      <Box flexDirection="row" justifyContent="space-between" width="100%" paddingLeft={INDENT}>
         <Box flexDirection="row" gap={1}>
           <Button key="model" plain onPress={() => toggle('model')}>
             <Text color="#c678dd">🤖 {modelId === '?' ? '?' : modelName(modelId)}</Text>
@@ -121,18 +122,28 @@ export const register: Register = on => {
             <Text dimColor>({r.effort})</Text>
           </Button>
         </Box>
-        <Button key="caveman" plain onPress={() => toggle('caveman')}>
-          <Text>🗿 {current.caveman}</Text>
-        </Button>
-        <Button key="ponytail" plain onPress={() => toggle('ponytail')}>
-          <Text>🦥 {current.ponytail}</Text>
-        </Button>
-        {r.tests !== null && (
-          <Box key="tests">
-            <Text color={r.tests === 'passed' ? 'green' : 'red'}>[{r.tests}]</Text>
+        <Box flexDirection="row" gap={1}>
+          {r.tests !== null && (
+            <Box key="tests">
+              <Text color={r.tests === 'passed' ? 'green' : 'red'}>[{r.tests}]</Text>
+            </Box>
+          )}
+          {r.tests !== null && (
+            <Box key="tests-sep">
+              <Text dimColor>|</Text>
+            </Box>
+          )}
+          <Button key="caveman" plain onPress={() => toggle('caveman')}>
+            <Text>[🗿 {current.caveman}]</Text>
+          </Button>
+          <Box key="modes-sep">
+            <Text dimColor>|</Text>
           </Box>
-        )}
-        <Button key="board" plain label="Board" onPress={() => openBoard($).catch(() => $.ui.toast('could not open the board'))} />
+          <Button key="ponytail" plain onPress={() => toggle('ponytail')}>
+            <Text>[🦥 {current.ponytail}]</Text>
+          </Button>
+          <Button key="board" plain label="[Board]" onPress={() => openBoard($).catch(() => $.ui.toast('could not open the board'))} />
+        </Box>
       </Box>
     )
   }).catch(($, e, next) => next(e))
