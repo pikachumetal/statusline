@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-10-19
+
+### Changed
+
+- El mod de controles declara la versión del repo (`2.1.1`) en `mod/.claude-plugin/plugin.json`, en vez de `0.1.0`: `/plugin` muestra la misma versión que la release.
+
 ## [2.1.0] - 2026-10-19
 
 ### Added
