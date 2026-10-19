@@ -28,6 +28,8 @@ type Session = {
   // Variables de entorno además de HOME, y si existe el board de ponytail.
   env?: Record<string, string>
   board?: boolean
+  // process.run falla, como un `code` que no está en el PATH.
+  processFails?: boolean
 }
 
 function session(on: On, opts: Session = {}) {
@@ -38,6 +40,7 @@ function session(on: On, opts: Session = {}) {
       throw new Error('boom')
     })
   } else mock.env(on, { HOME: '/home/u', ...opts.env })
+  on('session.cwd', () => ({ value: '/home/u/repo' }) as never)
   on('session.model', () => (opts.modelFails ? { deny: 'no model yet' } : { value: 'claude-opus-5-5' }) as never)
   on('fs.read', ($, e) => {
     const path = e.path.replaceAll('\\', '/')
@@ -59,6 +62,7 @@ function session(on: On, opts: Session = {}) {
   const opened: string[][] = []
   on('process.run', ($, e) => {
     opened.push([...e.argv])
+    if (opts.processFails && e.argv[0] !== 'uname') return { deny: 'not found' } as never
     return { value: { exitCode: 0, stdout: '', stderr: '' } } as never
   })
   // Bash bajo los plugins: sale con error si el comando lleva FAIL.
@@ -90,13 +94,17 @@ test('collapsed row shows the five controls in order', async ($, on) => {
   await step($, 'medium')
   const ui = await $.ui.mount(ROW)
   for (const key of ['model', 'effort', 'caveman', 'ponytail', 'board']) expect(await ui.find({ key })).toBeDefined()
-  expect(await ui.find({ text: /🤖 Opus 5\.5/ })).toBeDefined()
+  // El icono del modelo queda fuera del botón: solo el nombre se pulsa.
+  expect(await ui.find({ key: 'model', text: /^Opus 5\.5$/ })).toBeDefined()
+  expect(await ui.find({ key: 'model-icon', text: /^🤖$/u })).toBeDefined()
   expect(await ui.find({ text: /\(medium\)/ })).toBeDefined()
-  expect(await ui.find({ text: /🗿 caveman/ })).toBeDefined()
-  expect(await ui.find({ text: /🦥 off/ })).toBeDefined()
-  // Los modos y Board van entre corchetes para que se vea que se pulsan; una barra separa caveman de ponytail.
-  expect(await ui.find({ key: 'caveman', text: /^\[🗿 caveman\]$/ })).toBeDefined()
-  expect(await ui.find({ key: 'ponytail', text: /^\[🦥 off\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'caveman', text: /caveman/ })).toBeDefined()
+  expect(await ui.find({ key: 'ponytail', text: /off/ })).toBeDefined()
+  // Solo lo que va entre corchetes se pulsa: el emoji queda fuera del botón. Una barra separa caveman de ponytail.
+  expect(await ui.find({ key: 'caveman', text: /^\[caveman\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'ponytail', text: /^\[off\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'caveman-icon', text: /^🗿$/ })).toBeDefined()
+  expect(await ui.find({ key: 'ponytail-icon', text: /^🦥$/ })).toBeDefined()
   expect(await ui.find({ key: 'board', text: /^\[Board\]$/ })).toBeDefined()
   expect(await ui.find({ key: 'modes-sep', text: /^\|$/ })).toBeDefined()
   // El coste vive en la status line, no en la fila.
@@ -105,10 +113,72 @@ test('collapsed row shows the five controls in order', async ($, on) => {
   await ui.unmount()
 })
 
+test('folder and code sit after the model, each behind a bar', async ($, on) => {
+  session(on)
+  await step($, 'medium')
+  const ui = await $.ui.mount(ROW)
+  expect(await ui.find({ key: 'folder', text: /^\[folder\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'code', text: /^\[code\]$/ })).toBeDefined()
+  expect(await ui.find({ key: 'folder-icon', text: /^\uF07C$/ })).toBeDefined()
+  expect(await ui.find({ key: 'code-icon', text: /^\u{F0A1E}$/u })).toBeDefined()
+  expect(await ui.find({ key: 'model-sep', text: /^\|$/ })).toBeDefined()
+  expect(await ui.find({ key: 'open-sep', text: /^\|$/ })).toBeDefined()
+  // El ancho de la banda, no un 100 % que con la sangría la desborda.
+  expect(await ui.drawn()).toMatchObject({ props: { width: 120 } })
+  const drawn = JSON.stringify(await ui.drawn())
+  const at = (t: string) => drawn.indexOf(t)
+  expect(at('(medium)')).toBeLessThan(at('[folder]'))
+  expect(at('[folder]')).toBeLessThan(at('[code]'))
+  expect(at('[code]')).toBeLessThan(at('caveman'))
+  await ui.unmount()
+})
+
+test('the desktop draws emoji instead of Nerd Font icons', async ($, on) => {
+  session(on)
+  const ui = await $.ui.mount({ ...ROW, surface: 'desktop' })
+  expect(await ui.find({ key: 'folder-icon', text: /^📁$/u })).toBeDefined()
+  expect(await ui.find({ key: 'code-icon', text: /^💻$/u })).toBeDefined()
+  await ui.unmount()
+})
+
+test('folder opens the session folder', async ($, on) => {
+  const { opened } = session(on, { env: { OS: 'Windows_NT' } })
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'folder' })
+  expect(opened).toEqual([['cmd', '/c', 'start', '', '/home/u/repo']])
+  await ui.unmount()
+})
+
+test('code opens the session folder in VS Code', async ($, on) => {
+  const { opened } = session(on, { env: { OS: 'Windows_NT' } })
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'code' })
+  expect(opened).toEqual([['cmd', '/c', 'code', '/home/u/repo']])
+  await ui.unmount()
+})
+
+test('code outside Windows runs code directly', async ($, on) => {
+  const { opened } = session(on)
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'code' })
+  expect(opened.at(-1)).toEqual(['code', '/home/u/repo'])
+  await ui.unmount()
+})
+
+test('code that cannot start says so', async ($, on) => {
+  const { toasts } = session(on, { env: { OS: 'Windows_NT' }, processFails: true })
+  const ui = await $.ui.mount(ROW)
+  await ui.press({ key: 'code' })
+  expect(toasts).toContain('could not open VS Code')
+  await ui.press({ key: 'folder' })
+  expect(toasts).toContain('could not open the folder')
+  await ui.unmount()
+})
+
 test('model that cannot be read shows a question mark', async ($, on) => {
   session(on, { modelFails: true })
   const ui = await $.ui.mount(ROW)
-  expect(await ui.find({ text: /🤖 \?/ })).toBeDefined()
+  expect(await ui.find({ key: 'model', text: /^\?$/ })).toBeDefined()
   await ui.unmount()
 })
 
@@ -195,7 +265,7 @@ test('a missing command folds and says so', async ($, on) => {
   await settle($)
   await ui.press({ key: 'ponytail-full' })
   expect(await ui.find({ key: 'model' })).toBeDefined()
-  expect(await ui.find({ text: /🦥 off/ })).toBeDefined()
+  expect(await ui.find({ key: 'ponytail', text: /^\[off\]$/ })).toBeDefined()
   expect(toasts).toContain('/ponytail:ponytail is not available')
   await ui.unmount()
 })
@@ -254,6 +324,8 @@ test('a passing test run shows passed', async ($, on) => {
   await $.tool.call({ tool: 'Bash', command: 'node statusline.test.js' } as never)
   const ui = await $.ui.mount(ROW)
   expect(await ui.find({ key: 'tests', text: /\[passed\]/ })).toBeDefined()
+  // Como los demás controles, el estado de los tests lleva su icono delante.
+  expect(await ui.find({ key: 'tests-icon', text: /^🧪$/u })).toBeDefined()
   // Los tests abren el grupo derecho, separados de caveman por una barra.
   expect(await ui.find({ key: 'tests-sep', text: /^\|$/ })).toBeDefined()
   const drawn = JSON.stringify(await ui.drawn())
