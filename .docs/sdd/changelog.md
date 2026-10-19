@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **0029** — La fila del mod pega a la derecha, junto al `[-]` de la banda, `[passed] | [🗿 caveman] | [🦥 full] [Board]`: los corchetes dicen qué se puede pulsar y las barras separan los grupos. El modelo y el effort siguen a la izquierda. → [ref](specs/20261019-083021-patch-0029-controls-right-brackets/)
+
 ### Fixed
 
 - **0028** — La pastilla `N shells` de la línea de pista vuelve a ser clicable con el mod de controles: la fila del mod pasa a la banda sobre el prompt (`AbovePrompt`), sangrada como la status line, y cede su sitio a las encuestas. → [ref](specs/20261019-075407-patch-0028-controls-above-prompt/)

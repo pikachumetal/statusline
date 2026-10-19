@@ -4,10 +4,10 @@ task: 0029
 title: Patch — modos y Board del mod a la derecha y entre corchetes
 type: patch
 solution: dev-lead
-status: in-progress
+status: done
 created: 2026-10-19
 branch: patch/0029-controls-right-brackets
-commit:
+commit: fc2bd23
 ---
 
 # Patch 0029 — modos y Board del mod a la derecha y entre corchetes
@@ -52,12 +52,14 @@ Fijada por el dev-lead, con dos preguntas cerradas sobre la captura:
 | 3 | `claude plugin validate mod` | ✅ con el aviso que ya estaba |
 | 4 | `node statusline.test.js` | ✅ OK |
 | 5 | En una sesión real tras `/reload-plugins`: modos y Board a la derecha, junto al `[-]` | ✅ reportado por el dev-lead: lo vio y pidió mover los tests (1b) |
-| 6 | En una sesión real: `[passed] \| [🗿 caveman] \| [🦥 full] [Board]` | lo prueba el dev-lead |
+| 6 | En una sesión real: `[passed] \| [🗿 caveman] \| [🦥 full] [Board]` | ✅ reportado por el dev-lead |
+
+Validado: 2026-10-19 · «Validado: lo he probado y funciona» · no detalló qué probó
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.25h
-- Real: 0.4h
+- Real: 0.5h
 
 ## 6. Delta de capacidad
 
