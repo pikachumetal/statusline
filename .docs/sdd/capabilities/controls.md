@@ -10,7 +10,7 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 
 - GIVEN el mod instalado, la sesión en `claude-opus-5-5` con effort `medium` en el último turno, `.caveman-active` = `caveman` y `.ponytail-active` = `full`
 - WHEN Claude Code pinta la banda sobre el prompt, sin encuesta
-- THEN la fila muestra, en este orden, `🤖 Opus 5.5`, `(medium)` en gris, `🗿 caveman`, `🦥 full` y `Board`
+- THEN la fila muestra a la izquierda `🤖 Opus 5.5` y `(medium)` en gris, y a la derecha, en este orden, `[🗿 caveman]`, `|` en gris, `[🦥 full]` y `[Board]`
 - AND la fila no pinta el coste: está en la status line (segmento `cost`)
 - AND el modelo, el effort, caveman, ponytail y Board se pueden pulsar
 
@@ -72,7 +72,7 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 - GIVEN una sesión en la que todavía no se ha lanzado ningún test
 - WHEN se pinta la fila
 - THEN no aparece indicador de tests
-- AND tras un `node statusline.test.js` por Bash o por PowerShell que sale con 0, aparece `[passed]` en verde antes de `Board`
+- AND tras un `node statusline.test.js` por Bash o por PowerShell que sale con 0, aparece `[passed]` en verde al principio del grupo derecho, seguido de `|` en gris antes de `[🗿 …]`
 - AND tras un `npm test` que sale con 1, cambia a `[failed]` en rojo
 - AND un comando compuesto cuenta si alguno de sus tramos separados por `&&`, `||`, `;` o `|` es un test: `git add . && node statusline.test.js` cuenta
 - AND un `git status` posterior no lo cambia, ni un test lanzado en segundo plano, cuyo resultado no llega con la llamada
