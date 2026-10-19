@@ -4,10 +4,10 @@ task: 0030
 title: Patch — botones folder y code en la fila del mod
 type: patch
 solution: dev-lead
-status: in-progress
+status: done
 created: 2026-10-19
 branch: patch/0030-folder-code-buttons
-commit:
+commit: 86e4788
 ---
 
 # Patch 0030 — botones folder y code en la fila del mod
@@ -59,14 +59,16 @@ Fijada por el dev-lead:
 | 3 | `claude plugin validate mod` | ✅ con el aviso que ya estaba |
 | 4 | `node statusline.test.js` | ✅ OK |
 | 5 | En una sesión real: `[folder]` abre el Explorador y `[code]` abre VS Code en la carpeta de la sesión | ✅ reportado por el dev-lead: «te confirmo que el folder funciona», y de code, «ahh no ahora sí» |
-| 6 | En una sesión real: iconos fuera de los corchetes y solo `[…]` clicable | lo prueba el dev-lead |
+| 6 | En una sesión real: iconos fuera de los corchetes y solo `[…]` clicable | ✅ reportado por el dev-lead |
 | 7 | RED: ancho de la banda (`width: 120`) y emojis en `desktop` | ✅ 1 fail cada uno; después 45 pass, 0 fail |
-| 8 | En el addon de VS Code: sin scroll horizontal y con `📁`/`💻` | lo prueba el dev-lead |
+| 8 | En el addon de VS Code: sin scroll horizontal y con `📁`/`💻` | ✅ reportado por el dev-lead |
+
+Validado: 2026-10-19 · «te confirmo que el folder funciona», «ahh no ahora sí» (code) y, tras el último `/reload-plugins`, «chulo» · no detalló qué probó en el escritorio
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.5h
-- Real: 0.4h
+- Real: 1h
 
 ## 6. Delta de capacidad
 

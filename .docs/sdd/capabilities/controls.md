@@ -10,9 +10,10 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 
 - GIVEN el mod instalado, la sesión en `claude-opus-5-5` con effort `medium` en el último turno, `.caveman-active` = `caveman` y `.ponytail-active` = `full`
 - WHEN Claude Code pinta la banda sobre el prompt, sin encuesta
-- THEN la fila muestra a la izquierda `🤖 Opus 5.5` y `(medium)` en gris, y a la derecha, en este orden, `[🗿 caveman]`, `|` en gris, `[🦥 full]` y `[Board]`
+- THEN la fila muestra a la izquierda `🤖` y `Opus 5.5`, `(medium)` en gris, `|`, el icono de carpeta y `[folder]` en `#e5c07b`, `|` y el icono de VS Code y `[code]` en `#007acc`; y a la derecha, en este orden, `🗿 [caveman]`, `|` en gris, `🦥 [full]` y `[Board]`
 - AND la fila no pinta el coste: está en la status line (segmento `cost`)
-- AND el modelo, el effort, caveman, ponytail y Board se pueden pulsar
+- AND el modelo, el effort, folder, code, caveman, ponytail y Board se pueden pulsar; en folder, code, caveman y ponytail, solo lo que va entre corchetes, no el icono
+- AND en el escritorio los iconos de folder y code son `📁` y `💻`, porque su fuente no tiene los de Nerd Font
 
 ### Nombre del modelo
 
@@ -72,7 +73,7 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 - GIVEN una sesión en la que todavía no se ha lanzado ningún test
 - WHEN se pinta la fila
 - THEN no aparece indicador de tests
-- AND tras un `node statusline.test.js` por Bash o por PowerShell que sale con 0, aparece `[passed]` en verde al principio del grupo derecho, seguido de `|` en gris antes de `[🗿 …]`
+- AND tras un `node statusline.test.js` por Bash o por PowerShell que sale con 0, aparece `🧪 [passed]`, con `[passed]` en verde, al principio del grupo derecho, seguido de `|` en gris antes de `🗿`
 - AND tras un `npm test` que sale con 1, cambia a `[failed]` en rojo
 - AND un comando compuesto cuenta si alguno de sus tramos separados por `&&`, `||`, `;` o `|` es un test: `git add . && node statusline.test.js` cuenta
 - AND un `git status` posterior no lo cambia, ni un test lanzado en segundo plano, cuyo resultado no llega con la llamada
@@ -105,10 +106,24 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 - THEN la pinta el motor, con su pastilla `2 shells` clicable
 - AND el mod no la toca
 
+### Abrir la carpeta
+
+- GIVEN la sesión en `D:\work\app`
+- WHEN se pulsa `[folder]`
+- THEN se abre `D:\work\app` en el explorador del sistema
+- AND si no se puede abrir, un aviso dice `could not open the folder`
+
+### Abrir en VS Code
+
+- GIVEN la sesión en `D:\work\app`
+- WHEN se pulsa `[code]`
+- THEN se lanza `code D:\work\app`
+- AND si `code` no arranca, un aviso dice `could not open VS Code`
+
 ## Reglas de la capacidad
 
 - **Dónde viven los datos**: el mod no escribe ficheros. Lee el modelo de Claude Code (`$.session`), el effort de cada turno y de la respuesta de `/effort`, el resultado de las llamadas a Bash y PowerShell de la sesión, y los modos de `.caveman-active` y `.ponytail-active` en `CLAUDE_CONFIG_DIR`. Lo que recuerda (selector abierto, effort confirmado, último resultado de tests) vive en el estado de sesión de Claude Code y se pierde al cerrarla. Los valores por defecto que guardan `/model` y `/effort` los escribe Claude Code.
 - **Idioma de los nombres**: en inglés, el texto de la fila y los avisos (`effort`, `Board`, `[passed]`, `[failed]`, `command not available`).
 - **Límites**: los flags se leen con un máximo de 64 bytes y con whitelist. Un aviso enseña como mucho la primera línea de una respuesta, recortada a 80 caracteres. El texto de los comandos de Bash y PowerShell nunca se pinta.
-- **Avisos**: solo como respuesta a un clic: la respuesta de cada comando que lanza un selector, el comando que no existe y el Board que falta. Un dato que falla deja un `⚠` gris en su sitio.
+- **Avisos**: solo como respuesta a un clic: la respuesta de cada comando que lanza un selector, el comando que no existe, el Board que falta y la carpeta o VS Code que no se abren. Un dato que falla deja un `⚠` gris en su sitio.
 - **Regla ante conflicto**: manda Claude Code. El modelo que pinta la fila es el de `$.session.model()`, y el effort, el que Claude Code confirma en la respuesta de `/effort` o en el siguiente turno.
