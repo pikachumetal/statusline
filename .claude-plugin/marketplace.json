@@ -5,7 +5,7 @@
     {
       "name": "statusline-controls",
       "source": "./mod",
-      "description": "Clickable row under the status line: model, effort, caveman, ponytail, cost, tests and Board."
+      "description": "Clickable row above the prompt: model, effort, folder, code, tests, caveman, ponytail and Board."
     }
   ]
 }

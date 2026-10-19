@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-10-19
+
+### Changed
+
+- El README documenta cómo instalar solo el mod desde GitHub (`claude plugin marketplace add pikachumetal/statusline`), y la descripción del marketplace dice lo que hace la fila hoy (sin el coste y sobre el prompt).
+- El mod declara la versión `2.1.2` en `mod/.claude-plugin/plugin.json`.
+
 ## [2.1.1] - 2026-10-19
 
 ### Changed

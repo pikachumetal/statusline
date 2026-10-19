@@ -27,6 +27,12 @@
 
 ## Releases cerradas
 
+### v2.1.2 — 2026-10-19
+
+El README explica cómo instalar solo el mod desde el marketplace de GitHub. Sin cambios de comportamiento.
+
+[changelog](changelog.md)
+
 ### v2.1.1 — 2026-10-19
 
 El mod de controles declara la versión del repo en su `plugin.json` (estaba en `0.1.0`). Sin cambios de comportamiento.
