@@ -4,10 +4,10 @@ task: 0028
 title: Patch — los controles del mod pasan a la banda sobre el prompt
 type: patch
 solution: dev-lead
-status: in-progress
+status: done
 created: 2026-10-19
 branch: patch/0028-controls-above-prompt
-commit:
+commit: c113a1d
 ---
 
 # Patch 0028 — los controles del mod pasan a la banda sobre el prompt
@@ -54,12 +54,14 @@ De las tres opciones presentadas, el dev-lead eligió la 1: «la 1, métele un p
 | 2 | `claude plugin test mod` tras el cambio | ✅ 39 pass, 0 fail; tests RED sin tocar (`git diff --no-index`) |
 | 3 | `claude plugin validate mod` | ✅ con el aviso que ya estaba |
 | 4 | `node statusline.test.js` | ✅ OK |
-| 5 | En una sesión real tras `/reload-plugins`: la fila sobre el prompt y «N shells» clicable | lo prueba el dev-lead |
+| 5 | En una sesión real tras `/reload-plugins`: la fila sobre el prompt, alineada, y «N shells» clicable | ✅ reportado por el dev-lead |
+
+Validado: 2026-10-19 · «mejor» (alineación) y «si ahora se puede clickar» (pastilla de shells)
 
 ## 5. Tiempo (ligero)
 
 - Estimación: 0.25h
-- Real: 0.3h
+- Real: 0.5h
 
 ## 6. Delta de capacidad
 

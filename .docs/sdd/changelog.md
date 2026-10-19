@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **0028** — La pastilla `N shells` de la línea de pista vuelve a ser clicable con el mod de controles: la fila del mod pasa a la banda sobre el prompt (`AbovePrompt`), sangrada como la status line, y cede su sitio a las encuestas. → [ref](specs/20261019-075407-patch-0028-controls-above-prompt/)
+
 ## [2.0.0] - 2026-10-18
 
 ### Fixed

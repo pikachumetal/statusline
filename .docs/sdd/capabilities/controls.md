@@ -9,8 +9,8 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 ### Fila plegada
 
 - GIVEN el mod instalado, la sesión en `claude-opus-5-5` con effort `medium` en el último turno, `.caveman-active` = `caveman` y `.ponytail-active` = `full`
-- WHEN Claude Code pinta la línea bajo la status line
-- THEN la fila muestra, en este orden, `🤖 Opus 5.5`, `(medium)` en gris, `🗿 caveman`, `🦥 full` y `Board`, y detrás el texto de pista que le pasa el motor
+- WHEN Claude Code pinta la banda sobre el prompt, sin encuesta
+- THEN la fila muestra, en este orden, `🤖 Opus 5.5`, `(medium)` en gris, `🗿 caveman`, `🦥 full` y `Board`
 - AND la fila no pinta el coste: está en la status line (segmento `cost`)
 - AND el modelo, el effort, caveman, ponytail y Board se pueden pulsar
 
@@ -25,7 +25,7 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 
 - GIVEN la fila plegada con effort `medium`
 - WHEN se pulsa `(medium)`
-- THEN la fila solo muestra `effort`, las opciones `low`, `medium`, `high`, `xhigh` y `max` con `medium` resaltada, y `✕`, y detrás el texto de pista que le pasa el motor
+- THEN la fila solo muestra `effort`, las opciones `low`, `medium`, `high`, `xhigh` y `max` con `medium` resaltada, y `✕`
 - AND el resto de controles del mod no se pinta mientras el selector está abierto
 - AND el selector sigue abierto aunque empiece un turno
 - AND las opciones de cada selector son: modelo `opus`, `sonnet`, `haiku`; effort `low`, `medium`, `high`, `xhigh`, `max`; caveman `caveman`, `ultracave`, `megacave`; ponytail `off`, `lite`, `full`, `ultra`
@@ -89,7 +89,21 @@ La fila clicable que pinta el mod en la banda sobre el prompt, sin tocar la lín
 
 - GIVEN un pintado de la fila que falla entero
 - WHEN se pinta la fila
-- THEN la línea muestra la pista normal del motor, sin controles del mod
+- THEN la banda queda como la pinta el motor, sin controles del mod
+
+### Encuesta en la banda
+
+- GIVEN una encuesta de Claude Code en la banda sobre el prompt
+- WHEN se pinta la banda
+- THEN se ve la encuesta y no los controles del mod
+- AND los controles vuelven cuando la encuesta deja la banda
+
+### Línea de pista del motor
+
+- GIVEN el mod instalado y dos shells en segundo plano
+- WHEN Claude Code pinta la línea de pista bajo el prompt
+- THEN la pinta el motor, con su pastilla `2 shells` clicable
+- AND el mod no la toca
 
 ## Reglas de la capacidad
 
