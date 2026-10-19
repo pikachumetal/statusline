@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- **0030** — La fila del mod lleva, tras el effort, ` [folder]` en amarillo, que abre la carpeta de la sesión en el explorador, y `󰨞 [code]` en azul, que la abre en VS Code. Los iconos son de Nerd Font en el terminal y `📁`/`💻` en el escritorio. Los iconos y emojis de la fila (`🤖`, `🗿`, `🦥` y el nuevo `🧪` de los tests) quedan fuera del botón: solo se pulsa lo de dentro de los corchetes. La fila ocupa el ancho de la banda y ya no desborda en el escritorio. → [ref](specs/20261019-084004-patch-0030-folder-code-buttons/)
+
 ### Changed
 
 - **0029** — La fila del mod pega a la derecha, junto al `[-]` de la banda, `[passed] | [🗿 caveman] | [🦥 full] [Board]`: los corchetes dicen qué se puede pulsar y las barras separan los grupos. El modelo y el effort siguen a la izquierda. → [ref](specs/20261019-083021-patch-0029-controls-right-brackets/)
