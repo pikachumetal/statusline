@@ -67,15 +67,16 @@ configurables mientras la configurabilidad no entre en el roadmap.
 
 ## Mod de controles
 
-Un mod de Claude Code en `mod/` que pinta una fila clicable bajo la status line
-(`ui.render` sobre `PromptHint`). Comportamiento en `capabilities/controls.md`.
+Un mod de Claude Code en `mod/` que pinta una fila clicable en la banda sobre el
+prompt (`ui.render` sobre `AbovePrompt`). No pinta en `PromptHint`: un árbol
+propio ahí sustituye la línea de pista y apaga sus pastillas (`2 shells`). Comportamiento en `capabilities/controls.md`.
 
 - **`mod/hooks/logic.ts` es puro**: nombre del modelo, lectura
   de flags y las opciones de cada selector. Se prueba sin simular el motor.
 - **`mod/hooks/register.tsx` tiene todo el acceso al motor**: `$.session`,
   `$.fs`, `$.command.run` y el estado de sesión (`$.state`, atom `row`).
 - **El render acaba en `.catch(($, e, next) => next(e))`**: si la fila falla,
-  Claude Code pinta su línea de pista normal.
+  Claude Code pinta la banda como sin el mod.
 - **Cada control llama al comando que escribiría la persona** (`/model`,
   `/effort`, `/caveman:caveman`, `/ponytail:ponytail`): la lógica de cada modo
   sigue en su plugin.

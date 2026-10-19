@@ -24,6 +24,7 @@
 
 | Fecha | Id | Descripción |
 | --- | --- | --- |
+| 2026-10-19 | 0028 | Controles del mod en la banda sobre el prompt: «N shells» vuelve a ser clicable → [patch](specs/20261019-075407-patch-0028-controls-above-prompt/patch.md) |
 
 ## Releases cerradas
 

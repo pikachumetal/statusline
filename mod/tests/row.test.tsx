@@ -4,6 +4,14 @@ import type { EngineInterface, On } from 'claude-code'
 const ROW = {
   plugin: 'statusline-controls',
   surface: 'terminal',
+  component: 'AbovePrompt',
+  props: { hasSurvey: false, isWorking: false, maxRows: 10, bodyColumns: 120 } as never,
+} as const
+
+// La línea de pista sigue siendo del motor: sus pastillas («2 shells») se pueden pulsar.
+const HINT = {
+  plugin: 'statusline-controls',
+  surface: 'terminal',
   component: 'PromptHint',
   props: { isDraft: false, isWorking: false, hint: '? for shortcuts' },
 } as const
@@ -89,7 +97,6 @@ test('collapsed row shows the five controls in order', async ($, on) => {
   // El coste vive en la status line, no en la fila.
   expect(await ui.find({ key: 'cost' })).toBeUndefined()
   expect(await ui.find({ text: /💰/ })).toBeUndefined()
-  expect(await ui.find({ text: /\? for shortcuts/ })).toBeDefined()
   await ui.unmount()
 })
 
@@ -108,6 +115,22 @@ test('a failing render falls back to the engine line', async ($, on) => {
   await ui.unmount()
 })
 
+test('a survey keeps the band', async ($, on) => {
+  session(on)
+  const ui = await $.ui.mount({ ...ROW, props: { hasSurvey: true, isWorking: false, maxRows: 10, bodyColumns: 120 } as never })
+  expect(await ui.find({ text: /engine hint/ })).toBeDefined()
+  expect(await ui.find({ key: 'model' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('the hint line is left to the engine', async ($, on) => {
+  session(on)
+  const ui = await $.ui.mount(HINT)
+  expect(await ui.find({ text: /engine hint/ })).toBeDefined()
+  expect(await ui.find({ key: 'model' })).toBeUndefined()
+  await ui.unmount()
+})
+
 const SET_HIGH = 'Set effort level to high (saved as your default for new sessions): Comprehensive implementation'
 
 test('opening a selector hides the rest of the row', async ($, on) => {
@@ -119,7 +142,6 @@ test('opening a selector hides the rest of the row', async ($, on) => {
   expect(await ui.find({ key: 'close' })).toBeDefined()
   expect(await ui.find({ key: 'model' })).toBeUndefined()
   expect(await ui.find({ key: 'board' })).toBeUndefined()
-  expect(await ui.find({ text: /\? for shortcuts/ })).toBeDefined()
   await ui.unmount()
 })
 
